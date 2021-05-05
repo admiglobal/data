@@ -38,7 +38,7 @@ public class ImportsController {
 		System.out.println(file.getContentType());
 
 		String message;
-		Long dealerId = 1969L;
+		Long dealerId = 1518L;
 
 		switch (Objects.requireNonNull(file.getContentType())) {
 			case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":

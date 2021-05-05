@@ -1,43 +1,45 @@
 package com.admi.data.enums;
 
+import java.util.Arrays;
+
 public enum RRField implements InventoryField {
 
-	PART_NO("PART-NO", "partNo"),
-	QOH("QOH", "qoh"),
-	EX_VALUE("EX-VALUE", "costCents"),
-	SRC("SRC", "source"),
-	MNS("MNS", "monthNoSale"),
-	STAT("STAT", "status"),
-	ENTRY("ENTRY", "entryDate"),
-	BSL_CAT("BSL-CAT", "bsl"),
-	HIST_6("HIST-6", "history6"),
-	HIST_12("HIST-12", "history12"),
-	HIST_24("HIST-24", "history24"),
-	MIN("MIN", "min"),
-	MAX("MAX", "max");
+	PART_NO(new String [] {"PART-NO","PART-NO-1","PART-NO-2"}),
+	COST(new String [] {"BASE-COST","EX-VALUE"}),
+	QOH(new String [] {"QOH"}),
+	DESC(new String [] {"DESC"}),
+	STAT(new String [] {"STAT"}),
+	LAST_SALES_DATE(new String [] {"LAST-SLS-DATE"}),
+	LAST_RECEIPT_DATE(new String [] {"LAST-RECV-DATE"}),
+	SRC(new String [] {"SRC"}),
+	BIN(new String [] {"BIN"}),
+	MAKE(new String [] {"MAKE"}),
+	MFG_CONTROL(new String [] {"MFR-CONTROLLED"}),
+	MIN(new String [] {"MIN"}),
+	MAX(new String [] {"MAX"}),
+	BSL_CAT(new String [] {"BSL-CAT"}),
+	QPR(new String [] {"QPR"}),
+	HIST_6(new String [] {"HIST-6"}),
+	HIST_12(new String [] {"HIST-12"}),
+	HIST_24(new String [] {"HIST-24"});
 
-	private final String columnName;
-	private final String fieldName;
+	private final String [] columnNames;
 
-	RRField(String columnName, String field) {
-		this.columnName = columnName;
-		this.fieldName = field;
+	RRField(String [] columnName) {
+		this.columnNames = columnName;
 	}
 
 	public static RRField findByColumnName(String columnName) {
 		for (RRField field : values()) {
-			if (field.columnName.equals(columnName)) {
+			if (Arrays.asList(field.columnNames).contains(columnName)) {
 				return field;
 			}
 		}
 		return null;
 	}
 
-	public String getColumnName() {
-		return columnName;
+	public String [] getColumnNames() {
+		return columnNames;
 	}
 
-	public String getFieldName() {
-		return fieldName;
-	}
 }
