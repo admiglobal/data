@@ -104,24 +104,24 @@ public class ImportService {
 
 		Map<RRField, FieldDefinition<RRDto, ?>> map = new HashMap<>();
 
-		enumMap.put(PART_NO, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto ::setPartNo));
-		enumMap.put(COST, new FieldDefinition<RRDto, Long>(CellType.NUMERIC, Double.class, RRDto :: setCostCents));
-		enumMap.put(QOH, new FieldDefinition<RRDto, Long>(CellType.NUMERIC, Long.class, RRDto ::setQuantityOnHand));
-		enumMap.put(DESC, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setDescription));
-		enumMap.put(STAT, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setStatus));
-		enumMap.put(LAST_SALES_DATE, new FieldDefinition<RRDto, LocalDate>(CellType.NUMERIC, LocalDate.class, RRDto :: setLastSaleDate));
-		enumMap.put(LAST_RECEIPT_DATE, new FieldDefinition<RRDto, LocalDate>(CellType.NUMERIC, LocalDate.class, RRDto :: setLastReceiptDate));
-		enumMap.put(SRC, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setSource));
-		enumMap.put(BIN, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setBin));
-		enumMap.put(MAKE, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setMake));
+		enumMap.put(PART_NO, new FieldDefinition<>(CellType.STRING, String.class, RRDto ::setPartNo));
+		enumMap.put(COST, new FieldDefinition<>(CellType.NUMERIC, Double.class, RRDto :: setCostCents));
+		enumMap.put(QOH, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto ::setQuantityOnHand));
+		enumMap.put(DESC, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setDescription));
+		enumMap.put(STAT, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setStatus));
+		enumMap.put(LAST_SALES_DATE, new FieldDefinition<>(CellType.NUMERIC, LocalDate.class, RRDto :: setLastSaleDate));
+		enumMap.put(LAST_RECEIPT_DATE, new FieldDefinition<>(CellType.NUMERIC, LocalDate.class, RRDto :: setLastReceiptDate));
+		enumMap.put(SRC, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setSource));
+		enumMap.put(BIN, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setBin));
+		enumMap.put(MAKE, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setMake));
 		enumMap.put(MFG_CONTROL, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setMfgControlled));
-		enumMap.put(MIN, new FieldDefinition<RRDto, Long>(CellType.NUMERIC, Long.class, RRDto :: setMin));
-		enumMap.put(MAX, new FieldDefinition<RRDto, Long>(CellType.NUMERIC, Long.class, RRDto :: setMax));
-		enumMap.put(BSL_CAT, new FieldDefinition<RRDto, Long>(CellType.NUMERIC, Long.class, RRDto ::setBestStockingLevel));
-		enumMap.put(QPR, new FieldDefinition<RRDto, Long>(CellType.NUMERIC, Long.class, RRDto ::setQuantityPerRepair));
-		enumMap.put(HIST_6, new FieldDefinition<RRDto, Long>(CellType.NUMERIC, Long.class, RRDto :: setHistory6));
-		enumMap.put(HIST_12, new FieldDefinition<RRDto, Long>(CellType.NUMERIC, Long.class, RRDto :: setHistory12));
-		enumMap.put(HIST_24, new FieldDefinition<RRDto, Long>(CellType.NUMERIC, Long.class, RRDto :: setHistory24));
+		enumMap.put(MIN, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setMin));
+		enumMap.put(MAX, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setMax));
+		enumMap.put(BSL_CAT, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto ::setBestStockingLevel));
+		enumMap.put(QPR, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto ::setQuantityPerRepair));
+		enumMap.put(HIST_6, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setHistory6));
+		enumMap.put(HIST_12, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setHistory12));
+		enumMap.put(HIST_24, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setHistory24));
 
 		return enumMap;
 	}
