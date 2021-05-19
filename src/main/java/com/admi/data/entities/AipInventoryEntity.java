@@ -3,7 +3,11 @@ package com.admi.data.entities;
 import com.admi.data.entities.keys.AipInventoryEntityPK;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.Objects;
 
 @Entity
@@ -24,6 +28,33 @@ public class AipInventoryEntity {
 	private Boolean mfgControlled;
 	private LocalDate dataDate;
 	private String manufacturer;
+
+	@Transient
+	public ZigEntity toZigEntity(String paCode) {
+		ZigEntity zig = new ZigEntity();
+
+		zig.setPaCode(paCode);
+		zig.setPartNo(this.partNo);
+		zig.setQoh(this.qoh);
+		zig.setDes(this.description);
+		zig.setLsDate(this.lastSale);
+		zig.setLrDate(this.lastReceipt);
+		zig.setStatus(this.admiStatus);
+		zig.setRFlag(isReturnable());
+		zig.setCost(new BigDecimal(cents/100).setScale(2, RoundingMode.HALF_UP));
+		zig.setBin(this.bin);
+		zig.setSrc(this.source);
+		zig.setDmsStatus(this.status);
+		zig.setMfgControlled(this.mfgControlled);
+		zig.setDataDate(LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0)));
+
+		return zig;
+	}
+
+	@Transient
+	public Boolean isReturnable() {
+		return this.cents > 1500;
+	}
 
 	@Id
 	@Column(name = "DEALER_ID", nullable = false, precision = 0)

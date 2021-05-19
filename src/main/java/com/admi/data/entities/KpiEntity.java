@@ -3,6 +3,8 @@ package com.admi.data.entities;
 import com.admi.data.entities.keys.KpiEntityPK;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DateFormatSymbols;
 import java.time.LocalDateTime;
 import java.util.Objects;
@@ -22,12 +24,14 @@ public class KpiEntity {
 	private Long nsLessThan60;
 	private Long ns61To90;
 	private Long ns61To9M;
-	private Long dmsPerf;
+	private Float dmsPerf;
 	private Long pieceCount;
 	private Long outOfSpec;
 	private Long ns30To60;
 	private Long nsNewIdle;
 	private Long nsPreIdle;
+	private Long totalRimValue;
+	private Long rimSkuCount;
 	private LocalDateTime dataUpdated;
 
 	public KpiEntity() {
@@ -42,12 +46,14 @@ public class KpiEntity {
 		this.nsLessThan60 = 0L;
 		this.ns61To90 = 0L;
 		this.ns61To9M = 0L;
-		this.dmsPerf = 0L;
+		this.dmsPerf = 0F;
 		this.pieceCount = 0L;
 		this.outOfSpec = 0L;
 		this.ns30To60 = 0L;
 		this.nsNewIdle = 0L;
 		this.nsPreIdle = 0L;
+		this.totalRimValue = 0L;
+		this.rimSkuCount= 0L;
 		this.dataUpdated = LocalDateTime.now();
 	}
 
@@ -163,11 +169,11 @@ public class KpiEntity {
 
 	@Basic
 	@Column(name = "DMS_PERF", nullable = true, precision = 2)
-	public Long getDmsPerf() {
+	public Float getDmsPerf() {
 		return dmsPerf;
 	}
 
-	public void setDmsPerf(Long dmsPerf) {
+	public void setDmsPerf(Float dmsPerf) {
 		this.dmsPerf = dmsPerf;
 	}
 
@@ -222,6 +228,26 @@ public class KpiEntity {
 	}
 
 	@Basic
+	@Column(name = "TOTAL_RIM_VALUE", nullable = true, precision = 0)
+	public Long getTotalRimValue() {
+		return totalRimValue;
+	}
+
+	public void setTotalRimValue(Long totalRimValue) {
+		this.totalRimValue = totalRimValue;
+	}
+
+	@Basic
+	@Column(name = "RIM_SKU_COUNT", nullable = true, precision = 0)
+	public Long getRimSkuCount() {
+		return rimSkuCount;
+	}
+
+	public void setRimSkuCount(Long rimSkuCount) {
+		this.rimSkuCount = rimSkuCount;
+	}
+
+	@Basic
 	@Column(name = "DATA_UPDATED", nullable = true)
 	public LocalDateTime getDataUpdated() {
 		return dataUpdated;
@@ -240,6 +266,28 @@ public class KpiEntity {
 		String monthString = new DateFormatSymbols().getShortMonths()[month - 1];
 
 		return monthString.concat(' ' + year);
+	}
+
+	@Transient
+	public void convertAllCentsToDollars() {
+		this.totalSValue = convertCentsToDollar(this.totalSValue);
+		this.totalNsValue = convertCentsToDollar(this.totalNsValue);
+		this.sOver9M = convertCentsToDollar(this.sOver9M);
+		this.nsOver9M = convertCentsToDollar(this.nsOver9M);
+		this.nsLessThan60 = convertCentsToDollar(this.nsLessThan60);
+		this.ns61To90 = convertCentsToDollar(this.ns61To90);
+		this.ns61To9M = convertCentsToDollar(this.ns61To9M);
+		this.ns30To60 = convertCentsToDollar(this.ns30To60);
+		this.nsPreIdle = convertCentsToDollar(this.nsPreIdle);
+		this.nsNewIdle = convertCentsToDollar(this.nsNewIdle);
+		this.totalRimValue = convertCentsToDollar(this.totalRimValue);
+	}
+
+	@Transient
+	private Long convertCentsToDollar(Long value) {
+		BigDecimal den = new BigDecimal(100);
+		BigDecimal dollar = new BigDecimal(value).divide(den, 0, RoundingMode.HALF_UP);
+		return dollar.longValue();
 	}
 
 	@Override
@@ -264,11 +312,39 @@ public class KpiEntity {
 				Objects.equals(ns30To60, kpiEntity.ns30To60) &&
 				Objects.equals(nsNewIdle, kpiEntity.nsNewIdle) &&
 				Objects.equals(nsPreIdle, kpiEntity.nsPreIdle) &&
+				Objects.equals(totalRimValue, kpiEntity.totalRimValue) &&
+				Objects.equals(rimSkuCount, kpiEntity.rimSkuCount) &&
 				Objects.equals(dataUpdated, kpiEntity.dataUpdated);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(dealerId, dataDate, totalSValue, totalNsValue, sSkuCount, nsSkuCount, sOver9M, nsOver9M, nsLessThan60, ns61To90, ns61To9M, dmsPerf, pieceCount, outOfSpec, ns30To60, nsNewIdle, nsPreIdle, dataUpdated);
+		return Objects.hash(dealerId, dataDate, totalSValue, totalNsValue, sSkuCount, nsSkuCount, sOver9M, nsOver9M, nsLessThan60, ns61To90, ns61To9M, dmsPerf, pieceCount, outOfSpec, ns30To60, nsNewIdle, nsPreIdle, totalRimValue, rimSkuCount, dataUpdated);
+	}
+
+	@Override
+	public String toString() {
+		return "KpiEntity{" +
+				"dealerId=" + dealerId +
+				", dataDate=" + dataDate +
+				", totalSValue=" + totalSValue +
+				", totalNsValue=" + totalNsValue +
+				", sSkuCount=" + sSkuCount +
+				", nsSkuCount=" + nsSkuCount +
+				", sOver9M=" + sOver9M +
+				", nsOver9M=" + nsOver9M +
+				", nsLessThan60=" + nsLessThan60 +
+				", ns61To90=" + ns61To90 +
+				", ns61To9M=" + ns61To9M +
+				", dmsPerf=" + dmsPerf +
+				", pieceCount=" + pieceCount +
+				", outOfSpec=" + outOfSpec +
+				", ns30To60=" + ns30To60 +
+				", nsNewIdle=" + nsNewIdle +
+				", nsPreIdle=" + nsPreIdle +
+				", totalRimValue=" + totalRimValue +
+				", rimSkuCount=" + rimSkuCount +
+				", dataUpdated=" + dataUpdated +
+				'}';
 	}
 }

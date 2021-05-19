@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.admi</groupId>
     <artifactId>data</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <name>data</name>
     <description>Used to import and process flat files.</description>
     <properties>
@@ -51,6 +51,7 @@
         <dependency>
             <groupId>com.oracle.database.jdbc</groupId>
             <artifactId>ojdbc8</artifactId>
+            <version>21.1.0.0</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -85,6 +86,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <jvmArguments>-Xmx512m</jvmArguments>
+                </configuration>
             </plugin>
         </plugins>
     </build>

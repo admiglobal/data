@@ -1,23 +1,34 @@
 package com.admi.data.imports;
 
 import com.admi.data.dto.FieldDefinition;
+import com.admi.data.dto.ImportJob;
 import com.admi.data.dto.RRDto;
 import com.admi.data.entities.AipInventoryEntity;
+import com.admi.data.entities.KpiEntity;
 import com.admi.data.enums.RRField;
+import com.admi.data.processes.DateService;
+import com.admi.data.processes.ProcessService;
 import com.admi.data.repositories.AipInventoryRepository;
+import com.admi.data.repositories.ZigRepository;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.admi.data.enums.RRField.*;
@@ -28,38 +39,98 @@ public class ImportService {
 	@Autowired
 	AipInventoryRepository inventoryRepo;
 
-	DateTimeFormatter rrFormatter = DateTimeFormatter.ofPattern("d/M/yyyy");
+	@Autowired
+	ProcessService processService;
 
-	public String importXlsxInventoryFile(MultipartFile multipartFile, Long dealerId, Long dmsId) throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
-//		FileInputStream inputStream = new FileInputStream(file);
-//		File file = getFileFromMultipartFile(multipartFile);
+	@Autowired
+	ZigRepository zigRepo;
 
-//		OPCPackage pkg = OPCPackage.open(file);
-		OPCPackage pkg = OPCPackage.open(multipartFile.getInputStream());
+	@Async("asyncExecutor")
+	public void runAipInventory(ImportJob importJob) throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
+
+		System.out.println(DateService.getTimeString() + ": Importing Dealer " + importJob.getDealerId());
+		List<AipInventoryEntity> inventory = importInventoryFile(importJob);
+		System.out.println(DateService.getTimeString() + ": Completed importing Dealer " + importJob.getDealerId());
+
+
+		System.out.println(DateService.getTimeString() + ": Processing KPIs");
+		KpiEntity kpis = processService.calculateAisKpi(inventory, importJob.getPaCode());
+		System.out.println(DateService.getTimeString() + ": Processing complete!");
+
+		System.out.println(DateService.getTimeString() + ": Writing ZIG");
+		zigRepo.deleteAllByPaCode(importJob.getPaCode());
+		zigRepo.copyZigParts(importJob.getPaCode(), importJob.getDealerId(), LocalDate.now());
+		System.out.println(DateService.getTimeString() + ": ZIG Complete!");
+		System.out.println(DateService.getTimeString() + ": Inventory Import Complete!");
+	}
+
+	public List<AipInventoryEntity> importInventoryFile(File file, Long dealerId, int dmsId)
+			throws InvalidFormatException, IllegalAccessException, NoSuchFieldException, IOException {
+		List<AipInventoryEntity> inventory = new ArrayList<>();
+
+
+		String fileType = Files.probeContentType(file.toPath());
+//		System.out.println(fileType);
+
+		switch (Objects.requireNonNull(fileType)) {
+			case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+				inventory = importXlsxInventoryFile(file, dealerId, dmsId);
+				break;
+			case "application/vnd.ms-excel":
+			case "application/octet-stream":
+			default:
+				break;
+		}
+		return inventory;
+	}
+
+	public List<AipInventoryEntity> importInventoryFile(ImportJob job)
+			throws InvalidFormatException, IllegalAccessException, NoSuchFieldException, IOException {
+		File file = new File(job.getFilePath());
+		return importInventoryFile(file, job.getDealerId(), job.getDmsId());
+	}
+
+	public ImportJob createInventoryImportJob(MultipartFile file, Long dealerId, int dmsId, String paCode) {
+		String filePath = saveInventoryFile(file, "08616");
+
+		return createInventoryImportJob(filePath, dealerId, dmsId, paCode);
+	}
+
+	public ImportJob createInventoryImportJob(String filePath, Long dealerId, int dmsId, String paCode) {
+		ImportJob job = new ImportJob(dealerId, dmsId, filePath);
+
+		if (filePath != null) {
+			return job;
+		} else {
+			return null;
+		}
+	}
+
+	private List<AipInventoryEntity> importXlsxInventoryFile(File file, Long dealerId, int dmsId)
+			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
+		OPCPackage pkg = OPCPackage.open(file);
 
 		Workbook workbook = new XSSFWorkbook(pkg);
 		Sheet sheet = workbook.getSheetAt(0);
+		pkg.close();
 
-		if (dmsId == 0) {
-			importRAndRInventory(sheet, dealerId);
-		} else if (dmsId == 1) {
+		List<AipInventoryEntity> inventory = new ArrayList<>();
 
-		} else if (dmsId == 2) {
-
+		switch(dmsId) {
+			case 1:
+			case 48:
+			case 50:
+				inventory = importRAndRInventory(sheet, dealerId);
+				break;
+			default:
+				break;
 		}
 
-		pkg.close();
-		return "Imported";
+		inventoryRepo.saveAll(inventory);
+		return inventory;
 	}
 
-	private File getFileFromMultipartFile(MultipartFile multipartFile) throws IOException {
-		File file = new File("src/main/resources/temp/" + multipartFile.getOriginalFilename());
-		multipartFile.transferTo(file);
-
-		return file;
-	}
-
-	private void importRAndRInventory(Sheet sheet, Long dealerId) throws NoSuchFieldException, IllegalAccessException {
+	private List<AipInventoryEntity> importRAndRInventory(Sheet sheet, Long dealerId) throws NoSuchFieldException, IllegalAccessException {
 		Row topRow = sheet.getRow(0);
 
 		List<RRField> headers = getHeaderList(topRow);
@@ -89,13 +160,15 @@ public class ImportService {
 					}
 //					throw new IllegalStateException("Unexpected value: " + headers.get(i));
 				}
-				System.out.println(rowDTO.toString());
-				inventoryList.add(rowDTO.toAipInventory(1969L, LocalDate.now()));
+
+				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now()));
 				inventory.add(rowDTO);
 			}
 		}
-		inventoryRepo.saveAll(inventoryList);
+
 		System.out.println("Row Count: " + inventory.size());
+
+		return inventoryList;
 	}
 
 	@SuppressWarnings("Duplicates")
@@ -168,12 +241,47 @@ public class ImportService {
 		return headers;
 	}
 
-	public void saveInventoryToDatabase(){
+	public String saveInventoryFile(MultipartFile file, String paCode) {
+		String filePath = "P:" + File.separator +
+				"Development" + File.separator +
+				"AIP Inventory Files" + File.separator
+				+ paCode + File.separator;
+		String extension = FilenameUtils.getExtension(file.getOriginalFilename());
 
+		filePath += paCode + "_" + DateService.getFileTimeString() + "." + extension;
+
+		if (isAcceptedType(file) && saveFileToDirectory(file, filePath)) {
+			return filePath;
+		} else {
+			return null;
+		}
 	}
 
-	public void saveFileToDirectory(File file, String fileName, String directory) {
+	private Boolean isAcceptedType(MultipartFile file) {
+		String fileType = Objects.requireNonNull(file.getContentType());
 
+		switch (fileType) {
+			case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+				return true;
+			case "application/vnd.ms-excel":
+			case "application/octet-stream":
+			default:
+				throw new ResponseStatusException(HttpStatus.NOT_ACCEPTABLE, "File type " + fileType + " is not accepted.");
+		}
+	}
+
+	private Boolean saveFileToDirectory(MultipartFile file, String filePath) {
+		try {
+			Files.createDirectories(Paths.get(filePath));
+
+			File newFile = new File(filePath);
+
+			file.transferTo(newFile);
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		}
+		return true;
 	}
 
 

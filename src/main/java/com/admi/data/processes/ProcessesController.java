@@ -1,0 +1,37 @@
+package com.admi.data.processes;
+
+import com.admi.data.entities.AipInventoryEntity;
+import com.admi.data.entities.KpiEntity;
+import com.admi.data.repositories.AipInventoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@RequestMapping("/process")
+@Controller
+public class ProcessesController {
+
+	@Autowired
+	AisKpiService aisKpiService;
+
+	@Autowired
+	AipInventoryRepository aipInventoryRepo;
+
+	@ResponseBody
+//	@GetMapping("/processTest")
+	public String processTest(Model model) {
+		List<AipInventoryEntity> inventory = aipInventoryRepo.findAllByDealerIdAndDataDate(1969L, LocalDate.of(2021,5,5));
+
+		KpiEntity kpis = aisKpiService.calculateAisKpi(inventory, "00000");
+
+		return kpis.toString();
+	}
+
+}

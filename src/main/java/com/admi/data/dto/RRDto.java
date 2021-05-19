@@ -58,10 +58,10 @@ public class RRDto {
 		inv.setCents(this.costCents);
 		inv.setQoh(this.quantityOnHand);
 		inv.setDescription(this.description);
-		inv.setStatus(this.status);
+		inv.setStatus(this.getDmsStatus());
 		inv.setAdmiStatus(this.getAdmiStatus());
-		inv.setLastSale(this.lastSaleDate);
-		inv.setLastReceipt(this.lastReceiptDate);
+		inv.setLastSale(getDefaultDateIfNull(this.lastSaleDate));
+		inv.setLastReceipt(getDefaultDateIfNull(this.lastReceiptDate));
 		inv.setBin(this.bin);
 		inv.setSource(this.source);
 		inv.setMfgControlled(this.mfgControlled);
@@ -80,10 +80,26 @@ public class RRDto {
 	}
 
 	private String getAdmiStatus() {
-		if (this.status == null) {
+		if (this.status == null || this.status.equals("RB")) {
 			return "S";
 		} else {
 			return "N";
+		}
+	}
+
+	private String getDmsStatus() {
+		if (this.status == null) {
+			return "STOCK";
+		} else {
+			return this.status;
+		}
+	}
+
+	private LocalDate getDefaultDateIfNull(LocalDate date) {
+		if (date == null) {
+			return LocalDate.of(2000,1,1);
+		} else {
+			return date;
 		}
 	}
 
