@@ -70,23 +70,27 @@ public class ImportService {
 
 
 		String fileType = Files.probeContentType(file.toPath());
-//		System.out.println(fileType);
+		System.out.println("File Type: " + fileType);
 
-		switch (Objects.requireNonNull(fileType)) {
-			case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
+//		switch (Objects.requireNonNull(fileType)) {
+//			case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
 				inventory = importXlsxInventoryFile(file, dealerId, dmsId);
-				break;
-			case "application/vnd.ms-excel":
-			case "application/octet-stream":
-			default:
-				break;
-		}
+//				break;
+//			case "application/vnd.ms-excel":
+//			case "application/octet-stream":
+//			default:
+//				break;
+//		}
 		return inventory;
 	}
 
 	public List<AipInventoryEntity> importInventoryFile(ImportJob job)
 			throws InvalidFormatException, IllegalAccessException, NoSuchFieldException, IOException {
 		File file = new File(job.getFilePath());
+
+		System.out.println(job.toString());
+		System.out.println("File Exists: " + file.exists());
+
 		return importInventoryFile(file, job.getDealerId(), job.getDmsId());
 	}
 

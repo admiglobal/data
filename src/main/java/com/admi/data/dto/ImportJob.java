@@ -46,4 +46,14 @@ public class ImportJob {
 	public void setPaCode(String paCode) {
 		this.paCode = paCode;
 	}
+
+	@Override
+	public String toString() {
+		return "ImportJob{" +
+				"dealerId=" + dealerId +
+				", dmsId=" + dmsId +
+				", filePath='" + filePath + '\'' +
+				", paCode='" + paCode + '\'' +
+				'}';
+	}
 }
