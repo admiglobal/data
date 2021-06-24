@@ -6,9 +6,10 @@
 				<div class="card">
 					<div class="card-body">
 						<h5 class="card-title">
-							Please select an inventory file to upload:
+							Please select an XLSX/XLS/CSV file to upload:
 						</h5>
-						<form action="/imports/inventory" method="post" enctype="multipart/form-data">
+						<!--/*@thymesVar id="action" type="java.lang.String"*/-->
+						<form th:action="${action}" method="post" enctype="multipart/form-data">
 							<input type="file"
 							       name="file"
 							       class="form-control mb-3"

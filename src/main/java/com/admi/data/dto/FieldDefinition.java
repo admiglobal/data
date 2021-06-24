@@ -51,4 +51,13 @@ public class FieldDefinition<T, V> {
 	public void setSetter(BiConsumer<T, V> setter) {
 		this.setter = setter;
 	}
+
+	@Override
+	public String toString() {
+		return "FieldDefinition{" +
+				"cellType=" + cellType +
+				", clazz=" + clazz +
+				", setter=" + setter +
+				'}';
+	}
 }

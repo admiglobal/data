@@ -1,21 +1,17 @@
 package com.admi.data.imports;
 
-import com.admi.data.dto.FieldDefinition;
-import com.admi.data.dto.ImportJob;
-import com.admi.data.dto.RRDto;
-import com.admi.data.entities.AipInventoryEntity;
-import com.admi.data.entities.KpiEntity;
+import com.admi.data.dto.*;
+import com.admi.data.entities.*;
 import com.admi.data.enums.RRField;
 import com.admi.data.processes.DateService;
+import com.admi.data.processes.EmailService;
 import com.admi.data.processes.ProcessService;
-import com.admi.data.repositories.AipInventoryRepository;
-import com.admi.data.repositories.ZigRepository;
+import com.admi.data.repositories.*;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
@@ -23,11 +19,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import javax.mail.MessagingException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.*;
 
@@ -44,6 +42,19 @@ public class ImportService {
 
 	@Autowired
 	ZigRepository zigRepo;
+
+	@Autowired
+	McPartsRepository partsRepo;
+
+	@Autowired
+	McOrdersRepository ordersRepo;
+
+	@Autowired
+	McOrdersContentRepository ordersContentRepo;
+
+	@Autowired
+	EmailService emailService;
+
 
 	@Async("asyncExecutor")
 	public void runAipInventory(ImportJob importJob) throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
@@ -62,6 +73,185 @@ public class ImportService {
 		zigRepo.copyZigParts(importJob.getPaCode(), importJob.getDealerId(), LocalDate.now());
 		System.out.println(DateService.getTimeString() + ": ZIG Complete!");
 		System.out.println(DateService.getTimeString() + ": Inventory Import Complete!");
+	}
+
+	@Async("asyncMotorcraftExecutor")
+	public void runMotorcraftOrders(ImportJob job) throws IOException, InvalidFormatException, MessagingException {
+
+		List<ImportIssue> issues = new ArrayList<>();
+		List<MotorcraftOrderSet> orders = importMotorcraftOrders(job);
+
+		orders.forEach((MotorcraftOrderSet order) -> issues.addAll(order.getIssues()));
+
+		emailService.sendMotorcraftOrderEmail(job.getEmail(), issues, job.getPaCode());
+
+		processService.generateDowOrders(orders);
+		System.out.println("File Imported");
+	}
+
+	public List<MotorcraftOrderSet> importMotorcraftOrders(ImportJob job) throws IOException, InvalidFormatException {
+		File file = new File(job.getFilePath());
+		OPCPackage pkg = OPCPackage.open(file);
+
+		List<MotorcraftOrderSet> orders = new ArrayList<>();
+
+		Workbook workbook = new XSSFWorkbook(pkg);
+		for (Iterator<Sheet> it = workbook.sheetIterator(); it.hasNext(); ) {
+			Sheet sheet = it.next();
+
+			orders.add(createMotorcraftOrder(sheet, job));
+		}
+
+		pkg.close();
+
+		return orders;
+	}
+
+	private MotorcraftOrderSet createMotorcraftOrder(Sheet sheet, ImportJob job) {
+		McOrdersEntity order = new McOrdersEntity();
+		List<McOrdersContentEntity> orderContent = new ArrayList<>();
+		List<McPartsEntity> allowedParts = partsRepo.findAllByReleasedIsNotNull();
+
+		List<ImportIssue> issues = new ArrayList<>();
+
+		String orderNumber = ordersRepo.getOrderNumber();
+
+		Cell paCodeCell = sheet.getRow(0).getCell(1);
+		String paCode = paCodeCell.getStringCellValue();
+
+		Boolean skipOrder = false;
+
+		if (paCode == null || paCode.equals("")) {
+			paCode = job.getPaCode();
+			issues.add(new ImportIssue(
+					"Missing P&A Code",
+					"Order was submitted without a P&A Code",
+					sheet.getSheetName(),
+					"The order has been imported using your account's P&A Code." )
+			);
+		}
+
+		Cell poNumberCell = sheet.getRow(1).getCell(1);
+		String poNumber = poNumberCell.getStringCellValue();
+
+
+		if (poNumber.equals("") || poNumber == null) {
+			issues.add(new ImportIssue(
+					"Missing PO Number",
+					"Order was submitted without a PO Number",
+					sheet.getSheetName(),
+					"Please re-upload this sheet with a PO Number." )
+			);
+			skipOrder = true;
+		}
+
+		Cell orderDateCell = sheet.getRow(2).getCell(1);
+		Date cellDate = orderDateCell.getDateCellValue();
+		LocalDate orderDate = LocalDate.now();
+
+		if (cellDate != null) {
+			orderDate = orderDateCell.getDateCellValue()
+					.toInstant()
+					.atZone(ZoneId.systemDefault())
+					.toLocalDate();
+		} else {
+			issues.add(new ImportIssue(
+					"Missing Order Date",
+					"Order date was missing or invalid.",
+					sheet.getSheetName(),
+					"Please re-upload this sheet with a valid order date." )
+			);
+			skipOrder = true;
+		}
+
+		order.setOrderNumber(orderNumber);
+		order.setPaCode(paCode);
+		order.setEmail(job.getEmail());
+		order.setPlaced(LocalDateTime.now());
+		order.setLastUpdated(LocalDateTime.now());
+		order.setPoNumber(poNumber);
+		order.setOrderDate(orderDate);
+
+		boolean hasNextPart = true;
+		int rowIndex = 5;
+
+		while (hasNextPart && !skipOrder) {
+			Row part = sheet.getRow(rowIndex);
+			String partNumber;
+
+			try {
+				partNumber = part.getCell(0).getStringCellValue();
+			} catch (NullPointerException e) {
+				hasNextPart = false;
+				break;
+			}
+
+			McPartsEntity mcPart = getAllowedPart(partNumber, allowedParts);
+
+			if (mcPart != null) {
+				McOrdersContentEntity orderLine = new McOrdersContentEntity();
+				Double quantity = part.getCell(2).getNumericCellValue();
+
+				orderLine.setOrderNumber(order.getOrderNumber());
+				orderLine.setPaCode(paCode);
+				orderLine.setPartno(mcPart.getPartno());
+				orderLine.setPrice(mcPart.getFadPrice());
+				orderLine.setQty(quantity.longValue());
+				orderLine.setOcPartno(mcPart.getOcPartno());
+				orderLine.setSupplierPartno(mcPart.getPartno());
+
+				if (orderLine.getQty() > 0) {
+					System.out.println(orderLine);
+					orderContent.add(orderLine);
+				}
+			}
+			rowIndex++;
+		}
+
+//		System.out.println(order.toString());
+		if (!skipOrder) {
+			if (orderContent.size() > 0) {
+
+				order = ordersRepo.save(order);
+				ordersContentRepo.saveAll(orderContent);
+
+				System.out.println("Saved!");
+			} else {
+				issues.add(new ImportIssue(
+						"No Parts",
+						"Order was submitted without any quantities.",
+						sheet.getSheetName(),
+						"Please re-upload this sheet with corrected quantities, if this was a mistake." )
+				);
+			}
+		}
+
+		return new MotorcraftOrderSet(order, orderContent, issues);
+	}
+
+	private List<McOrdersContentEntity> updateOrderNumber(List<McOrdersContentEntity> parts, String orderNumber) {
+		for (McOrdersContentEntity part : parts) {
+			part.setOrderNumber(orderNumber);
+		}
+		return parts;
+	}
+
+	private McPartsEntity getAllowedPart(String partNumber, List<McPartsEntity> parts) {
+		for (McPartsEntity part : parts) {
+			if (part.getPartno().equals(partNumber)) {
+				return part;
+			}
+		}
+		return null;
+	}
+
+	private boolean isPartAllowed(String partNumber, List<McPartsEntity> parts) {
+		for (McPartsEntity part : parts) {
+			if (part.getPartno().equals(partNumber)) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public List<AipInventoryEntity> importInventoryFile(File file, Long dealerId, int dmsId)
@@ -94,13 +284,13 @@ public class ImportService {
 		return importInventoryFile(file, job.getDealerId(), job.getDmsId());
 	}
 
-	public ImportJob createInventoryImportJob(MultipartFile file, Long dealerId, int dmsId, String paCode) {
-		String filePath = saveInventoryFile(file, "08616");
+	public ImportJob createImportJob(MultipartFile file, Long dealerId, Integer dmsId, String paCode) {
+		String filePath = saveInventoryFile(file, paCode);
 
-		return createInventoryImportJob(filePath, dealerId, dmsId, paCode);
+		return createImportJob(filePath, dealerId, dmsId, paCode);
 	}
 
-	public ImportJob createInventoryImportJob(String filePath, Long dealerId, int dmsId, String paCode) {
+	public ImportJob createImportJob(String filePath, Long dealerId, Integer dmsId, String paCode) {
 		ImportJob job = new ImportJob(dealerId, dmsId, filePath);
 
 		if (filePath != null) {
@@ -108,6 +298,12 @@ public class ImportService {
 		} else {
 			return null;
 		}
+	}
+
+	public ImportJob createMotorcraftImportJob(MultipartFile file, Long dealerId, String paCode) {
+		String filePath = saveMotorcraftFile(file, paCode);
+
+		return createImportJob(filePath, dealerId, null, paCode);
 	}
 
 	private List<AipInventoryEntity> importXlsxInventoryFile(File file, Long dealerId, int dmsId)
@@ -158,9 +354,9 @@ public class ImportService {
 					try {
 						setDtoField(cell, rowDTO, rrFields.get(field));
 					} catch(Exception e) {
-						System.out.println(e);
-						System.out.println(cell.toString());
-						System.out.println(rrFields.get(field).toString());
+						System.out.println("Cell: " + cell.toString());
+						System.out.println("Field: " + field.toString());
+						e.printStackTrace();
 					}
 //					throw new IllegalStateException("Unexpected value: " + headers.get(i));
 				}
@@ -239,9 +435,14 @@ public class ImportService {
 
 		while(cellIterator.hasNext()) {
 			String cellValue = cellIterator.next().getStringCellValue();
+
+//			System.out.println(cellValue);
+
+			RRField field = RRField.findByColumnName(cellValue);
 			headers.add(RRField.findByColumnName(cellValue));
 		}
 
+//		System.out.println(headers.toString());
 		return headers;
 	}
 
@@ -250,6 +451,23 @@ public class ImportService {
 				"Development" + File.separator +
 				"AIP Inventory Files" + File.separator
 				+ paCode + File.separator;
+		String extension = FilenameUtils.getExtension(file.getOriginalFilename());
+
+		filePath += paCode + "_" + DateService.getFileTimeString() + "." + extension;
+
+		if (isAcceptedType(file) && saveFileToDirectory(file, filePath)) {
+			return filePath;
+		} else {
+			return null;
+		}
+	}
+
+	public String saveMotorcraftFile(MultipartFile file, String paCode) {
+		String filePath = "P:" + File.separator +
+				"Development" + File.separator +
+				"Motorcraft_Orders" + File.separator
+				+ paCode + File.separator;
+
 		String extension = FilenameUtils.getExtension(file.getOriginalFilename());
 
 		filePath += paCode + "_" + DateService.getFileTimeString() + "." + extension;

@@ -15,6 +15,16 @@ public class DataApplication {
 		SpringApplication.run(DataApplication.class, args);
 	}
 
+	@Bean("taskExecutor")
+	public TaskExecutor getTaskExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(2);
+		executor.setMaxPoolSize(5);
+		executor.setWaitForTasksToCompleteOnShutdown(true);
+		executor.setThreadNamePrefix("Task-");
+		return executor;
+	}
+
 	@Bean("asyncExecutor")
 	public TaskExecutor getAsyncExecutor() {
 		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
@@ -22,6 +32,16 @@ public class DataApplication {
 		executor.setMaxPoolSize(5);
 		executor.setWaitForTasksToCompleteOnShutdown(true);
 		executor.setThreadNamePrefix("Async-");
+		return executor;
+	}
+
+	@Bean("asyncMotorcraftExecutor")
+	public TaskExecutor getAsyncMotorcraftExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(5);
+		executor.setMaxPoolSize(20);
+		executor.setWaitForTasksToCompleteOnShutdown(true);
+		executor.setThreadNamePrefix("Motorcraft-");
 		return executor;
 	}
 }

@@ -12,7 +12,7 @@ public enum RRField implements InventoryField {
 	LAST_SALES_DATE(new String [] {"LAST-SLS-DATE"}),
 	LAST_RECEIPT_DATE(new String [] {"LAST-RECV-DATE"}),
 	SRC(new String [] {"SRC"}),
-	BIN(new String [] {"BIN"}),
+	BIN(new String [] {"BIN", "BIN1"}),
 	MAKE(new String [] {"MAKE"}),
 	MFG_CONTROL(new String [] {"MFR-CONTROLLED"}),
 	MIN(new String [] {"MIN"}),

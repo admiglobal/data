@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -58,6 +59,10 @@ public class DateService {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd'_'HH-mm-ss");
 		Date date = new Date(System.currentTimeMillis());
 		return formatter.format(date);
+	}
+	public static String getFileTimeString(LocalDateTime dateTime) {
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'_'HH-mm-ss");
+		return dateTime.format(formatter);
 	}
 
 
