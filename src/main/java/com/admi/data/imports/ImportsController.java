@@ -57,8 +57,8 @@ public class ImportsController {
 	@ResponseBody
 	public String submitInventoryFile(@RequestParam("file") MultipartFile file, Model model)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
-		String paCode = "03180";
-		Long dealerId = 1794L;
+		String paCode = "20636";
+		Long dealerId = 374L;
 
 		ImportJob job = importService.createImportJob(file, dealerId, 0, paCode);
 		List<AipInventoryEntity> inventory = importService.importInventoryFile(job);

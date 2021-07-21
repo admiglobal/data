@@ -317,6 +317,7 @@ public class ImportService {
 		List<AipInventoryEntity> inventory = new ArrayList<>();
 
 		switch(dmsId) {
+			case 0:
 			case 1:
 			case 48:
 			case 50:
@@ -361,6 +362,7 @@ public class ImportService {
 //					throw new IllegalStateException("Unexpected value: " + headers.get(i));
 				}
 
+//				System.out.println(rowDTO.toString());
 				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now()));
 				inventory.add(rowDTO);
 			}
@@ -422,7 +424,7 @@ public class ImportService {
 						.toLocalDate();
 				value = (V) date;
 			} else {
-				System.out.println(cell.toString());
+				System.out.println("Incorrect class for cell: " + cell.toString());
 			}
 			fieldDefinition.getSetter()
 					.accept(dto, value);

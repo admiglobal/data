@@ -44,7 +44,8 @@ public class AisKpiService {
 			for (AipInventoryEntity part : inventory) {
 				totalDmsSku += getSkuCountByField(part, "S", AipInventoryEntity::getAdmiStatus);
 
-				if (part.getQoh() != null && part.getQoh() > 0) {
+				if ((part.getQoh() != null && part.getQoh() > 0)
+						&& (part.getCents() != null && part.getCents() > 0)) {
 
 					Long totalStockValue = getPartTotalByField(part, "S", AipInventoryEntity::getAdmiStatus);
 					Long totalNonStockValue = getPartTotalByField(part, "N", AipInventoryEntity::getAdmiStatus);

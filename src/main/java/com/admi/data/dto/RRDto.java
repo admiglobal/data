@@ -103,6 +103,14 @@ public class RRDto {
 		}
 	}
 
+	private Long getDefaultLongIfNull(Long number) {
+		if (number == null) {
+			return 0L;
+		} else {
+			return number;
+		}
+	}
+
 	public String getPartNo() {
 		return partNo;
 	}
@@ -255,5 +263,29 @@ public class RRDto {
 
 	public void setHistory24(Long history24) {
 		this.history24 = history24;
+	}
+
+	@Override
+	public String toString() {
+		return "RRDto{" +
+				"partNo='" + partNo + '\'' +
+				", costCents=" + costCents +
+				", quantityOnHand=" + quantityOnHand +
+				", description='" + description + '\'' +
+				", status='" + status + '\'' +
+				", lastSaleDate=" + lastSaleDate +
+				", lastReceiptDate=" + lastReceiptDate +
+				", bin='" + bin + '\'' +
+				", source='" + source + '\'' +
+				", make='" + make + '\'' +
+				", mfgControlled=" + mfgControlled +
+				", min=" + min +
+				", max=" + max +
+				", bestStockingLevel=" + bestStockingLevel +
+				", quantityPerRepair=" + quantityPerRepair +
+				", history6=" + history6 +
+				", history12=" + history12 +
+				", history24=" + history24 +
+				'}';
 	}
 }
