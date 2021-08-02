@@ -45,7 +45,7 @@ public class AipInventoryEntity {
 		zig.setBin(this.bin);
 		zig.setSrc(this.source);
 		zig.setDmsStatus(this.status);
-		zig.setMfgControlled(this.mfgControlled);
+		zig.setMfgControlled(null);
 		zig.setDataDate(LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0)));
 
 		return zig;
