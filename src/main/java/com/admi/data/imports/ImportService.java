@@ -117,7 +117,16 @@ public class ImportService {
 		String orderNumber = ordersRepo.getOrderNumber();
 
 		Cell paCodeCell = sheet.getRow(0).getCell(1);
-		String paCode = paCodeCell.getStringCellValue();
+
+
+		String paCode;
+		try {
+			paCode = paCodeCell.getStringCellValue();
+		} catch (IllegalStateException e) {
+			Double paCodeInt = paCodeCell.getNumericCellValue();
+			paCode = String.valueOf(paCodeInt.intValue());
+		}
+
 
 		Boolean skipOrder = false;
 
@@ -364,7 +373,7 @@ public class ImportService {
 
 //				System.out.println(rowDTO.toString());
 				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now()));
-				inventory.add(rowDTO);
+//				inventory.add(rowDTO);
 			}
 		}
 

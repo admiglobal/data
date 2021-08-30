@@ -64,7 +64,8 @@ public class RRDto {
 		inv.setLastReceipt(getDefaultDateIfNull(this.lastReceiptDate));
 		inv.setBin(this.bin);
 		inv.setSource(this.source);
-		inv.setMfgControlled(this.mfgControlled);
+//		inv.setMfgControlled(this.mfgControlled);
+		inv.setMfgControlled(null);
 		inv.setDataDate(date);
 		inv.setManufacturer(this.make);
 

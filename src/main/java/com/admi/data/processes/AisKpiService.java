@@ -13,10 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 @Service
@@ -99,7 +96,7 @@ public class AisKpiService {
 	}
 
 	private <T> Long getPartTotalByField(AipInventoryEntity part, T valueToMatch, Function<AipInventoryEntity, T> fieldGetter) {
-		if (fieldGetter.apply(part).equals(valueToMatch)) {
+		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
 			return part.getQoh() * part.getCents();
 		} else {
 			return 0L;
@@ -107,7 +104,7 @@ public class AisKpiService {
 	}
 
 	private <T> Long getSkuCountByField(AipInventoryEntity part, T valueToMatch, Function<AipInventoryEntity, T> fieldGetter) {
-		if (fieldGetter.apply(part).equals(valueToMatch)) {
+		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
 			return 1L;
 		} else {
 			return 0L;
