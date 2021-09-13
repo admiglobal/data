@@ -83,7 +83,12 @@ public class ImportService {
 
 		orders.forEach((MotorcraftOrderSet order) -> issues.addAll(order.getIssues()));
 
-		emailService.sendMotorcraftOrderEmail(job.getEmail(), issues, job.getPaCode());
+		try {
+			emailService.sendMotorcraftOrderEmail(job.getEmail(), issues, job.getPaCode());
+		} catch (MessagingException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
 
 		processService.generateDowOrders(orders);
 		System.out.println("File Imported");
