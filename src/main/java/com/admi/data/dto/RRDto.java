@@ -8,8 +8,8 @@ import java.time.LocalDate;
 public class RRDto {
 
 	private String partNo;
-	private Long costCents;
-	private Long quantityOnHand;
+	private Integer costCents;
+	private Integer quantityOnHand;
 	private String description;
 	private String status;
 	private LocalDate lastSaleDate;
@@ -28,7 +28,7 @@ public class RRDto {
 
 	public RRDto(){}
 
-	public RRDto(String partNo, Long costCents, Long quantityOnHand, String description, String status, LocalDate lastSaleDate, LocalDate lastReceiptDate, String bin, String source, String make, Boolean mfgControlled, Long min, Long max, Long bestStockingLevel, Long quantityPerRepair, Long history6, Long history12, Long history24) {
+	public RRDto(String partNo, Integer costCents, Integer quantityOnHand, String description, String status, LocalDate lastSaleDate, LocalDate lastReceiptDate, String bin, String source, String make, Boolean mfgControlled, Long min, Long max, Long bestStockingLevel, Long quantityPerRepair, Long history6, Long history12, Long history24) {
 		this.partNo = partNo;
 		this.costCents = costCents;
 		this.quantityOnHand = quantityOnHand;
@@ -49,7 +49,7 @@ public class RRDto {
 		this.history24 = history24;
 	}
 
-	public AipInventoryEntity toAipInventory(@NotNull Long dealerId, @NotNull LocalDate date) {
+	public AipInventoryEntity toAipInventory(@NotNull Long dealerId, @NotNull LocalDate date, Boolean setMfgConrolled) {
 
 		AipInventoryEntity inv = new AipInventoryEntity();
 
@@ -64,8 +64,12 @@ public class RRDto {
 		inv.setLastReceipt(getDefaultDateIfNull(this.lastReceiptDate));
 		inv.setBin(this.bin);
 		inv.setSource(this.source);
-//		inv.setMfgControlled(this.mfgControlled);
-		inv.setMfgControlled(null);
+
+		if (setMfgConrolled)
+			inv.setMfgControlled(this.mfgControlled);
+		else
+			inv.setMfgControlled(Boolean.valueOf(null));
+
 		inv.setDataDate(date);
 		inv.setManufacturer(this.make);
 
@@ -120,19 +124,19 @@ public class RRDto {
 		this.partNo = partNo;
 	}
 
-	public Long getCostCents() {
+	public Integer getCostCents() {
 		return costCents;
 	}
 
-	public void setCostCents(Long costCents) {
+	public void setCostCents(Integer costCents) {
 		this.costCents = costCents;
 	}
 
-	public Long getQuantityOnHand() {
+	public Integer getQuantityOnHand() {
 		return quantityOnHand;
 	}
 
-	public void setQuantityOnHand(Long quantityOnHand) {
+	public void setQuantityOnHand(Integer quantityOnHand) {
 		this.quantityOnHand = quantityOnHand;
 	}
 
