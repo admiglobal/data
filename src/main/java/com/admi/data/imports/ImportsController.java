@@ -2,10 +2,11 @@ package com.admi.data.imports;
 
 import com.admi.data.dto.ImportIssue;
 import com.admi.data.dto.ImportJob;
-import com.admi.data.entities.AipInventoryEntity;
-import com.admi.data.entities.KpiEntity;
+import com.admi.data.entities.*;
 import com.admi.data.processes.DateService;
 import com.admi.data.processes.ProcessService;
+import com.admi.data.repositories.DealerMasterRepository;
+import com.admi.data.repositories.MixDealersRepository;
 import com.admi.data.repositories.ZigRepository;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,9 +17,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 
 @Controller
 @CrossOrigin
@@ -35,7 +36,19 @@ public class ImportsController {
 	DateService dateService;
 
 	@Autowired
+	FcsdCreditService fcsdCreditService;
+
+	@Autowired
+	MixImportService mixService;
+
+	@Autowired
 	ZigRepository zigRepo;
+
+	@Autowired
+	MixDealersRepository mixDealerRepo;
+
+	@Autowired
+	DealerMasterRepository dealerMasterRepo;
 
 	String title = "Imports";
 	String folder = "/imports/";
@@ -69,6 +82,51 @@ public class ImportsController {
 		return kpis.toString();
 	}
 
+	@GetMapping("/UDBInventory")
+	public String selectUdbInventoryFile(Model model) {
+		model.addAttribute("action", "/imports/UDBInventory");
+		return getPage("upload", "Inventory", model);
+	}
+
+	@PostMapping("/UDBInventory")
+	@ResponseBody
+	public String submitUdbInventoryFile(@RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
+		List<AipInventoryEntity> inventory = importService.importUdbInventoryFile(file);
+
+		return "UDB File imported.\n \n " + inventory.toString();
+	}
+
+	@GetMapping("/mix/{dealerId}/{dateString}")
+	@ResponseBody
+	public String importMotiveDealer(@PathVariable("dealerId") Long dealerId, @PathVariable("dateString") String dateString) {
+		LocalDate date = LocalDate.parse(dateString);
+		MixDealersEntity dealer = mixDealerRepo.findByDealerId(dealerId);
+		DealerMasterEntity dealerMasterEntity = dealerMasterRepo.findByDealerId(dealerId);
+
+//		try {
+			mixService.importMixDealer(dealerId, date, dealerMasterEntity.getPaCode(), dealer.getMixSource());
+			return "dealer";
+//		} catch (Exception e) {
+//			System.out.println(e.getMessage());
+//			System.out.println(Arrays.toString(e.getStackTrace()));
+//			return "There was an issue importing " + dealerId;
+//		}
+	}
+
+	@GetMapping("/rimDashUpload")
+	public String selectDashDataFile(Model model) {
+		model.addAttribute("action", "/imports/rimDashUpload");
+		return getPage("upload", "Rim Dash", model);
+	}
+
+	@PostMapping("/rimDashUpload")
+	@ResponseBody
+	public String uploadDashDataFile(@RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
+		Map<String, List<FcsdProgramCreditsEntity>> credits = fcsdCreditService.importRimDashboardFile(file);
+		List<String> missingPaCodes = fcsdCreditService.combineCreditsAndSave(credits);
+
+		return missingPaCodes.toString();
+	}
 
 	@GetMapping("/motorcraft")
 	public String selectMotorocraftOrder(Model model) {

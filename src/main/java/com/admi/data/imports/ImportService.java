@@ -3,6 +3,7 @@ package com.admi.data.imports;
 import com.admi.data.dto.*;
 import com.admi.data.entities.*;
 import com.admi.data.enums.RRField;
+import com.admi.data.enums.UdbInventoryField;
 import com.admi.data.processes.DateService;
 import com.admi.data.processes.EmailService;
 import com.admi.data.processes.ProcessService;
@@ -35,10 +36,13 @@ import static com.admi.data.enums.RRField.*;
 public class ImportService {
 
 	@Autowired
-	AipInventoryRepository inventoryRepo;
+	ProcessService processService;
 
 	@Autowired
-	ProcessService processService;
+	EmailService emailService;
+
+	@Autowired
+	AipInventoryRepository inventoryRepo;
 
 	@Autowired
 	ZigRepository zigRepo;
@@ -51,9 +55,6 @@ public class ImportService {
 
 	@Autowired
 	McOrdersContentRepository ordersContentRepo;
-
-	@Autowired
-	EmailService emailService;
 
 
 	@Async("asyncExecutor")
@@ -298,6 +299,63 @@ public class ImportService {
 		return importInventoryFile(file, job.getDealerId(), job.getDmsId());
 	}
 
+	public List<AipInventoryEntity> importUdbInventoryFile(MultipartFile file) throws IOException, InvalidFormatException {
+		OPCPackage pkg = OPCPackage.open(file.getInputStream());
+		Workbook workbook = new XSSFWorkbook(pkg);
+		List<AipInventoryEntity> inventory = new ArrayList<>();
+		Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+
+		return importUdbInventorySheet(workbook.getSheetAt(0));
+	}
+
+	private List<AipInventoryEntity> importUdbInventorySheet(Sheet sheet) {
+		Iterator<Row> rowIterator = sheet.rowIterator();
+		List<UdbInventoryField> headers = getUdbInventoryHeaders(rowIterator.next());
+		List<AipInventoryEntity> inventory = new ArrayList<>();
+
+		while (rowIterator.hasNext())
+			inventory.add(importUdbInventoryRow(rowIterator.next(), headers));
+
+		return inventory;
+	}
+
+	private AipInventoryEntity importUdbInventoryRow(Row row, List<UdbInventoryField> headers) {
+		Iterator<Cell> cellIterator = row.cellIterator();
+		AipInventoryEntity inventoryEntity = new AipInventoryEntity();
+
+		int i = 0;
+		while (cellIterator.hasNext()) {
+			Cell cell = cellIterator.next();
+
+
+
+//			System.out.println(cell.toString());
+
+			UdbInventoryField header = headers.get(i);
+
+//			System.out.println("Header:" + header);
+
+			CellDefinition<AipInventoryEntity, ?, ?> cellDefinition = header.getDefinition();
+
+			if (cellDefinition.getEntitySetter() != null)
+				cellDefinition.getAndSetField(cell, inventoryEntity);
+
+			i++;
+		}
+
+		return inventoryEntity;
+	}
+
+	private List<UdbInventoryField> getUdbInventoryHeaders(Row row) {
+		Iterator<Cell> cellIterator = row.cellIterator();
+		List<UdbInventoryField> headers = new ArrayList<>();
+
+		while (cellIterator.hasNext())
+			headers.add(UdbInventoryField.of(cellIterator.next().getStringCellValue()));
+
+		return headers;
+	}
+
 	public ImportJob createImportJob(MultipartFile file, Long dealerId, Integer dmsId, String paCode) {
 		String filePath = saveInventoryFile(file, paCode);
 
@@ -307,11 +365,10 @@ public class ImportService {
 	public ImportJob createImportJob(String filePath, Long dealerId, Integer dmsId, String paCode) {
 		ImportJob job = new ImportJob(dealerId, dmsId, filePath);
 
-		if (filePath != null) {
+		if (filePath != null)
 			return job;
-		} else {
+		else
 			return null;
-		}
 	}
 
 	public ImportJob createMotorcraftImportJob(MultipartFile file, Long dealerId, String paCode) {
@@ -377,7 +434,7 @@ public class ImportService {
 				}
 
 //				System.out.println(rowDTO.toString());
-				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now()));
+				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now(), false));
 //				inventory.add(rowDTO);
 			}
 		}

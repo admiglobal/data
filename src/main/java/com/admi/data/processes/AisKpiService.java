@@ -50,12 +50,12 @@ public class AisKpiService {
 					Long totalStockSkuCount = getSkuCountByField(part, "S", AipInventoryEntity::getAdmiStatus);
 					Long totalNonStockSkuCount = getSkuCountByField(part, "N", AipInventoryEntity::getAdmiStatus);
 
-					Long stockOver9m = getPartTotalByStatusBeforeDate(part, "S", 270L, AipInventoryEntity::getLastSale);
-					Long nonStockOver9m = getPartTotalByStatusBeforeDate(part, "N", 270L, AipInventoryEntity::getLastSale);
-					Long nonStockLT60 = getPartTotalByStatusBetweenDate(part, "N", 0L, 61L, AipInventoryEntity::getLastSale);
-					Long nonStock30To60 = getPartTotalByStatusBetweenDate(part, "N", 29L, 61L, AipInventoryEntity::getLastSale);
-					Long nonStock61To90 = getPartTotalByStatusBetweenDate(part, "N", 60L, 91L, AipInventoryEntity::getLastSale);
-					Long nonStock61To9m = getPartTotalByStatusBetweenDate(part, "N", 60L, 271L, AipInventoryEntity::getLastSale);
+					Long stockOver9m = getPartTotalByStatusBeforeDate(part, "S", 270L, AipInventoryEntity::getLastSaleOrReceipt);
+					Long nonStockOver9m = getPartTotalByStatusBeforeDate(part, "N", 270L, AipInventoryEntity::getLastSaleOrReceipt);
+					Long nonStockLT60 = getPartTotalByStatusBetweenDate(part, "N", 0L, 61L, AipInventoryEntity::getLastSaleOrReceipt);
+					Long nonStock30To60 = getPartTotalByStatusBetweenDate(part, "N", 29L, 61L, AipInventoryEntity::getLastSaleOrReceipt);
+					Long nonStock61To90 = getPartTotalByStatusBetweenDate(part, "N", 60L, 91L, AipInventoryEntity::getLastSaleOrReceipt);
+					Long nonStock61To9m = getPartTotalByStatusBetweenDate(part, "N", 60L, 271L, AipInventoryEntity::getLastSaleOrReceipt);
 
 					Long preIdle = getPartTotalByStatusBetweenDate(part, "N", 29L, 61L, AipInventoryEntity::getLastReceipt);
 					Long newIdle = getPartTotalByStatusBetweenDate(part, "N", 60L, 91L, AipInventoryEntity::getLastReceipt);
@@ -97,7 +97,7 @@ public class AisKpiService {
 
 	private <T> Long getPartTotalByField(AipInventoryEntity part, T valueToMatch, Function<AipInventoryEntity, T> fieldGetter) {
 		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
-			return part.getQoh() * part.getCents();
+			return (long) part.getQoh() * part.getCents();
 		} else {
 			return 0L;
 		}
@@ -118,14 +118,13 @@ public class AisKpiService {
 	                                            Function<AipInventoryEntity, LocalDate> dateGetter) {
 		LocalDate startDate = LocalDate.now().minusDays(startDayCount);
 		LocalDate endDate = LocalDate.now().minusDays(endDayCount);
-
 		LocalDate partDate = dateGetter.apply(part);
 
 		if (partDate != null
 				&& partDate.isBefore(startDate)
 				&& partDate.isAfter(endDate)
 				&& part.getAdmiStatus().equalsIgnoreCase(status)) {
-			return part.getCents() * part.getQoh();
+			return (long) part.getCents() * part.getQoh();
 		} else {
 			return 0L;
 		}
@@ -136,13 +135,12 @@ public class AisKpiService {
 	                                           Long dayCount,
 	                                           Function<AipInventoryEntity, LocalDate> dateGetter) {
 		LocalDate date = LocalDate.now().minusDays(dayCount);
-
 		LocalDate partDate = dateGetter.apply(part);
 
 		if (partDate != null
 				&& partDate.isBefore(date)
 				&& part.getAdmiStatus().equalsIgnoreCase(status)) {
-			return part.getCents() * part.getQoh();
+			return (long) part.getCents() * part.getQoh();
 		} else {
 			return 0L;
 		}
@@ -175,7 +173,7 @@ public class AisKpiService {
 				Pair<Long, Long> countAndTotal = statusMap.get(newStatus);
 
 				count = 1L;
-				total = part.getCents() * part.getQoh();
+				total = (long) part.getCents() * part.getQoh();
 
 				if (countAndTotal != null) {
 					count = count + countAndTotal.getFirst();

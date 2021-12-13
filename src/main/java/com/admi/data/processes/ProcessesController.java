@@ -27,7 +27,7 @@ public class ProcessesController {
 	@ResponseBody
 //	@GetMapping("/processTest")
 	public String processTest(Model model) {
-		List<AipInventoryEntity> inventory = aipInventoryRepo.findAllByDealerIdAndDataDate(1969L, LocalDate.of(2021,5,5));
+		List<AipInventoryEntity> inventory = aipInventoryRepo.findAllByDealerIdAndDataDate(1969L, LocalDate.of(2021,10,21));
 
 		KpiEntity kpis = aisKpiService.calculateAisKpi(inventory, "00000");
 

@@ -16,8 +16,8 @@ import java.util.Objects;
 public class AipInventoryEntity {
 	private Long dealerId;
 	private String partNo;
-	private Long cents;
-	private Long qoh;
+	private Integer cents;
+	private Integer qoh;
 	private String description;
 	private String status;
 	private String admiStatus;
@@ -28,33 +28,10 @@ public class AipInventoryEntity {
 	private Boolean mfgControlled;
 	private LocalDate dataDate;
 	private String manufacturer;
+	private Integer qoo;
+	private Integer twelveMonthSales;
 
-	@Transient
-	public ZigEntity toZigEntity(String paCode) {
-		ZigEntity zig = new ZigEntity();
-
-		zig.setPaCode(paCode);
-		zig.setPartNo(this.partNo);
-		zig.setQoh(this.qoh);
-		zig.setDes(this.description);
-		zig.setLsDate(this.lastSale);
-		zig.setLrDate(this.lastReceipt);
-		zig.setStatus(this.admiStatus);
-		zig.setRFlag(isReturnable());
-		zig.setCost(new BigDecimal(cents/100).setScale(2, RoundingMode.HALF_UP));
-		zig.setBin(this.bin);
-		zig.setSrc(this.source);
-		zig.setDmsStatus(this.status);
-		zig.setMfgControlled(null);
-		zig.setDataDate(LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0)));
-
-		return zig;
-	}
-
-	@Transient
-	public Boolean isReturnable() {
-		return this.cents > 1500;
-	}
+	private String paCode;
 
 	@Id
 	@Column(name = "DEALER_ID", nullable = false, precision = 0)
@@ -78,21 +55,26 @@ public class AipInventoryEntity {
 
 	@Basic
 	@Column(name = "CENTS", nullable = true, precision = 0)
-	public Long getCents() {
+	public Integer getCents() {
 		return cents;
 	}
 
-	public void setCents(Long cents) {
+	public void setCents(Integer cents) {
 		this.cents = cents;
+	}
+
+	@Transient
+	public void setCentsFromDouble(Double price) {
+		this.cents = Math.toIntExact(Math.round(price * 100));
 	}
 
 	@Basic
 	@Column(name = "QOH", nullable = true, precision = 0)
-	public Long getQoh() {
+	public Integer getQoh() {
 		return qoh;
 	}
 
-	public void setQoh(Long qoh) {
+	public void setQoh(Integer qoh) {
 		this.qoh = qoh;
 	}
 
@@ -184,6 +166,39 @@ public class AipInventoryEntity {
 
 	public void setMfgControlled(Boolean mfgControlled) {
 		this.mfgControlled = mfgControlled;
+		
+	}
+
+	@Transient
+	public void setMfgControlledFromString(String mfgControlString) {
+		if (mfgControlString.equalsIgnoreCase("Y")) {
+			this.mfgControlled = true;
+		} else if (mfgControlString.equalsIgnoreCase("N")) {
+			this.mfgControlled = false;
+		} else {
+			this.mfgControlled = null;
+		}
+
+	}
+
+	@Basic
+	@Column(name = "QOO", nullable = true, precision = 0)
+	public Integer getQoo() {
+		return qoo;
+	}
+
+	public void setQoo(Integer qoo) {
+		this.qoo = qoo;
+	}
+
+	@Basic
+	@Column(name = "TWELVE_MONTH_SALES", nullable = true, precision = 0)
+	public Integer getTwelveMonthSales() {
+		return twelveMonthSales;
+	}
+
+	public void setTwelveMonthSales(Integer twelveMonthSales) {
+		this.twelveMonthSales = twelveMonthSales;
 	}
 
 	@Id
@@ -194,6 +209,57 @@ public class AipInventoryEntity {
 
 	public void setDataDate(LocalDate dataDate) {
 		this.dataDate = dataDate;
+	}
+
+	@Transient
+	public String getPaCode() {
+		return paCode;
+	}
+
+	public void setPaCode(String paCode) {
+		this.paCode = paCode;
+	}
+
+	public void setPaCodeAsDouble(Double paCode) {
+		this.paCode = String.valueOf(Math.round(paCode));
+	}
+
+	@Transient
+	public LocalDate getLastSaleOrReceipt() {
+		if (lastSale != null) {
+			return lastSale;
+		} else if (lastReceipt != null) {
+			return lastReceipt;
+		} else {
+			return LocalDate.of(2000,1,1);
+		}
+	}
+
+	@Transient
+	public ZigEntity toZigEntity(String paCode) {
+		ZigEntity zig = new ZigEntity();
+
+		zig.setPaCode(paCode);
+		zig.setPartNo(this.partNo);
+		zig.setQoh(Long.valueOf(this.qoh));
+		zig.setDes(this.description);
+		zig.setLsDate(this.lastSale);
+		zig.setLrDate(this.lastReceipt);
+		zig.setStatus(this.admiStatus);
+		zig.setRFlag(isReturnable());
+		zig.setCost(new BigDecimal(cents/100).setScale(2, RoundingMode.HALF_UP));
+		zig.setBin(this.bin);
+		zig.setSrc(this.source);
+		zig.setDmsStatus(this.status);
+		zig.setMfgControlled(null);
+		zig.setDataDate(LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0)));
+
+		return zig;
+	}
+
+	@Transient
+	public Boolean isReturnable() {
+		return this.cents > 1500;
 	}
 
 	@Override
