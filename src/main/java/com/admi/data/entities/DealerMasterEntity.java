@@ -10,6 +10,7 @@ import java.util.Objects;
 public class DealerMasterEntity {
 	private long dealerId;
 	private String locationCode;
+	private Integer dmsId;
 	private String paCode;
 	private String dealershipName;
 	private String dealershipAddress1;
@@ -93,6 +94,16 @@ public class DealerMasterEntity {
 
 	public void setLocationCode(String locationCode) {
 		this.locationCode = locationCode;
+	}
+
+	@Basic
+	@Column(name = "DSP_ID", nullable = true)
+	public Integer getDmsId() {
+		return dmsId;
+	}
+
+	public void setDmsId(Integer dmsId) {
+		this.dmsId = dmsId;
 	}
 
 	@Basic
@@ -740,76 +751,11 @@ public class DealerMasterEntity {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		DealerMasterEntity that = (DealerMasterEntity) o;
-		return dealerId == that.dealerId &&
-				Objects.equals(locationCode, that.locationCode) &&
-				Objects.equals(paCode, that.paCode) &&
-				Objects.equals(dealershipName, that.dealershipName) &&
-				Objects.equals(dealershipAddress1, that.dealershipAddress1) &&
-				Objects.equals(dealershipAddress2, that.dealershipAddress2) &&
-				Objects.equals(dealershipCity, that.dealershipCity) &&
-				Objects.equals(dealershipState, that.dealershipState) &&
-				Objects.equals(dealershipZip, that.dealershipZip) &&
-				Objects.equals(dealershipZipplus4, that.dealershipZipplus4) &&
-				Objects.equals(dealershipCountry, that.dealershipCountry) &&
-				Objects.equals(useShippingAddressForMaili, that.useShippingAddressForMaili) &&
-				Objects.equals(mailingAddress1, that.mailingAddress1) &&
-				Objects.equals(mailingAddress2, that.mailingAddress2) &&
-				Objects.equals(mailingCity, that.mailingCity) &&
-				Objects.equals(mailingState, that.mailingState) &&
-				Objects.equals(mailingZip, that.mailingZip) &&
-				Objects.equals(mailingZipplus4, that.mailingZipplus4) &&
-				Objects.equals(mailingCountry, that.mailingCountry) &&
-				Objects.equals(heavyTruckFlag, that.heavyTruckFlag) &&
-				Objects.equals(fordRegionNumber, that.fordRegionNumber) &&
-				Objects.equals(primaryEmailAddress, that.primaryEmailAddress) &&
-				Objects.equals(primaryManufacturerId, that.primaryManufacturerId) &&
-				Objects.equals(fordSegment, that.fordSegment) &&
-				Objects.equals(admiDealerType, that.admiDealerType) &&
-				Objects.equals(responsibleConsultantId, that.responsibleConsultantId) &&
-				Objects.equals(graphMonths, that.graphMonths) &&
-				Objects.equals(graphStartDate, that.graphStartDate) &&
-				Objects.equals(referenceDealer, that.referenceDealer) &&
-				Objects.equals(fordHvcRegionCode, that.fordHvcRegionCode) &&
-				Objects.equals(doNotSolicitFlag, that.doNotSolicitFlag) &&
-				Objects.equals(solicitationComments, that.solicitationComments) &&
-				Objects.equals(fordDominantMarketArea, that.fordDominantMarketArea) &&
-				Objects.equals(fordMajorMarketArea, that.fordMajorMarketArea) &&
-				Objects.equals(fordFcsdMarketArea, that.fordFcsdMarketArea) &&
-				Objects.equals(fordFcsdZone, that.fordFcsdZone) &&
-				Objects.equals(lastUpdatedBy, that.lastUpdatedBy) &&
-				Objects.equals(lastUpdatedDate, that.lastUpdatedDate) &&
-				Objects.equals(reactDate, that.reactDate) &&
-				Objects.equals(testDealerFlag, that.testDealerFlag) &&
-				Objects.equals(imaBlock, that.imaBlock) &&
-				Objects.equals(electronicReporting, that.electronicReporting) &&
-				Objects.equals(hyperion, that.hyperion) &&
-				Objects.equals(hyperionDist, that.hyperionDist) &&
-				Objects.equals(dspServiceId, that.dspServiceId) &&
-				Objects.equals(dealerSalesCode, that.dealerSalesCode) &&
-				Objects.equals(effectiveDate, that.effectiveDate) &&
-				Objects.equals(terminationDate, that.terminationDate) &&
-				Objects.equals(primaryOrSecondary, that.primaryOrSecondary) &&
-				Objects.equals(nissRegionCode, that.nissRegionCode) &&
-				Objects.equals(salesCode, that.salesCode) &&
-				Objects.equals(golddId, that.golddId) &&
-				Objects.equals(billToPerson, that.billToPerson) &&
-				Objects.equals(lm, that.lm) &&
-				Objects.equals(minorityCode, that.minorityCode) &&
-				Objects.equals(regionMarket, that.regionMarket) &&
-				Objects.equals(selectDealer, that.selectDealer) &&
-				Objects.equals(mon, that.mon) &&
-				Objects.equals(tue, that.tue) &&
-				Objects.equals(wed, that.wed) &&
-				Objects.equals(thu, that.thu) &&
-				Objects.equals(fri, that.fri) &&
-				Objects.equals(previousDealership, that.previousDealership) &&
-				Objects.equals(returnWeek, that.returnWeek) &&
-				Objects.equals(utc, that.utc) &&
-				Objects.equals(localDlrName, that.localDlrName);
+		return dealerId == that.dealerId && Objects.equals(locationCode, that.locationCode) && Objects.equals(dmsId, that.dmsId) && Objects.equals(paCode, that.paCode) && Objects.equals(dealershipName, that.dealershipName) && Objects.equals(dealershipAddress1, that.dealershipAddress1) && Objects.equals(dealershipAddress2, that.dealershipAddress2) && Objects.equals(dealershipCity, that.dealershipCity) && Objects.equals(dealershipState, that.dealershipState) && Objects.equals(dealershipZip, that.dealershipZip) && Objects.equals(dealershipZipplus4, that.dealershipZipplus4) && Objects.equals(dealershipCountry, that.dealershipCountry) && Objects.equals(useShippingAddressForMaili, that.useShippingAddressForMaili) && Objects.equals(mailingAddress1, that.mailingAddress1) && Objects.equals(mailingAddress2, that.mailingAddress2) && Objects.equals(mailingCity, that.mailingCity) && Objects.equals(mailingState, that.mailingState) && Objects.equals(mailingZip, that.mailingZip) && Objects.equals(mailingZipplus4, that.mailingZipplus4) && Objects.equals(mailingCountry, that.mailingCountry) && Objects.equals(heavyTruckFlag, that.heavyTruckFlag) && Objects.equals(fordRegionNumber, that.fordRegionNumber) && Objects.equals(primaryEmailAddress, that.primaryEmailAddress) && Objects.equals(primaryManufacturerId, that.primaryManufacturerId) && Objects.equals(fordSegment, that.fordSegment) && Objects.equals(admiDealerType, that.admiDealerType) && Objects.equals(responsibleConsultantId, that.responsibleConsultantId) && Objects.equals(graphMonths, that.graphMonths) && Objects.equals(graphStartDate, that.graphStartDate) && Objects.equals(referenceDealer, that.referenceDealer) && Objects.equals(fordHvcRegionCode, that.fordHvcRegionCode) && Objects.equals(doNotSolicitFlag, that.doNotSolicitFlag) && Objects.equals(solicitationComments, that.solicitationComments) && Objects.equals(fordDominantMarketArea, that.fordDominantMarketArea) && Objects.equals(fordMajorMarketArea, that.fordMajorMarketArea) && Objects.equals(fordFcsdMarketArea, that.fordFcsdMarketArea) && Objects.equals(fordFcsdZone, that.fordFcsdZone) && Objects.equals(lastUpdatedBy, that.lastUpdatedBy) && Objects.equals(lastUpdatedDate, that.lastUpdatedDate) && Objects.equals(reactDate, that.reactDate) && Objects.equals(testDealerFlag, that.testDealerFlag) && Objects.equals(imaBlock, that.imaBlock) && Objects.equals(electronicReporting, that.electronicReporting) && Objects.equals(hyperion, that.hyperion) && Objects.equals(hyperionDist, that.hyperionDist) && Objects.equals(dspServiceId, that.dspServiceId) && Objects.equals(dealerSalesCode, that.dealerSalesCode) && Objects.equals(effectiveDate, that.effectiveDate) && Objects.equals(terminationDate, that.terminationDate) && Objects.equals(primaryOrSecondary, that.primaryOrSecondary) && Objects.equals(nissRegionCode, that.nissRegionCode) && Objects.equals(salesCode, that.salesCode) && Objects.equals(golddId, that.golddId) && Objects.equals(billToPerson, that.billToPerson) && Objects.equals(lm, that.lm) && Objects.equals(minorityCode, that.minorityCode) && Objects.equals(regionMarket, that.regionMarket) && Objects.equals(selectDealer, that.selectDealer) && Objects.equals(mon, that.mon) && Objects.equals(tue, that.tue) && Objects.equals(wed, that.wed) && Objects.equals(thu, that.thu) && Objects.equals(fri, that.fri) && Objects.equals(previousDealership, that.previousDealership) && Objects.equals(returnWeek, that.returnWeek) && Objects.equals(utc, that.utc) && Objects.equals(localDlrName, that.localDlrName);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(dealerId, locationCode, paCode, dealershipName, dealershipAddress1, dealershipAddress2, dealershipCity, dealershipState, dealershipZip, dealershipZipplus4, dealershipCountry, useShippingAddressForMaili, mailingAddress1, mailingAddress2, mailingCity, mailingState, mailingZip, mailingZipplus4, mailingCountry, heavyTruckFlag, fordRegionNumber, primaryEmailAddress, primaryManufacturerId, fordSegment, admiDealerType, responsibleConsultantId, graphMonths, graphStartDate, referenceDealer, fordHvcRegionCode, doNotSolicitFlag, solicitationComments, fordDominantMarketArea, fordMajorMarketArea, fordFcsdMarketArea, fordFcsdZone, lastUpdatedBy, lastUpdatedDate, reactDate, testDealerFlag, imaBlock, electronicReporting, hyperion, hyperionDist, dspServiceId, dealerSalesCode, effectiveDate, terminationDate, primaryOrSecondary, nissRegionCode, salesCode, golddId, billToPerson, lm, minorityCode, regionMarket, selectDealer, mon, tue, wed, thu, fri, previousDealership, returnWeek, utc, localDlrName);
+		return Objects.hash(dealerId, locationCode, dmsId, paCode, dealershipName, dealershipAddress1, dealershipAddress2, dealershipCity, dealershipState, dealershipZip, dealershipZipplus4, dealershipCountry, useShippingAddressForMaili, mailingAddress1, mailingAddress2, mailingCity, mailingState, mailingZip, mailingZipplus4, mailingCountry, heavyTruckFlag, fordRegionNumber, primaryEmailAddress, primaryManufacturerId, fordSegment, admiDealerType, responsibleConsultantId, graphMonths, graphStartDate, referenceDealer, fordHvcRegionCode, doNotSolicitFlag, solicitationComments, fordDominantMarketArea, fordMajorMarketArea, fordFcsdMarketArea, fordFcsdZone, lastUpdatedBy, lastUpdatedDate, reactDate, testDealerFlag, imaBlock, electronicReporting, hyperion, hyperionDist, dspServiceId, dealerSalesCode, effectiveDate, terminationDate, primaryOrSecondary, nissRegionCode, salesCode, golddId, billToPerson, lm, minorityCode, regionMarket, selectDealer, mon, tue, wed, thu, fri, previousDealership, returnWeek, utc, localDlrName);
 	}
 }

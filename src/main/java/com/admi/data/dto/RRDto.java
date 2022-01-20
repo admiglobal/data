@@ -8,8 +8,8 @@ import java.time.LocalDate;
 public class RRDto {
 
 	private String partNo;
-	private Integer costCents;
-	private Integer quantityOnHand;
+	private Long costCents;
+	private Long quantityOnHand;
 	private String description;
 	private String status;
 	private LocalDate lastSaleDate;
@@ -28,7 +28,7 @@ public class RRDto {
 
 	public RRDto(){}
 
-	public RRDto(String partNo, Integer costCents, Integer quantityOnHand, String description, String status, LocalDate lastSaleDate, LocalDate lastReceiptDate, String bin, String source, String make, Boolean mfgControlled, Long min, Long max, Long bestStockingLevel, Long quantityPerRepair, Long history6, Long history12, Long history24) {
+	public RRDto(String partNo, Long costCents, Long quantityOnHand, String description, String status, LocalDate lastSaleDate, LocalDate lastReceiptDate, String bin, String source, String make, Boolean mfgControlled, Long min, Long max, Long bestStockingLevel, Long quantityPerRepair, Long history6, Long history12, Long history24) {
 		this.partNo = partNo;
 		this.costCents = costCents;
 		this.quantityOnHand = quantityOnHand;
@@ -55,8 +55,8 @@ public class RRDto {
 
 		inv.setDealerId(dealerId);
 		inv.setPartNo(this.getAlphaNumPartNo());
-		inv.setCents(this.costCents);
-		inv.setQoh(this.quantityOnHand);
+		inv.setCents(this.costCents == null ? null : Math.toIntExact(this.costCents));
+		inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
 		inv.setDescription(this.description);
 		inv.setStatus(this.getDmsStatus());
 		inv.setAdmiStatus(this.getAdmiStatus());
@@ -124,19 +124,19 @@ public class RRDto {
 		this.partNo = partNo;
 	}
 
-	public Integer getCostCents() {
+	public Long getCostCents() {
 		return costCents;
 	}
 
-	public void setCostCents(Integer costCents) {
+	public void setCostCents(Long costCents) {
 		this.costCents = costCents;
 	}
 
-	public Integer getQuantityOnHand() {
+	public Long getQuantityOnHand() {
 		return quantityOnHand;
 	}
 
-	public void setQuantityOnHand(Integer quantityOnHand) {
+	public void setQuantityOnHand(Long quantityOnHand) {
 		this.quantityOnHand = quantityOnHand;
 	}
 

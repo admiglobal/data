@@ -133,17 +133,24 @@ public class FcsdCreditService {
 					.filter(c -> c.getDataDate().equals(date))
 					.findFirst()
 					.orElse(new FcsdProgramCreditsEntity());
-			Cell cell = cellIterator.next();
+			try {
+				Cell cell = cellIterator.next();
 
-			credit.setDataDate(date);
+				credit.setDataDate(date);
 
-			if (cell.getCellType() == CellType.NUMERIC) {
-				BigDecimal bd = BigDecimal.valueOf(cell.getNumericCellValue());
-				creditType.getSetter().accept(credit, bd.setScale(2, RoundingMode.HALF_UP));
+				if (cell.getCellType() == CellType.NUMERIC) {
+					BigDecimal bd = BigDecimal.valueOf(cell.getNumericCellValue());
+					creditType.getSetter().accept(credit, bd.setScale(2, RoundingMode.HALF_UP));
+				}
+
+				if (!creditList.contains(credit))
+					creditList.add(credit);
+			} catch (Exception e) {
+				System.out.println(e.toString());
+				System.out.print(credit + " ");
+				System.out.print(paCode + " ");
+				System.out.print(creditType + " \n");
 			}
-
-			if (!creditList.contains(credit))
-				creditList.add(credit);
 		}
 		sheetCredits.put(paCode, creditList);
 	}

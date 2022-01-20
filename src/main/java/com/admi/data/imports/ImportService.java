@@ -8,6 +8,9 @@ import com.admi.data.processes.DateService;
 import com.admi.data.processes.EmailService;
 import com.admi.data.processes.ProcessService;
 import com.admi.data.repositories.*;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -21,13 +24,15 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.mail.MessagingException;
-import java.io.File;
-import java.io.IOException;
+import javax.swing.text.DateFormatter;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 import static com.admi.data.enums.RRField.*;
@@ -56,6 +61,7 @@ public class ImportService {
 	@Autowired
 	McOrdersContentRepository ordersContentRepo;
 
+	private final DateTimeFormatter format = DateTimeFormatter.ofPattern("M/d/yyyy");
 
 	@Async("asyncExecutor")
 	public void runAipInventory(ImportJob importJob) throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
@@ -269,23 +275,11 @@ public class ImportService {
 		return false;
 	}
 
-	public List<AipInventoryEntity> importInventoryFile(File file, Long dealerId, int dmsId)
+	public List<AipInventoryEntity> importInventoryFile(InputStream file, Long dealerId, int dmsId)
 			throws InvalidFormatException, IllegalAccessException, NoSuchFieldException, IOException {
-		List<AipInventoryEntity> inventory = new ArrayList<>();
+		List<AipInventoryEntity> inventory;
+		inventory = importXlsxInventoryFile(file, dealerId, dmsId);
 
-
-		String fileType = Files.probeContentType(file.toPath());
-		System.out.println("File Type: " + fileType);
-
-//		switch (Objects.requireNonNull(fileType)) {
-//			case "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet":
-				inventory = importXlsxInventoryFile(file, dealerId, dmsId);
-//				break;
-//			case "application/vnd.ms-excel":
-//			case "application/octet-stream":
-//			default:
-//				break;
-//		}
 		return inventory;
 	}
 
@@ -296,7 +290,35 @@ public class ImportService {
 		System.out.println(job.toString());
 		System.out.println("File Exists: " + file.exists());
 
-		return importInventoryFile(file, job.getDealerId(), job.getDmsId());
+		return importInventoryFile(new FileInputStream(file), job.getDealerId(), job.getDmsId());
+	}
+
+	public List<AipInventoryEntity> importCsvInventoryFile(InputStream file, Long dealerId, int dms) throws IOException {
+		Reader reader = new InputStreamReader(file);
+		CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT);
+		List<AipInventoryEntity> inventory = new ArrayList<>();
+		Iterator<CSVRecord> recordIterator = parser.iterator();
+
+		List<RRField> headers = getHeaderList(recordIterator.next().toList());
+		System.out.println(headers);
+
+		while (recordIterator.hasNext()) {
+			CSVRecord record = recordIterator.next();
+			RRDto dto = new RRDto();
+
+			System.out.println(record.toString());
+
+			for (int i = 0; i == record.size(); i++) {
+				String value = record.get(i);
+				RRField field = headers.get(i);
+
+				if (field != null) {
+					setDtoField(value, dto, field.getField());
+				}
+			}
+			inventory.add(dto.toAipInventory(dealerId, LocalDate.now(), false));
+		}
+		return inventory;
 	}
 
 	public List<AipInventoryEntity> importUdbInventoryFile(MultipartFile file) throws IOException, InvalidFormatException {
@@ -313,8 +335,10 @@ public class ImportService {
 		List<UdbInventoryField> headers = getUdbInventoryHeaders(rowIterator.next());
 		List<AipInventoryEntity> inventory = new ArrayList<>();
 
-		while (rowIterator.hasNext())
-			inventory.add(importUdbInventoryRow(rowIterator.next(), headers));
+		while (rowIterator.hasNext()) {
+			AipInventoryEntity part = importUdbInventoryRow(rowIterator.next(), headers);
+			inventory.add(part);
+		}
 
 		return inventory;
 	}
@@ -326,8 +350,6 @@ public class ImportService {
 		int i = 0;
 		while (cellIterator.hasNext()) {
 			Cell cell = cellIterator.next();
-
-
 
 //			System.out.println(cell.toString());
 
@@ -342,7 +364,6 @@ public class ImportService {
 
 			i++;
 		}
-
 		return inventoryEntity;
 	}
 
@@ -377,7 +398,7 @@ public class ImportService {
 		return createImportJob(filePath, dealerId, null, paCode);
 	}
 
-	private List<AipInventoryEntity> importXlsxInventoryFile(File file, Long dealerId, int dmsId)
+	private List<AipInventoryEntity> importXlsxInventoryFile(InputStream file, Long dealerId, int dmsId)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
 		OPCPackage pkg = OPCPackage.open(file);
 
@@ -408,7 +429,6 @@ public class ImportService {
 		List<RRField> headers = getHeaderList(topRow);
 		EnumMap<RRField, FieldDefinition<RRDto, ?>> rrFields = getRRFieldMap();
 
-		List<RRDto> inventory = new ArrayList<>();
 		List<AipInventoryEntity> inventoryList = new ArrayList<>();
 
 		Iterator<Row> rowIterator = sheet.iterator();
@@ -430,16 +450,13 @@ public class ImportService {
 						System.out.println("Field: " + field.toString());
 						e.printStackTrace();
 					}
-//					throw new IllegalStateException("Unexpected value: " + headers.get(i));
 				}
 
-//				System.out.println(rowDTO.toString());
 				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now(), false));
-//				inventory.add(rowDTO);
 			}
 		}
 
-		System.out.println("Row Count: " + inventory.size());
+		System.out.println("Row Count: " + inventoryList.size());
 
 		return inventoryList;
 	}
@@ -450,9 +467,9 @@ public class ImportService {
 
 		Map<RRField, FieldDefinition<RRDto, ?>> map = new HashMap<>();
 
-		enumMap.put(PART_NO, new FieldDefinition<>(CellType.STRING, String.class, RRDto ::setPartNo));
+		enumMap.put(PART_NO, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setPartNo));
 		enumMap.put(COST, new FieldDefinition<>(CellType.NUMERIC, Double.class, RRDto :: setCostCents));
-		enumMap.put(QOH, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto ::setQuantityOnHand));
+		enumMap.put(QOH, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setQuantityOnHand));
 		enumMap.put(DESC, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setDescription));
 		enumMap.put(STAT, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setStatus));
 		enumMap.put(LAST_SALES_DATE, new FieldDefinition<>(CellType.NUMERIC, LocalDate.class, RRDto :: setLastSaleDate));
@@ -502,6 +519,25 @@ public class ImportService {
 		}
 	}
 
+	private <T, V> void setDtoField(String stringValue, T dto, FieldDefinition<T, V> field) {
+		V value = null;
+
+		if (field.getClazz() == String.class) {
+			value = (V) stringValue;
+		} else if (field.getClazz() == Long.class) {
+			value = (V) Long.valueOf(stringValue);
+		} else if (field.getClazz() == Double.class) {
+//			We are making the assumption that Doubles are only used for the cost of a part.
+			Double doubleValue = Double.valueOf(stringValue);
+			Long longValue = Math.round(doubleValue * 100);
+			value = (V) longValue;
+		} else if (field.getClazz() == LocalDate.class) {
+			LocalDate date = LocalDate.parse(stringValue, format);
+			value = (V) date;
+		}
+		field.getSetter().accept(dto, value);
+	}
+
 	private List<RRField> getHeaderList(Row row) {
 		Iterator<Cell> cellIterator = row.iterator();
 		List<RRField> headers = new ArrayList<>();
@@ -516,6 +552,24 @@ public class ImportService {
 		}
 
 //		System.out.println(headers.toString());
+		return headers;
+	}
+
+	private List<RRField> getHeaderList(List<String> headerStrings) {
+		List<RRField> headers = new ArrayList<>();
+
+		for(String header : headerStrings) {
+
+			RRField field = RRField.findByColumnName(header);
+
+			System.out.println(header);
+
+			if (field != null) {
+				System.out.println("matches " + field.toString());
+			}
+
+			headers.add(field);
+		}
 		return headers;
 	}
 

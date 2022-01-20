@@ -3,19 +3,24 @@ package com.admi.data.imports;
 import com.admi.data.dto.ImportIssue;
 import com.admi.data.dto.ImportJob;
 import com.admi.data.entities.*;
+import com.admi.data.exceptions.ApiNotSupportedException;
 import com.admi.data.processes.DateService;
 import com.admi.data.processes.ProcessService;
 import com.admi.data.repositories.DealerMasterRepository;
 import com.admi.data.repositories.MixDealersRepository;
 import com.admi.data.repositories.ZigRepository;
+import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -42,6 +47,12 @@ public class ImportsController {
 	MixImportService mixService;
 
 	@Autowired
+	CdkImportService cdkService;
+
+	@Autowired
+	DealerTrackImportService dtService;
+
+	@Autowired
 	ZigRepository zigRepo;
 
 	@Autowired
@@ -51,7 +62,7 @@ public class ImportsController {
 	DealerMasterRepository dealerMasterRepo;
 
 	String title = "Imports";
-	String folder = "/imports/";
+	String folder = "imports/";
 
 	@GetMapping("/home")
 	public String getImportHome(Model model) {
@@ -59,23 +70,33 @@ public class ImportsController {
 		return getPage("home", "Home", model);
 	}
 
-	@GetMapping("/inventory")
-	public String selectInventoryFile(Model model) {
+	@GetMapping("/inventory/{dealerId}")
+	public String selectInventoryFile(@PathVariable("dealerId") Long dealerId, Model model) {
 
-		model.addAttribute("action", "/imports/inventory");
+		model.addAttribute("action", "/imports/inventory/" + dealerId);
 		return getPage("upload", "Inventory", model);
 	}
 
-	@PostMapping("/inventory")
+	@PostMapping("/inventory/{dealerId}")
 	@ResponseBody
-	public String submitInventoryFile(@RequestParam("file") MultipartFile file, Model model)
+	public String submitInventoryFile(@PathVariable("dealerId") Long dealerId,
+	                                  @RequestParam("file") MultipartFile file, Model model)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
-		String paCode = "20636";
-		Long dealerId = 374L;
+		DealerMasterEntity dealer = dealerMasterRepo.findByDealerId(dealerId);
+		String paCode = dealer.getPaCode();
+		List<AipInventoryEntity> inventory;
 
-		ImportJob job = importService.createImportJob(file, dealerId, 0, paCode);
-		List<AipInventoryEntity> inventory = importService.importInventoryFile(job);
-		KpiEntity kpis = processService.calculateAisKpi(inventory, job.getPaCode());
+		System.out.println(file.getContentType());
+
+		if (Objects.equals(file.getContentType(), ".csv")
+				|| Objects.equals(file.getContentType(), "application/vnd.ms-excel")) {
+			System.out.println("CSV file selected");
+			inventory = importService.importCsvInventoryFile(file.getInputStream(), dealerId, dealer.getDmsId());
+		} else {
+			inventory = importService.importInventoryFile(file.getInputStream(), dealerId, dealer.getDmsId());
+		}
+
+		KpiEntity kpis = processService.calculateAisKpi(inventory, paCode);
 
 		System.out.println(DateService.getTimeString() + ": Completed Dealer " + dealerId);
 
@@ -93,25 +114,68 @@ public class ImportsController {
 	public String submitUdbInventoryFile(@RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
 		List<AipInventoryEntity> inventory = importService.importUdbInventoryFile(file);
 
-		return "UDB File imported.\n \n " + inventory.toString();
+		return "UDB File imported.\n \n Lines: " + inventory.size() + "\n \n " + inventory.subList(0,100);
 	}
 
-	@GetMapping("/mix/{dealerId}/{dateString}")
+	@GetMapping("/DTInventory/{dealerId}")
+	public String selectDtInventoryFile(@PathVariable("dealerId") Long dealerId, Model model) {
+		model.addAttribute("action", "/imports/DTInventory/" + dealerId);
+		return getPage("upload", "Inventory", model);
+	}
+
+	@PostMapping("/DTInventory/{dealerId}")
 	@ResponseBody
-	public String importMotiveDealer(@PathVariable("dealerId") Long dealerId, @PathVariable("dateString") String dateString) {
+	public String submitDtInventoryFile(@PathVariable("dealerId") Long dealerId, @RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
+		List<AipInventoryEntity> inventory = dtService.importInventoryFile(file.getInputStream(), dealerId);
+
+		KpiEntity kpiEntity = processService.calculateAisKpi(inventory, "00348");
+
+//		return "DT File imported.\n \n Lines: " + inventory.size() + "\n \n " + inventory.subList(0,100);
+		return "DT File imported.\n \n KPIs: " + kpiEntity;
+	}
+
+	@GetMapping("/DTInventoryRun")
+	public String runAllDtInventoryFiles() {
+
+		String filePath = File.separator + File.separator +
+				"192.168.250.90" + File.separator +
+				"ftp_server" + File.separator +
+				"dtrack" + File.separator;
+
+		return "";
+	}
+
+	@GetMapping("/{api}/{dealerId}/{dateString}")
+	@ResponseBody
+	public String importApiDealer(@PathVariable("api") String apiName, @PathVariable("dealerId") Long dealerId, @PathVariable("dateString") String dateString) throws ApiNotSupportedException {
 		LocalDate date = LocalDate.parse(dateString);
 		MixDealersEntity dealer = mixDealerRepo.findByDealerId(dealerId);
 		DealerMasterEntity dealerMasterEntity = dealerMasterRepo.findByDealerId(dealerId);
 
+		switch (apiName.toLowerCase()) {
+			case "cdk":
+				cdkService.importInventory(dealerId, date, dealerMasterEntity.getPaCode());
+				break;
+
+			case "mix":
+				mixService.importMixDealer(dealerId, date, dealerMasterEntity.getPaCode(), dealer.getMixSource());
+				break;
+
+			default:
+				throw new ApiNotSupportedException("This API is not currently supported by this import process.");
+		}
+		return "dealer";
+
+
 //		try {
-			mixService.importMixDealer(dealerId, date, dealerMasterEntity.getPaCode(), dealer.getMixSource());
-			return "dealer";
 //		} catch (Exception e) {
 //			System.out.println(e.getMessage());
 //			System.out.println(Arrays.toString(e.getStackTrace()));
 //			return "There was an issue importing " + dealerId;
 //		}
 	}
+
+
 
 	@GetMapping("/rimDashUpload")
 	public String selectDashDataFile(Model model) {

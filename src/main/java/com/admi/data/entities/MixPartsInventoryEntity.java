@@ -76,6 +76,7 @@ public class MixPartsInventoryEntity {
 		aip.setMfgControlled(null);
 		aip.setDataDate(this.inventoryDate);
 		aip.setManufacturer(this.partManufacturer);
+		aip.setEntryDate(this.systemSetupDate);
 
 		return aip;
 	}

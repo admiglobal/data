@@ -54,17 +54,22 @@ public class DateService {
 		return formatter.format(date);
 	}
 
-
 	public static String getFileTimeString() {
 		SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd'_'HH-mm-ss");
 		Date date = new Date(System.currentTimeMillis());
 		return formatter.format(date);
 	}
+
 	public static String getFileTimeString(LocalDateTime dateTime) {
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'_'HH-mm-ss");
 		return dateTime.format(formatter);
 	}
 
+	public DateTimeFormatter getFormatterOfPattern(String pattern) {
+		return new DateTimeFormatterBuilder()
+				.appendPattern(pattern)
+				.toFormatter();
+	}
 
 
 }

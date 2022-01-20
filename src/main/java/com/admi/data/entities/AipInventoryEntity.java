@@ -30,6 +30,7 @@ public class AipInventoryEntity {
 	private String manufacturer;
 	private Integer qoo;
 	private Integer twelveMonthSales;
+	private LocalDate entryDate;
 
 	private String paCode;
 
@@ -211,6 +212,16 @@ public class AipInventoryEntity {
 		this.dataDate = dataDate;
 	}
 
+	@Id
+	@Column(name = "ENTRY_DATE", nullable = false)
+	public LocalDate getEntryDate() {
+		return entryDate;
+	}
+
+	public void setEntryDate(LocalDate entryDate) {
+		this.entryDate = entryDate;
+	}
+
 	@Transient
 	public String getPaCode() {
 		return paCode;
@@ -230,6 +241,8 @@ public class AipInventoryEntity {
 			return lastSale;
 		} else if (lastReceipt != null) {
 			return lastReceipt;
+		} else if (entryDate != null) {
+			return entryDate;
 		} else {
 			return LocalDate.of(2000,1,1);
 		}
@@ -286,5 +299,29 @@ public class AipInventoryEntity {
 	@Override
 	public int hashCode() {
 		return Objects.hash(dealerId, partNo, cents, qoh, description, status, admiStatus, lastSale, lastReceipt, bin, source, mfgControlled, dataDate, manufacturer);
+	}
+
+	@Override
+	public String toString() {
+		return "AipInventoryEntity{" +
+				"dealerId=" + dealerId +
+				", partNo='" + partNo + '\'' +
+				", cents=" + cents +
+				", qoh=" + qoh +
+				", description='" + description + '\'' +
+				", status='" + status + '\'' +
+				", admiStatus='" + admiStatus + '\'' +
+				", lastSale=" + lastSale +
+				", lastReceipt=" + lastReceipt +
+				", bin='" + bin + '\'' +
+				", source='" + source + '\'' +
+				", mfgControlled=" + mfgControlled +
+				", dataDate=" + dataDate +
+				", manufacturer='" + manufacturer + '\'' +
+				", qoo=" + qoo +
+				", twelveMonthSales=" + twelveMonthSales +
+				", entryDate=" + entryDate +
+				", paCode='" + paCode + '\'' +
+				'}';
 	}
 }
