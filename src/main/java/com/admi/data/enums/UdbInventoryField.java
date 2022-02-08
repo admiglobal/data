@@ -6,7 +6,6 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,42 +15,42 @@ public enum UdbInventoryField {
 			new CellDefinition<>(
 					CellType.STRING,
 					Cell :: getStringCellValue,
-					Double.class,
+					String.class,
 					AipInventoryEntity :: setPaCode,
-					Double.class)),
+					String.class)),
 	PART_NUMBER("Part #",
 			new CellDefinition<>(
 					CellType.STRING,
 					Cell :: getStringCellValue,
 					String.class,
-					AipInventoryEntity :: setPaCode,
+					AipInventoryEntity :: setPartNo,
 					String.class)),
 	PART_STATUS("Part Status (Stocking)",
 			new CellDefinition<>(
 					CellType.STRING,
 					Cell :: getStringCellValue,
 					String.class,
-					AipInventoryEntity :: setPaCode,
+					AipInventoryEntity :: setStatus,
 					String.class)),
 	QOH("Qty OH",
 			new CellDefinition<>(
-					CellType.NUMERIC,
+					CellType.STRING,
 					Cell :: getNumericCellValue,
-					Double.class,
+					String.class,
 					AipInventoryEntity :: setQoh,
 					Integer.class)),
 	LAST_SALE_DATE("Part Last Sale Date",
 			new CellDefinition<>(
-					CellType.NUMERIC,
+					CellType.STRING,
 					Cell :: getLocalDateTimeCellValue,
-					LocalDateTime.class,
+					String.class,
 					AipInventoryEntity :: setLastSale,
 					LocalDate.class)),
 	LAST_RECEIPT_DATE("Qty OH Last Change Date",
 			new CellDefinition<>(
-					CellType.NUMERIC,
+					CellType.STRING,
 					Cell :: getLocalDateTimeCellValue,
-					LocalDateTime.class,
+					String.class,
 					AipInventoryEntity :: setLastReceipt,
 					LocalDate.class)),
 	BIN_LOCATION("BIN Location",
@@ -63,9 +62,9 @@ public enum UdbInventoryField {
 					String.class)),
 	QOO("Qty OO",
 			new CellDefinition<>(
-					CellType.NUMERIC,
+					CellType.STRING,
 					Cell :: getNumericCellValue,
-					Double.class,
+					String.class,
 					AipInventoryEntity :: setQoo,
 					Integer.class)),
 	RIM_STATUS("RIM Status",
@@ -77,16 +76,16 @@ public enum UdbInventoryField {
 					String.class)),
 	TWELVE_MONTH_SALES("12 Month Sales",
 			new CellDefinition<>(
-					CellType.NUMERIC,
+					CellType.STRING,
 					Cell :: getNumericCellValue,
-					Double.class,
+					String.class,
 					AipInventoryEntity :: setTwelveMonthSales,
 					Integer.class)),
 	COST("Cost",
 			new CellDefinition<>(
-					CellType.NUMERIC,
+					CellType.STRING,
 					Cell :: getNumericCellValue,
-					Double.class,
+					String.class,
 					AipInventoryEntity :: setCentsFromDouble,
 					Double.class)),
 	SERVICE_PART_NUMBER("MC-Ford ServicePart",

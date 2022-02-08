@@ -1,4 +1,4 @@
-package com.admi.data.processes;
+package com.admi.data.services;
 
 import com.admi.data.dto.MotorcraftOrderSet;
 import com.admi.data.entities.*;
@@ -28,8 +28,8 @@ public class ProcessService {
 	@Autowired
 	McOrdersContentRepository ordersContentRepo;
 
-	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory, String paCode) {
-		return aisKpiService.calculateAisKpi(inventory, paCode);
+	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory) {
+		return aisKpiService.calculateAisKpi(inventory);
 	}
 
 	public void generateDowOrders(List<MotorcraftOrderSet> orders) throws IOException {

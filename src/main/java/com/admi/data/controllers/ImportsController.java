@@ -1,26 +1,22 @@
-package com.admi.data.imports;
+package com.admi.data.controllers;
 
-import com.admi.data.dto.ImportIssue;
 import com.admi.data.dto.ImportJob;
 import com.admi.data.entities.*;
 import com.admi.data.exceptions.ApiNotSupportedException;
-import com.admi.data.processes.DateService;
-import com.admi.data.processes.ProcessService;
+import com.admi.data.services.ImportService;
+import com.admi.data.services.MixImportService;
+import com.admi.data.services.*;
 import com.admi.data.repositories.DealerMasterRepository;
 import com.admi.data.repositories.MixDealersRepository;
 import com.admi.data.repositories.ZigRepository;
-import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -96,7 +92,7 @@ public class ImportsController {
 			inventory = importService.importInventoryFile(file.getInputStream(), dealerId, dealer.getDmsId());
 		}
 
-		KpiEntity kpis = processService.calculateAisKpi(inventory, paCode);
+		KpiEntity kpis = processService.calculateAisKpi(inventory);
 
 		System.out.println(DateService.getTimeString() + ": Completed Dealer " + dealerId);
 
@@ -126,23 +122,17 @@ public class ImportsController {
 	@PostMapping("/DTInventory/{dealerId}")
 	@ResponseBody
 	public String submitDtInventoryFile(@PathVariable("dealerId") Long dealerId, @RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
-		List<AipInventoryEntity> inventory = dtService.importInventoryFile(file.getInputStream(), dealerId);
+		String paCode = file.getOriginalFilename().substring(0, file.getOriginalFilename().indexOf('.'));
 
-		KpiEntity kpiEntity = processService.calculateAisKpi(inventory, "00348");
-
-//		return "DT File imported.\n \n Lines: " + inventory.size() + "\n \n " + inventory.subList(0,100);
-		return "DT File imported.\n \n KPIs: " + kpiEntity;
+		dtService.runDtInventoryFile(dealerId, file.getInputStream(), paCode);
+		return "DT File imported for " + paCode;
 	}
 
 	@GetMapping("/DTInventoryRun")
-	public String runAllDtInventoryFiles() {
-
-		String filePath = File.separator + File.separator +
-				"192.168.250.90" + File.separator +
-				"ftp_server" + File.separator +
-				"dtrack" + File.separator;
-
-		return "";
+	@ResponseBody
+	public String runAllDealerTrack() throws IOException {
+		dtService.runAllDtInventoryFiles();
+		return "DT Ran";
 	}
 
 	@GetMapping("/{api}/{dealerId}/{dateString}")
@@ -164,7 +154,7 @@ public class ImportsController {
 			default:
 				throw new ApiNotSupportedException("This API is not currently supported by this import process.");
 		}
-		return "dealer";
+		return apiName.toUpperCase() + " Dealer " + dealerMasterEntity.getPaCode() + " Processing";
 
 
 //		try {
@@ -174,8 +164,6 @@ public class ImportsController {
 //			return "There was an issue importing " + dealerId;
 //		}
 	}
-
-
 
 	@GetMapping("/rimDashUpload")
 	public String selectDashDataFile(Model model) {

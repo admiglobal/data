@@ -1,13 +1,12 @@
-package com.admi.data.imports;
+package com.admi.data.services;
 
 import com.admi.data.entities.AipInventoryEntity;
-import com.admi.data.entities.KpiEntity;
 import com.admi.data.entities.MixPartsInventoryEntity;
 import com.admi.data.enums.MixSource;
-import com.admi.data.processes.ProcessService;
 import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.repositories.MixPartsInventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -21,19 +20,44 @@ public class MixImportService {
 	ProcessService processService;
 
 	@Autowired
+	ZigService zigService;
+
+	@Autowired
+	RimHistoryService rimService;
+
+	@Autowired
 	AipInventoryRepository inventoryRepo;
 
 	@Autowired
 	MixPartsInventoryRepository mixRepo;
 
+	@Async("asyncMixExecutor")
 	public void importMixDealer(Long dealerId, LocalDate date, String paCode, MixSource dms) {
 		List<MixPartsInventoryEntity> mixInventory = mixRepo.findAllByDealerIdAndInventoryDate(dealerId, date);
 		List<AipInventoryEntity> aipInventory = mixInventory
 				.stream()
-				.map( part -> part.toAipInventoryEntity(dms))
+				.map(part -> part.toAipInventoryEntity(dms))
 				.collect(Collectors.toList());
-		inventoryRepo.saveAll(aipInventory);
-		KpiEntity kpis = processService.calculateAisKpi(aipInventory, paCode);
+		try {
+			inventoryRepo.saveAll(aipInventory);
+		} catch (Exception e) {
+			for (AipInventoryEntity part : aipInventory) {
+				try {
+					inventoryRepo.save(part);
+				} catch (Exception f) {
+					System.out.println("Part not saved - "
+							+ "Dealer Id: " + dealerId
+							+ " Part Number: " + part.getPartNo()
+							+ " Desc: " + part.getDescription());
+				}
+			}
+		}
+
+		zigService.saveAsZig(aipInventory, paCode);
+		rimService.addOrUpdateRimParts(dealerId, aipInventory);
+		processService.calculateAisKpi(aipInventory);
+
+		System.out.println("Imported and processed "+ dms.getSourceName() + " " + paCode + " Dealer Id: " + dealerId);
 	}
 
 }

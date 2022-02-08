@@ -1,12 +1,12 @@
-package com.admi.data.imports;
+package com.admi.data.services;
 
 import com.admi.data.dto.*;
 import com.admi.data.entities.*;
 import com.admi.data.enums.RRField;
 import com.admi.data.enums.UdbInventoryField;
-import com.admi.data.processes.DateService;
-import com.admi.data.processes.EmailService;
-import com.admi.data.processes.ProcessService;
+import com.admi.data.services.DateService;
+import com.admi.data.services.EmailService;
+import com.admi.data.services.ProcessService;
 import com.admi.data.repositories.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -24,11 +24,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import javax.mail.MessagingException;
-import javax.swing.text.DateFormatter;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.text.DateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -61,6 +59,9 @@ public class ImportService {
 	@Autowired
 	McOrdersContentRepository ordersContentRepo;
 
+	@Autowired
+	DealerMasterRepository dealerRepo;
+
 	private final DateTimeFormatter format = DateTimeFormatter.ofPattern("M/d/yyyy");
 
 	@Async("asyncExecutor")
@@ -72,7 +73,7 @@ public class ImportService {
 
 
 		System.out.println(DateService.getTimeString() + ": Processing KPIs");
-		KpiEntity kpis = processService.calculateAisKpi(inventory, importJob.getPaCode());
+		KpiEntity kpis = processService.calculateAisKpi(inventory);
 		System.out.println(DateService.getTimeString() + ": Processing complete!");
 
 		System.out.println(DateService.getTimeString() + ": Writing ZIG");
@@ -326,45 +327,71 @@ public class ImportService {
 		Workbook workbook = new XSSFWorkbook(pkg);
 		List<AipInventoryEntity> inventory = new ArrayList<>();
 		Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+		DataFormatter cellFormatter = new DataFormatter();
 
-		return importUdbInventorySheet(workbook.getSheetAt(0));
+		List<AipInventoryEntity> aipInventory = importUdbInventorySheet(workbook.getSheetAt(0), cellFormatter);
+
+//		inventoryRepo.saveAll(aipInventory);
+		processService.calculateAisKpi(aipInventory);
+
+		return aipInventory;
 	}
 
-	private List<AipInventoryEntity> importUdbInventorySheet(Sheet sheet) {
+	private List<AipInventoryEntity> importUdbInventorySheet(Sheet sheet, DataFormatter cellFormatter) {
 		Iterator<Row> rowIterator = sheet.rowIterator();
 		List<UdbInventoryField> headers = getUdbInventoryHeaders(rowIterator.next());
 		List<AipInventoryEntity> inventory = new ArrayList<>();
 
-		while (rowIterator.hasNext()) {
-			AipInventoryEntity part = importUdbInventoryRow(rowIterator.next(), headers);
-			inventory.add(part);
+		Row row = sheet.getRow(1);
+		String paCode = cellFormatter.formatCellValue(row.getCell(0));
+
+		if (paCode != null) {
+			String paddedPaCode = String.format("%5s", paCode).replace(' ', '0');
+			DealerMasterEntity dealer = dealerRepo.findFirstByPaCodeAndPrimaryManufacturerIdAndTerminationDateIsNull(paddedPaCode, 1);
+
+			while (rowIterator.hasNext()) {
+				AipInventoryEntity part = importUdbInventoryRow(rowIterator.next(), headers, cellFormatter, dealer.getDealerId());
+				inventory.add(part);
+			}
 		}
 
 		return inventory;
 	}
 
-	private AipInventoryEntity importUdbInventoryRow(Row row, List<UdbInventoryField> headers) {
+	private AipInventoryEntity importUdbInventoryRow(Row row, List<UdbInventoryField> headers, DataFormatter cellFormatter, Long dealerId) {
 		Iterator<Cell> cellIterator = row.cellIterator();
 		AipInventoryEntity inventoryEntity = new AipInventoryEntity();
+		inventoryEntity.setDataDate(LocalDate.now());
+		inventoryEntity.setDealerId(dealerId);
 
-		int i = 0;
-		while (cellIterator.hasNext()) {
-			Cell cell = cellIterator.next();
+		short lastCell = row.getLastCellNum();
 
-//			System.out.println(cell.toString());
-
+		for (int i = 0; i < lastCell; i++) {
+			Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL);
 			UdbInventoryField header = headers.get(i);
 
-//			System.out.println("Header:" + header);
-
 			CellDefinition<AipInventoryEntity, ?, ?> cellDefinition = header.getDefinition();
+			String cellValue = cellFormatter.formatCellValue(cell);
+//			System.out.println("Header: " + header.getFieldName() + " Value: " + cellValue);
 
 			if (cellDefinition.getEntitySetter() != null)
-				cellDefinition.getAndSetField(cell, inventoryEntity);
-
-			i++;
+				cellDefinition.getAndSetField(cellValue, inventoryEntity);
 		}
+
+		inventoryEntity.setAdmiStatus(getAdmiStatusForUdb(inventoryEntity.getStatus()));
 		return inventoryEntity;
+	}
+
+	private String getAdmiStatusForUdb(String status) {
+		String newStatus;
+		if (status == null) {
+			newStatus = "N";
+		} else if (status.equals("Y")) {
+			newStatus = "S";
+		} else {
+			newStatus = "N";
+		}
+		return newStatus;
 	}
 
 	private List<UdbInventoryField> getUdbInventoryHeaders(Row row) {

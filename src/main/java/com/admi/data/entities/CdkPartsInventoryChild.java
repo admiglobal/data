@@ -1604,11 +1604,11 @@ public class CdkPartsInventoryChild implements Serializable {
 		AipInventoryEntity aip = new AipInventoryEntity();
 
 		aip.setDealerId(dealerId);
-		aip.setPartNo(this.partNumber);
+		aip.setPartNo(this.partNumber.replaceAll("[^a-zA-Z0-9]", "").toUpperCase());
 		aip.setCents(getPricing());
 		aip.setQoh(Objects.nonNull(this.onHand) ? Math.toIntExact(this.onHand) : 0);
 		aip.setDescription(this.description);
-		aip.setStatus(this.specialStatus);
+		aip.setStatus(getModifiedSpecialStatus());
 		aip.setAdmiStatus(this.getAdmiStatus());
 		aip.setLastSale(getLastReceiptOrSale(this.lastSaleDate, this.monthsNoSale));
 		aip.setLastReceipt(getLastReceiptOrSale(this.dateLastReceipted, this.monthsNoReceipt));
@@ -1625,6 +1625,14 @@ public class CdkPartsInventoryChild implements Serializable {
 
 	@Transient
 	private Integer getPricing() {
+		if (description != null
+				&& (description.contains("MOTORCRAFT")
+					|| description.contains("REFRIGERANT")
+					|| description.contains("OIL - ENGINE"))) {
+			return 1;
+		}
+
+
 		if (this.cost == null)
 			return 0;
 		else
@@ -1639,7 +1647,7 @@ public class CdkPartsInventoryChild implements Serializable {
 			switch(this.specialStatus) {
 				case "AP":
 				case "MO":
-					status = "N";
+					status = "S";
 					break;
 				case "SP":
 				case "NS":
@@ -1652,6 +1660,14 @@ public class CdkPartsInventoryChild implements Serializable {
 		}
 
 		return status;
+	}
+
+	@Transient
+	private String getModifiedSpecialStatus() {
+		if (this.specialStatus == null)
+			return "STOCK";
+		else
+			return this.specialStatus;
 	}
 
 	@Transient

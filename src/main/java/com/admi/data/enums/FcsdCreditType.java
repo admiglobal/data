@@ -8,15 +8,15 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 
 public enum FcsdCreditType {
-	INVENTORY_MANAGEMENT_ALLOWANCE("INVENTORY MANAGEMENT ALLOWANCE", FcsdProgramCreditsEntity :: setIma),
-	DEALER_TERMS_AND_CONDITIONS("DEALER TERMS AND CONDITIONS", FcsdProgramCreditsEntity :: setDtc),
-	WINS_WHOLESALE("WINS WHOLESALE", FcsdProgramCreditsEntity :: setWw),
-	WINS_GOVERNMENT_FLEET("WINS GOVERNMENT FLEET", FcsdProgramCreditsEntity :: setWgf),
-	WINS_GOVERNMENT("WINS GOVERNMENT", FcsdProgramCreditsEntity :: setWg),
-	WINS_DEALER_TO_DEALER("WINS DEALER TO DEALER", FcsdProgramCreditsEntity :: setWdd),
-	WINS_FLEET("WINS FLEET", FcsdProgramCreditsEntity :: setWf),
-	SIXTY_DAY("60 DAY", FcsdProgramCreditsEntity :: setSixtyDay),
-	NORMAL_RETURN("NORMAL RETURN", FcsdProgramCreditsEntity :: setNr);
+	INVENTORY_MANAGEMENT_ALLOWANCE("INVENTORY MANAGEMENT ALLOWANCE(IMA)", FcsdProgramCreditsEntity :: setIma),
+	DEALER_TERMS_AND_CONDITIONS("DEALER TERMS & CONDITIONS", FcsdProgramCreditsEntity :: setDtc),
+	WINS_WHOLESALE("WINS-WHOLESALE", FcsdProgramCreditsEntity :: setWw),
+	WINS_GOVERNMENT_FLEET("WINS-GOVERNMENT FLEET", FcsdProgramCreditsEntity :: setWgf),
+	WINS_GOVERNMENT("WINS-GOVERNMENT", FcsdProgramCreditsEntity :: setWg),
+	WINS_DEALER_TO_DEALER("WINS-DEALER TO DEALER", FcsdProgramCreditsEntity :: setWdd),
+	WINS_FLEET("WINS-FLEET", FcsdProgramCreditsEntity :: setWf),
+	SIXTY_DAY("30 DAY RETURNS", FcsdProgramCreditsEntity :: setSixtyDay),
+	NORMAL_RETURN("NORMAL RETURNS", FcsdProgramCreditsEntity :: setNr);
 
 	private final String creditType;
 	private final BiConsumer<FcsdProgramCreditsEntity, BigDecimal> setter;

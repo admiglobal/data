@@ -63,7 +63,9 @@ public class MixPartsInventoryEntity {
 		AipInventoryEntity aip = new AipInventoryEntity();
 
 		aip.setDealerId(this.dealerId);
-		aip.setPartNo(this.partNumber);
+		aip.setPartNo(this.partNumber
+				.replaceAll("[^a-zA-Z0-9]", "")
+				.toUpperCase());
 		aip.setCents(getPricing());
 		aip.setQoh(this.qtyOnHand);
 		aip.setDescription(this.partItemDescription);
@@ -531,19 +533,28 @@ public class MixPartsInventoryEntity {
 
 	@Transient
 	private Integer getPricing() {
-		if (this.cost == null && this.partCost == null)
-			return 0;
-		else if (this.cost == null)
+		if (this.partItemDescription != null
+				&& (this.partItemDescription.contains("MOTORCRAFT")
+					|| this.partItemDescription.contains("REFRIGERANT")
+					|| this.partItemDescription.contains("OIL - ENGINE"))) {
+			return 1;
+		}
+
+		if (this.unitPrice != null)
+			return (int) Math.round(this.unitPrice * 100);
+		else if (this.partCost != null)
 			return (int) Math.round(this.partCost * 100);
-		else
+		else if (this.cost != null)
 			return (int) Math.round(this.cost * 100);
+		else
+			return 0;
 	}
 
 	@Transient
 	private String getAdmiStatus(MixSource dms) {
-		List<String> automateStatus = List.of("STOCKED");
-		List<String> autosoftStatus = List.of("Y");
-		List<String> pbsStatus = List.of("S", "STK");
+		List<String> automateStatus = List.of("STOCKED", "AUTO_PHASE_OUT","MANUAL");
+		List<String> autosoftStatus = List.of("Y", "P", "O");
+		List<String> pbsStatus = List.of("S", "STK","Stock", "Manual Order");
 
 
 		String status = "N";

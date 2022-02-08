@@ -5,6 +5,7 @@ import org.apache.poi.ss.usermodel.CellType;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 
@@ -47,10 +48,21 @@ public class CellDefinition<T, V, W> {
 
 		} catch (IllegalStateException e) {
 			System.out.println(e.getMessage());
-			System.out.println("Cell Value: " + cell.toString());
-			System.out.println("Cell Row: " + cell.getRowIndex());
-			System.out.println("Cell Column: " + cell.getColumnIndex());
-			System.out.println(this.toString());
+			System.out.println("Cell Value: " + cell.toString()
+					+ "| Cell Row: " + cell.getRowIndex() + "| Cell Column: " + cell.getColumnIndex());
+//			System.out.println(this.toString());
+		}
+	}
+
+	public void getAndSetField(String string, T entity) {
+		try {
+			V value = convert((W) string);
+			entitySetter.accept(entity, value);
+
+		} catch (IllegalStateException e) {
+			System.out.println(e.getMessage());
+			System.out.println("String Value: " + string);
+//			System.out.println(this.toString());
 		}
 	}
 
@@ -110,6 +122,61 @@ public class CellDefinition<T, V, W> {
 			Double d = (Double) toConvert;
 			Integer i = d.intValue();
 			newValue = (V) i;
+		}
+
+		if (String.class.equals(getterClass) && Integer.class.equals(setterClass)) {
+			String s = (String) toConvert;
+			Integer i;
+
+			if (s != null) {
+				try {
+					i = Integer.parseInt(s.trim());
+				} catch (Exception e) {
+					System.out.print("** Exception: " + s + " not converted to Integer. - ");
+//				    e.printStackTrace();
+					i = 0;
+				}
+			} else {
+				i = 0;
+			}
+			newValue = (V) i;
+		}
+
+		if (String.class.equals(getterClass) && Double.class.equals(setterClass)) {
+			String s = (String) toConvert;
+			Double d;
+
+			if (s != null) {
+				try {
+					d = Double.parseDouble(s.trim());
+				} catch (Exception e) {
+					System.out.print("** Exception: " + s + " not converted to Double. - ");
+//				    e.printStackTrace();
+					d = 0D;
+				}
+			} else {
+				d = 0D;
+			}
+			newValue = (V) d;
+		}
+
+		if (String.class.equals(getterClass) && LocalDate.class.equals(setterClass)) {
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("M/d/yy");
+			String s = (String) toConvert;
+			LocalDate date;
+
+			if (s != null) {
+				try {
+					date = LocalDate.parse(s, formatter);
+				} catch (Exception e) {
+					System.out.print("** Exception: " + s + " not converted to LocalDate. - ");
+//				    e.printStackTrace();
+					date = LocalDate.of(2000,1,1);
+				}
+			} else {
+				date = LocalDate.of(2000,1,1);
+			}
+			newValue = (V) date;
 		}
 
 		return newValue;

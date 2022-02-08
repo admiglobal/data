@@ -1,4 +1,4 @@
-package com.admi.data.imports;
+package com.admi.data.services;
 
 import com.admi.data.entities.DealerMasterEntity;
 import com.admi.data.entities.FcsdProgramCreditsEntity;
@@ -71,7 +71,7 @@ public class FcsdCreditService {
 		Iterator<Row> rowIterator = sheet.rowIterator();
 
 		try {
-			dataPointName = sheet.getRow(0).getCell(1).getStringCellValue().trim();
+			dataPointName = sheet.getRow(0).getCell(7).getStringCellValue().trim();
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			System.out.println("Issue setting data point name.");

@@ -8,6 +8,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Arrays;
 import java.util.Objects;
 
 @Entity
@@ -80,12 +81,18 @@ public class AipInventoryEntity {
 	}
 
 	@Basic
-	@Column(name = "DESCRIPTION", nullable = true, length = 40)
+	@Column(name = "DESCRIPTION", nullable = true, length = 60)
 	public String getDescription() {
 		return description;
 	}
 
 	public void setDescription(String description) {
+		if (description != null) {
+			int size = 60;
+			int inLength = description.length();
+			if (inLength > size)
+				description = description.substring(0, size);
+		}
 		this.description = description;
 	}
 
@@ -172,14 +179,16 @@ public class AipInventoryEntity {
 
 	@Transient
 	public void setMfgControlledFromString(String mfgControlString) {
-		if (mfgControlString.equalsIgnoreCase("Y")) {
+		String[] yesList = new String[]{"Y", "YES"};
+		String[] noList = new String[]{"N", "NO"};
+
+		if (Arrays.asList(yesList).contains(mfgControlString.toUpperCase())) {
 			this.mfgControlled = true;
-		} else if (mfgControlString.equalsIgnoreCase("N")) {
+		} else if (Arrays.asList(noList).contains(mfgControlString.toUpperCase())) {
 			this.mfgControlled = false;
 		} else {
 			this.mfgControlled = null;
 		}
-
 	}
 
 	@Basic
@@ -212,8 +221,8 @@ public class AipInventoryEntity {
 		this.dataDate = dataDate;
 	}
 
-	@Id
-	@Column(name = "ENTRY_DATE", nullable = false)
+	@Basic
+	@Column(name = "ENTRY_DATE", nullable = true)
 	public LocalDate getEntryDate() {
 		return entryDate;
 	}
@@ -237,10 +246,20 @@ public class AipInventoryEntity {
 
 	@Transient
 	public LocalDate getLastSaleOrReceipt() {
-		if (lastSale != null) {
-			return lastSale;
-		} else if (lastReceipt != null) {
+//		if (lastSale != null) {
+//			return lastSale;
+//		} else if (lastReceipt != null) {
+//			return lastReceipt;
+//		} else if (entryDate != null) {
+//			return entryDate;
+//		} else {
+//			return LocalDate.of(2000,1,1);
+//		}
+
+		if (lastReceipt != null) {
 			return lastReceipt;
+		} else if (lastSale != null) {
+			return lastSale;
 		} else if (entryDate != null) {
 			return entryDate;
 		} else {
@@ -264,7 +283,7 @@ public class AipInventoryEntity {
 		zig.setBin(this.bin);
 		zig.setSrc(this.source);
 		zig.setDmsStatus(this.status);
-		zig.setMfgControlled(null);
+		zig.setMfgControlled(this.mfgControlled);
 		zig.setDataDate(LocalDateTime.of(LocalDate.now(), LocalTime.of(0,0)));
 
 		return zig;

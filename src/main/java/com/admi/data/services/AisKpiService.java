@@ -1,14 +1,12 @@
-package com.admi.data.processes;
+package com.admi.data.services;
 
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.KpiEntity;
-import com.admi.data.entities.ZigEntity;
 import com.admi.data.repositories.KpiRepository;
 import com.admi.data.repositories.ZigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -28,12 +26,13 @@ public class AisKpiService {
 	@Autowired
 	ZigRepository zigRepo;
 
-	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory, String paCode) {
+	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory) {
 		KpiEntity kpi = new KpiEntity();
 
 		if (inventory.size() > 0) {
 			kpi.setDealerId(inventory.get(0).getDealerId());
-			kpi.setDataDate(dateService.getLongDate(inventory.get(0).getDataDate()));
+//			Always treat KPI calculations as though they are for yesterday.
+			kpi.setDataDate(dateService.getLongDate(inventory.get(0).getDataDate().minusDays(1)));
 
 			Long totalDmsSku = 0L;
 			Long pieceCount = 0L;

@@ -43,7 +43,9 @@ public class DealerTrackInventoryRow {
 		AipInventoryEntity part = new AipInventoryEntity();
 
 		part.setDealerId(dealerId);
-		part.setPartNo(this.partNo.trim().toUpperCase(Locale.ROOT));
+		part.setPartNo(this.partNo
+				.replaceAll("[^a-zA-Z0-9]", "")
+				.toUpperCase());
 		part.setCents(getStringAsCents(this.cost));
 		part.setQoh(getStringAsInteger(this.qoh));
 		part.setDescription(this.description.trim());
@@ -68,7 +70,7 @@ public class DealerTrackInventoryRow {
 			try {
 				return Integer.parseInt(string.trim());
 			} catch (NumberFormatException e) {
-				System.out.println("NumberFormatException: " + string + " not converted to Integer.");
+//				System.out.println("NumberFormatException: " + string + " not converted to Integer.");
 //				e.printStackTrace();
 				return 0;
 			}
@@ -82,8 +84,8 @@ public class DealerTrackInventoryRow {
 			try {
 				return LocalDate.parse(string.trim());
 			} catch (DateTimeParseException e) {
-				System.out.println("DateTimeParseException: " + string.trim() + " not converted to LocalDateTime.");
-				e.printStackTrace();
+//				System.out.println("DateTimeParseException: " + string.trim() + " not converted to LocalDateTime.");
+//				e.printStackTrace();
 				return LocalDate.of(2000, 1, 1);
 			}
 		} else {
@@ -109,8 +111,8 @@ public class DealerTrackInventoryRow {
 			try {
 				dollarValue = format.parse(string.trim()).doubleValue();
 			} catch (ParseException e) {
-				System.out.println("NumberFormatException: " + string.trim() + " not converted to Integer.");
-				e.printStackTrace();
+//				System.out.println("NumberFormatException: " + string.trim() + " not converted to Double.");
+//				e.printStackTrace();
 				dollarValue = 0.0;
 			}
 
@@ -122,11 +124,12 @@ public class DealerTrackInventoryRow {
 	}
 
 	private String getAdmiStatus() {
-		String status = this.status.trim().toUpperCase(Locale.ROOT);
+		String status = this.status.trim().toUpperCase();
 		String newStatus = "N";
 
 		switch(status) {
 			case "A":
+			case "R":
 				newStatus = "S";
 				break;
 		}
