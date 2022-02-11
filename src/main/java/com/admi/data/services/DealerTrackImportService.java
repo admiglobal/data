@@ -37,13 +37,7 @@ public class DealerTrackImportService {
 	DateService dateService;
 
 	@Autowired
-	ZigService zigService;
-
-	@Autowired
-	ProcessService processService;
-
-	@Autowired
-	RimHistoryService rimService;
+	AipInventoryService aipInventoryService;
 
 	@Autowired
 	AipInventoryRepository inventoryRepo;
@@ -64,18 +58,20 @@ public class DealerTrackImportService {
 		for (String fileName : files) {
 			String paCode = fileName.substring(0, fileName.indexOf('.'));
 
-			System.out.println("Running DT Dealer: " + paCode);
+			if (!paCode.equals("00489")) {
+				System.out.println("Running DT Dealer: " + paCode);
 
-			DealerMasterEntity dealer = dealerMasterRepo.findFirstByPaCode(paCode);
-			String fullPath = filePath + fileName;
-			File inventoryFile = new File(fullPath);
+				DealerMasterEntity dealer = dealerMasterRepo.findFirstByPaCode(paCode);
+				String fullPath = filePath + fileName;
+				File inventoryFile = new File(fullPath);
 
-			if (dealer != null) {
-				runDtInventoryFile(dealer.getDealerId(), new FileInputStream(inventoryFile), paCode);
+				if (dealer != null) {
+					runDtInventoryFile(dealer.getDealerId(), new FileInputStream(inventoryFile), paCode);
+				}
+
+				String savePath = filePath + "Hold" + File.separator + paCode + "_" + DateService.getFileTimeString() + ".csv";
+				Files.move(Path.of(fullPath), Path.of(savePath));
 			}
-
-			String savePath = filePath + "Hold" + File.separator + paCode + "_" + DateService.getFileTimeString() + ".csv";
-			Files.move(Path.of(fullPath), Path.of(savePath));
 		}
 
 		System.out.println(DateService.getTimeString() + ": Completed DealerTrack Dealers");
@@ -84,24 +80,7 @@ public class DealerTrackImportService {
 	public void runDtInventoryFile(Long dealerId, InputStream file, String paCode) throws IOException {
 		List<AipInventoryEntity> aipInventory = importInventoryFile(file, dealerId);
 
-		try {
-			inventoryRepo.saveAll(aipInventory);
-		} catch (Exception e) {
-			for (AipInventoryEntity part : aipInventory) {
-				try {
-					inventoryRepo.save(part);
-				} catch (Exception f) {
-					System.out.println("Part not saved - "
-							+ "Dealer Id: " + dealerId
-							+ " Part Number: " + part.getPartNo()
-							+ " Desc: " + part.getDescription());
-				}
-			}
-		}
-
-		zigService.saveAsZig(aipInventory, paCode);
-		rimService.addOrUpdateRimParts(dealerId, aipInventory);
-		processService.calculateAisKpi(aipInventory);
+		aipInventoryService.saveAll(aipInventory, dealerId, paCode);
 
 		file.close();
 	}

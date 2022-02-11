@@ -6,14 +6,17 @@ public class ImportJob {
 	Integer dmsId;
 	String filePath;
 	String paCode;
+	String fileType;
 	String email;
 
 	public ImportJob() {}
 
-	public ImportJob(Long dealerId, Integer dmsId, String filePath) {
+	public ImportJob(Long dealerId, Integer dmsId, String filePath, String paCode, String fileType) {
 		this.dealerId = dealerId;
 		this.dmsId = dmsId;
 		this.filePath = filePath;
+		this.paCode = paCode;
+		this.fileType = fileType;
 	}
 	public ImportJob(Long dealerId, Integer dmsId, String filePath, String email) {
 		this.dealerId = dealerId;
@@ -61,6 +64,15 @@ public class ImportJob {
 	public void setEmail(String email) {
 		this.email = email;
 	}
+
+	public String getFileType() {
+		return fileType;
+	}
+
+	public void setFileType(String fileType) {
+		this.fileType = fileType;
+	}
+
 
 	@Override
 	public String toString() {

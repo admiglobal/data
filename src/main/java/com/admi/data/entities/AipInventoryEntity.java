@@ -273,13 +273,13 @@ public class AipInventoryEntity {
 
 		zig.setPaCode(paCode);
 		zig.setPartNo(this.partNo);
-		zig.setQoh(Long.valueOf(this.qoh));
+		zig.setQoh(getQohIfNull());
 		zig.setDes(this.description);
 		zig.setLsDate(this.lastSale);
 		zig.setLrDate(this.lastReceipt);
 		zig.setStatus(this.admiStatus);
 		zig.setRFlag(isReturnable());
-		zig.setCost(new BigDecimal(cents/100).setScale(2, RoundingMode.HALF_UP));
+		zig.setCost(getCentsIfNull());
 		zig.setBin(this.bin);
 		zig.setSrc(this.source);
 		zig.setDmsStatus(this.status);
@@ -291,7 +291,27 @@ public class AipInventoryEntity {
 
 	@Transient
 	public Boolean isReturnable() {
-		return this.cents > 1500;
+		if (this.cents != null)
+			return this.cents > 1500;
+		else
+			return false;
+	}
+
+	@Transient
+	private Long getQohIfNull() {
+		if (this.qoh != null)
+			return Long.valueOf(this.qoh);
+		else
+			return 0L;
+	}
+
+	@Transient
+	private BigDecimal getCentsIfNull() {
+		if (this.cents != null) {
+			return BigDecimal.valueOf((cents * 1.00) / 100).setScale(2, RoundingMode.HALF_UP);
+		} else {
+			return BigDecimal.valueOf(0);
+		}
 	}
 
 	@Override

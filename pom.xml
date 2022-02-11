@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.admi</groupId>
     <artifactId>data</artifactId>
-    <version>1.4.0</version>
+    <version>1.5.4</version>
     <name>data</name>
     <description>Used to import and process flat files.</description>
     <properties>

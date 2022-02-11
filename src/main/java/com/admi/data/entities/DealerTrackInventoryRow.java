@@ -65,6 +65,13 @@ public class DealerTrackInventoryRow {
 		return part;
 	}
 
+//	public String getPartNumberIfNull() {
+//		String partNumber = this.partNo
+//				.replaceAll("[^a-zA-Z0-9]", "")
+//				.toUpperCase();
+//		if (partNumber == null || partNumber == "");
+//	}
+
 	public Integer getStringAsInteger(String string) {
 		if (string != null) {
 			try {

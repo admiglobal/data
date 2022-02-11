@@ -17,7 +17,11 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.mail.MessagingException;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -47,6 +51,12 @@ public class ImportsController {
 
 	@Autowired
 	DealerTrackImportService dtService;
+
+	@Autowired
+	RRImportService rrImportService;
+
+	@Autowired
+	AipInventoryService aipInventoryService;
 
 	@Autowired
 	ZigRepository zigRepo;
@@ -80,23 +90,14 @@ public class ImportsController {
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
 		DealerMasterEntity dealer = dealerMasterRepo.findByDealerId(dealerId);
 		String paCode = dealer.getPaCode();
-		List<AipInventoryEntity> inventory;
 
 		System.out.println(file.getContentType());
 
-		if (Objects.equals(file.getContentType(), ".csv")
-				|| Objects.equals(file.getContentType(), "application/vnd.ms-excel")) {
-			System.out.println("CSV file selected");
-			inventory = importService.importCsvInventoryFile(file.getInputStream(), dealerId, dealer.getDmsId());
-		} else {
-			inventory = importService.importInventoryFile(file.getInputStream(), dealerId, dealer.getDmsId());
-		}
-
-		KpiEntity kpis = processService.calculateAisKpi(inventory);
+		importService.runAipInventory(file.getInputStream(), dealerId, dealer.getPaCode(), dealer.getDmsId(), file.getContentType());
 
 		System.out.println(DateService.getTimeString() + ": Completed Dealer " + dealerId);
 
-		return kpis.toString();
+		return paCode + " - Dealer ID: " + dealerId + "Complete";
 	}
 
 	@GetMapping("/UDBInventory")
@@ -137,7 +138,10 @@ public class ImportsController {
 
 	@GetMapping("/{api}/{dealerId}/{dateString}")
 	@ResponseBody
-	public String importApiDealer(@PathVariable("api") String apiName, @PathVariable("dealerId") Long dealerId, @PathVariable("dateString") String dateString) throws ApiNotSupportedException {
+	public String importApiDealer(@PathVariable("api") String apiName,
+	                              @PathVariable("dealerId") Long dealerId,
+	                              @PathVariable("dateString") String dateString)
+			throws ApiNotSupportedException {
 		LocalDate date = LocalDate.parse(dateString);
 		MixDealersEntity dealer = mixDealerRepo.findByDealerId(dealerId);
 		DealerMasterEntity dealerMasterEntity = dealerMasterRepo.findByDealerId(dealerId);
@@ -255,7 +259,8 @@ public class ImportsController {
 		if (call.getPaCode() == null || call.getFilePath() == null || call.getDealerId() == null) {
 			return "All fields required. There can be no null values";
 		} else {
-			importService.runAipInventory(call);
+			File file = new File(call.getFilePath());
+			importService.runAipInventory(new FileInputStream(file), call.getDealerId(), call.getPaCode(), call.getDmsId(), call.getFileType());
 
 			return "Import queued successfully. Please wait a few minutes to allow us to process this file.";
 		}

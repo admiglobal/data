@@ -17,13 +17,7 @@ import java.util.stream.Collectors;
 public class MixImportService {
 
 	@Autowired
-	ProcessService processService;
-
-	@Autowired
-	ZigService zigService;
-
-	@Autowired
-	RimHistoryService rimService;
+	AipInventoryService aipInventoryService;
 
 	@Autowired
 	AipInventoryRepository inventoryRepo;
@@ -38,24 +32,8 @@ public class MixImportService {
 				.stream()
 				.map(part -> part.toAipInventoryEntity(dms))
 				.collect(Collectors.toList());
-		try {
-			inventoryRepo.saveAll(aipInventory);
-		} catch (Exception e) {
-			for (AipInventoryEntity part : aipInventory) {
-				try {
-					inventoryRepo.save(part);
-				} catch (Exception f) {
-					System.out.println("Part not saved - "
-							+ "Dealer Id: " + dealerId
-							+ " Part Number: " + part.getPartNo()
-							+ " Desc: " + part.getDescription());
-				}
-			}
-		}
 
-		zigService.saveAsZig(aipInventory, paCode);
-		rimService.addOrUpdateRimParts(dealerId, aipInventory);
-		processService.calculateAisKpi(aipInventory);
+		aipInventoryService.saveAll(aipInventory, dealerId, paCode);
 
 		System.out.println("Imported and processed "+ dms.getSourceName() + " " + paCode + " Dealer Id: " + dealerId);
 	}

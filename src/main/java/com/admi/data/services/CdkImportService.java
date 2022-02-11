@@ -21,22 +21,13 @@ import java.util.stream.Collectors;
 public class CdkImportService {
 
 	@Autowired
-	ProcessService processService;
-
-	@Autowired
-	ZigService zigService;
-
-	@Autowired
-	RimHistoryService rimService;
+	AipInventoryService aipInventoryService;
 
 	@Autowired
 	CdkPartsInventoryRepository cdkRepo;
 
 	@Autowired
 	CdkDealersRepository cdkDealersRepo;
-
-	@Autowired
-	AipInventoryRepository inventoryRepo;
 
 	@Async("asyncCdkExecutor")
 	public void importInventory(Long dealerId, LocalDate localDate, String paCode) {
@@ -45,24 +36,7 @@ public class CdkImportService {
 		List<CdkPartsInventoryChild> inventory = cdkRepo.findAllByDealerIdAndInventoryDate(dealer.getDealerId(), localDate);
 		List<AipInventoryEntity> aipInventory = inventory.stream().map(part -> part.toAipInventoryEntity(dealerId)).collect(Collectors.toList());
 
-		try {
-			inventoryRepo.saveAll(aipInventory);
-		} catch (Exception e) {
-			for (AipInventoryEntity part : aipInventory) {
-				try {
-					inventoryRepo.save(part);
-				} catch (Exception f) {
-					System.out.println("Part not saved - "
-							+ "Dealer Id: " + dealerId
-							+ " Part Number: " + part.getPartNo()
-							+ " Desc: " + part.getDescription());
-				}
-			}
-		}
-
-		zigService.saveAsZig(aipInventory, paCode);
-		rimService.addOrUpdateRimParts(dealerId, aipInventory);
-		processService.calculateAisKpi(aipInventory);
+		aipInventoryService.saveAll(aipInventory, dealerId, paCode);
 
 		System.out.println("Imported and processed CDK " + paCode + " Dealer Id: " + dealerId);
 	}
