@@ -12,6 +12,6 @@ public interface CdkDealersRepository extends JpaRepository<CdkDealersEntity, Lo
 
 	CdkDealersEntity findByDealerId(String dealerId);
 
-	CdkDealersEntity findAllByAdmiDealerId(Long dealerId);
+	CdkDealersEntity findFirstByAdmiDealerIdAndEndDateIsNull(Long dealerId);
 
 }
