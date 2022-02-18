@@ -50,6 +50,9 @@ public class ImportService {
 	RRImportService rrImportService;
 
 	@Autowired
+	CdkImportService cdkImportService;
+
+	@Autowired
 	AipInventoryRepository inventoryRepo;
 
 	@Autowired
@@ -424,10 +427,18 @@ public class ImportService {
 
 		switch(dmsId) {
 			case 0:
-			case 1:
-			case 48:
-			case 50:
+			case 1: 	//R&R
+			case 48: 	//R&R
+			case 50:	//R&R
 				inventory = rrImportService.importInventory(sheet, dealerId);
+				break;
+			case 8:		//CDK
+			case 35:	//CDK
+			case 37:	//CDK
+			case 53:	//CDK
+			case 54:	//CDK
+			case 61:	//CDK
+				inventory = cdkImportService.importInventory(sheet, dealerId);
 				break;
 			default:
 				break;
