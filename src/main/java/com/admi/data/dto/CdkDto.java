@@ -47,8 +47,14 @@ public class CdkDto {
 
         AipInventoryEntity inv = new AipInventoryEntity();
 
+        //can't have null part numbers: make stand-in of format "XXXX-[hashCode]"
+        String partNo = this.getPartNo();
+        if(partNo == null || partNo.equals("")){
+            partNo = "XXXX-" + this.hashCode();
+        }
+
         inv.setDealerId(dealerId);
-        inv.setPartNo(this.getPartNo());
+        inv.setPartNo(partNo);
         inv.setCents(this.costCents == null ? null : Math.toIntExact(this.costCents));
         inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
@@ -177,6 +183,7 @@ public class CdkDto {
     /**
      * Takes a string of the format "0 0 0 ..." and returns the first number before a space.
      * This format represents previous months' data, separated by spaces.
+     * Rounds non-integers.
      * @param multiMonthString A string of the format "0 0", "0 0 0", etc.
      * @return The first number in the argument, as a Long value. If unable to parse long, returns a 0
      */
@@ -186,7 +193,8 @@ public class CdkDto {
         }
 
         try{
-            return Long.parseLong(multiMonthString.split(" ")[0]);
+            double d = Double.parseDouble(multiMonthString.split(" ")[0]);
+            return Math.round(d);
         } catch(NumberFormatException nfe){
             System.out.println("Unable to parse string " + multiMonthString + " into a Long value");
             nfe.printStackTrace();

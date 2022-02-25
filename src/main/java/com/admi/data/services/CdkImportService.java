@@ -2,13 +2,10 @@ package com.admi.data.services;
 
 import com.admi.data.dto.CdkDto;
 import com.admi.data.dto.CellDefinition;
-import com.admi.data.dto.FieldDefinition;
-import com.admi.data.dto.RRDto;
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.CdkDealersEntity;
 import com.admi.data.entities.CdkPartsInventoryChild;
 import com.admi.data.enums.CdkInventoryField;
-import com.admi.data.enums.RRField;
 import com.admi.data.repositories.CdkDealersRepository;
 import com.admi.data.repositories.CdkPartsInventoryRepository;
 import org.apache.poi.ss.usermodel.Cell;
@@ -22,13 +19,9 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.time.format.TextStyle;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.admi.data.enums.RRField.*;
-import static com.admi.data.enums.RRField.HIST_24;
 
 @Service
 public class CdkImportService {
@@ -64,7 +57,6 @@ public class CdkImportService {
 		Row topRow = sheet.getRow(0);
 
 		List<CdkInventoryField> headers = getHeaderList(topRow);
-//		EnumMap<CdkImportService, FieldDefinition<CdkDto, ?>> cdkFields = getRRFieldMap();
 
 		List<AipInventoryEntity> inventoryList = new ArrayList<>();
 
@@ -77,9 +69,8 @@ public class CdkImportService {
 				short lastCell = row.getLastCellNum();
 
 				for(int i = 0; i < lastCell; i++){
-//					int i = cell.getColumnIndex();
 					Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL); //prevents skipping over blank cells
-					CdkInventoryField field = headers.get(i); //check this: not sure all headers are included
+					CdkInventoryField field = headers.get(i);
 
 					try {
 						setDtoField(cell, rowDTO, field.getDefinition());
@@ -91,16 +82,9 @@ public class CdkImportService {
 					}
 				}
 
-//				Iterator<Cell> cellIterator = row.cellIterator();
-//				while (cellIterator.hasNext()) {
-//					Cell cell = cellIterator.next();
-//				}
-
 				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now()));
 			}
 		}
-
-		//iterate inventoryList, checking for null part numbers. Replace nulls with unique stand-in ID.
 
 		System.out.println("Row Count: " + inventoryList.size());
 
@@ -128,46 +112,68 @@ public class CdkImportService {
 	 * @param dto
 	 * @param cellDefinition
 	 * @param <V> The value to be set
-	 * @param <W> (not used)
 	 */
 	private <V, W> void setDtoField(Cell cell, CdkDto dto, CellDefinition<CdkDto, V, W> cellDefinition) {
-		CellType cellType = cellDefinition.getCellType();
+		if(cell == null){
+			return; //cell is blank: ok to leave null in dto, too
+		}
+
 		Class<?> setterClass = cellDefinition.getSetterClass();
 
 		V value = null;
 
-		if (cell != null && cell.getCellType() == cellType) {
-			if (setterClass == String.class) {
-				value = (V) cell.getStringCellValue();
+		if (setterClass == String.class) {
+			String cellValue = translateCellIntoString(cell);
+			value = (V) cellValue;
 
-			} else if (setterClass == Long.class) {
-				Double d = cell.getNumericCellValue();
-				value = (V) Long.valueOf(Math.round(d));
+		} else if (setterClass == Long.class) {
+			Double d = cell.getNumericCellValue();
+			value = (V) Long.valueOf(Math.round(d));
 
-			} else if (setterClass == Double.class) {
-//				Long l = Math.round(cell.getNumericCellValue() * 100);
-				Double d = cell.getNumericCellValue();
-				value = (V) d;
+		} else if (setterClass == Double.class) {
+			Double d = cell.getNumericCellValue();
+			value = (V) d;
 
-			} else if (setterClass == LocalDate.class) {
-				LocalDate date;
-				try{
-					date = cell.getDateCellValue()
-							.toInstant()
-							.atZone(ZoneId.systemDefault())
-							.toLocalDate();
-				} catch(IllegalStateException ise){ //the cell isn't formatted as a date
-					//assume format like "04FEB22"--otherwise, null
-					date = parseUglyDate(cell.getStringCellValue());
-				}
-				value = (V) date;
-
-			} else {
-				System.out.println("Incorrect class for cell: " + cell.toString());
+		} else if (setterClass == LocalDate.class) {
+			LocalDate date;
+			try{
+				date = cell.getDateCellValue()
+						.toInstant()
+						.atZone(ZoneId.systemDefault())
+						.toLocalDate();
+			} catch(IllegalStateException ise){ //the cell isn't formatted as a date
+				//assume format like "04FEB22"--otherwise, null
+				date = parseUglyDate(cell.getStringCellValue());
 			}
-			cellDefinition.getEntitySetter()
-					.accept(dto, value);
+			value = (V) date;
+
+		} else {
+			System.out.println("Given setter class not accounted for in CdkImportService: " + setterClass);
 		}
+
+		cellDefinition.getEntitySetter()
+				.accept(dto, value);
+
+	}
+
+	/**
+	 * Takes a Cell of NUMERIC or STRING CellType and returns its value as a String.
+	 * If the cell is blank or null, returns a null String.
+	 * @param cell
+	 * @return the cell's value as a String
+	 */
+	private String translateCellIntoString(Cell cell){
+		if(cell == null || cell.getCellType().equals(CellType.BLANK)){
+			return null;
+		} else if(cell.getCellType().equals(CellType.STRING)){
+			return cell.getStringCellValue();
+		} else if(cell.getCellType().equals(CellType.NUMERIC)){
+			Double num = cell.getNumericCellValue();
+			return num.toString();
+		} else{
+			System.out.println("Unable to translate cell value into String. Cell: " + cell);
+		}
+		return null;
 	}
 
 	/**
