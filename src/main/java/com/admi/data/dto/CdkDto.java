@@ -6,6 +6,7 @@
 package com.admi.data.dto;
 
 import com.admi.data.entities.AipInventoryEntity;
+import com.admi.data.services.CdkImportService;
 import com.sun.istack.NotNull;
 import org.apache.tomcat.jni.Local;
 
@@ -56,7 +57,8 @@ public class CdkDto {
         inv.setDealerId(dealerId);
         inv.setPartNo(partNo);
         inv.setCents(this.costCents == null ? null : Math.toIntExact(this.costCents));
-        inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
+        Integer qoh = this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand);
+        inv.setQoh(qoh);
         inv.setDescription(this.description);
         inv.setStatus(this.getStatus());
         inv.setLastSale(this.getLastSaleDate());
@@ -65,10 +67,19 @@ public class CdkDto {
         inv.setSource(this.source);
         //mfgControlled
         inv.setDataDate(date);
+        inv.setAdmiStatus(CdkImportService.getAdmiStatus(this.getStatus()));
         //manufacturer
-        inv.setQoh(this.quantityOnOrder == null ? null : Math.toIntExact(this.quantityOnOrder));
+        inv.setQoo(this.quantityOnOrder == null ? null : Math.toIntExact(this.quantityOnOrder));
         inv.setTwelveMonthSales(this.yrsl == null ? null : Math.toIntExact(this.yrsl));
         inv.setEntryDate(this.getEntry());
+
+        if(!partNo.equals("XXXX-961614017")){
+            System.out.println("Qoh set to: " + qoh + ". Qoh value is now: " + inv.getQoh());
+            System.out.println("Importing CdkDto: QOH=" + this.quantityOnHand + "; DTO: " + this);
+//            int qoh = this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand);
+            System.out.println("QOH translation: " + qoh);
+            System.out.println("^ Imported to: QOH=" + inv.getQoh() + "; AipInventoryEntity: " + inv);
+        }
 
         return inv;
     }
@@ -79,6 +90,35 @@ public class CdkDto {
         } else {
             return date;
         }
+    }
+
+    public boolean isBlankRow(){
+        return partNo == null
+                && description == null
+                && costCents == null
+                && bin == null
+                && source == null
+                && quantityOnHand == null
+                && quantityOnOrder == null
+                && status == null
+                && mns == null
+                && mnr == null
+                && saleDate == null
+                && rDate == null
+                && entry == null
+                && jan == null
+                && feb == null
+                && mar == null
+                && apr == null
+                && may == null
+                && jun == null
+                && jul == null
+                && aug == null
+                && sep == null
+                && oct == null
+                && nov == null
+                && dec == null
+                && yrsl == null;
     }
 
     /**
@@ -218,10 +258,6 @@ public class CdkDto {
         this.mns = mns;
     }
 
-    public Long getMnr() {
-        return mnr;
-    }
-
     /**
      * Returns the Last Receipt Date appropriate for the AIP_INVENTORY table based on rDate.
      * If rDate is null, uses mnr (months no receipt) and translates it into a LocalDate.
@@ -240,6 +276,10 @@ public class CdkDto {
                 return LocalDate.of(then.getYear(), then.getMonth(), 1);
             }
         }
+    }
+
+    public Long getMnr() {
+        return mnr;
     }
 
     public void setMnr(Long mnr) {

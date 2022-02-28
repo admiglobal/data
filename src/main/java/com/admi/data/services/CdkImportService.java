@@ -51,12 +51,14 @@ public class CdkImportService {
 	}
 
 	/**
-	 * Copied over from RRImportService
+	 * Parses a sheet into a list of AipInventoryEntity's for the given dealer
 	 */
 	public List<AipInventoryEntity> importInventory(Sheet sheet, Long dealerId) throws NoSuchFieldException, IllegalAccessException {
 		Row topRow = sheet.getRow(0);
-
 		List<CdkInventoryField> headers = getHeaderList(topRow);
+//		boolean headerRowFound = false;
+//
+//		List<CdkInventoryField> headers = getHeaderList(sheet);
 
 		List<AipInventoryEntity> inventoryList = new ArrayList<>();
 
@@ -82,7 +84,9 @@ public class CdkImportService {
 					}
 				}
 
-				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now()));
+				if(!rowDTO.isBlankRow()){
+					inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now()));
+				}
 			}
 		}
 
@@ -104,6 +108,29 @@ public class CdkImportService {
 
 //		System.out.println(headers.toString());
 		return headers;
+	}
+
+	/**
+	 * Finds the header list for this sheet, even if the header list isn't the first row of the sheet.
+	 * Theoretically, the header list could be any row in the sheet.
+	 * @param sheet
+	 * @return
+	 */
+	private List<CdkInventoryField> getHeaderList(Sheet sheet){
+		List<CdkInventoryField> headerList = new ArrayList<>();
+		for(Row row: sheet){
+			headerList = getHeaderList(row);
+			if(headerList.contains(CdkInventoryField.PARTNO)
+					&& headerList.contains(CdkInventoryField.DESC)){
+				break;
+			}
+		}
+
+		if(headerList.isEmpty()){
+			System.out.println("Unable to find column headers for sheet: " + sheet);
+		}
+
+		return headerList;
 	}
 
 	/**
@@ -156,6 +183,29 @@ public class CdkImportService {
 
 	}
 
+
+	public static String getAdmiStatus(String cdkStatus){
+		String status = "N";
+
+		if(cdkStatus != null){
+			switch(cdkStatus){
+				case "AP":
+				case "MO":
+					status = "S";
+					break;
+				case "SP":
+				case "NS":
+				case "DEL":
+					status = "N";
+					break;
+			}
+		} else{
+			status = "S";
+		}
+
+		return status;
+	}
+
 	/**
 	 * Takes a Cell of NUMERIC or STRING CellType and returns its value as a String.
 	 * If the cell is blank or null, returns a null String.
@@ -168,8 +218,9 @@ public class CdkImportService {
 		} else if(cell.getCellType().equals(CellType.STRING)){
 			return cell.getStringCellValue();
 		} else if(cell.getCellType().equals(CellType.NUMERIC)){
-			Double num = cell.getNumericCellValue();
-			return num.toString();
+			//round to prevent decimal of .0 appended to numeric value
+			Long wholeNum = Math.round(cell.getNumericCellValue());
+			return wholeNum.toString();
 		} else{
 			System.out.println("Unable to translate cell value into String. Cell: " + cell);
 		}
@@ -212,5 +263,9 @@ public class CdkImportService {
 		return date;
 
 	}
+
+//	private class Headers {
+//
+//	}
 
 }

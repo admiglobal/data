@@ -134,7 +134,7 @@ public enum CdkInventoryField {
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
-                    CdkDto :: setMar,
+                    CdkDto :: setMay,
                     String.class)),
     JUN("JUN",
             new CellDefinition<>(
