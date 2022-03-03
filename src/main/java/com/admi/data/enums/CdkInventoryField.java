@@ -6,186 +6,187 @@ import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 public enum CdkInventoryField {
-    PARTNO("PART-NO.",
+    PARTNO(new String[] {"PART-NO."},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     String.class,
                     CdkDto::setPartNo,
                     String.class)),
-    DESC("DESC",
+    DESC(new String[] {"DESC"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     String.class,
                     CdkDto :: setDescription,
                     String.class)),
-    COST("COST",
+    COST(new String[] {"COST"},
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
                     String.class,
                     CdkDto :: setCostCents,
                     Double.class)),
-    BIN("BIN",
+    BIN(new String[] {"BIN", "BIN1"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     String.class,
                     CdkDto :: setBin,
                     String.class)),
-    SOURCE("SO",
+    SOURCE(new String[] {"SO"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     String.class,
                     CdkDto :: setSource,
                     String.class)),
-    QOH("O.H.",
+    QOH(new String[] {"O.H.", "OH", "QOH"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     String.class,
                     CdkDto :: setQuantityOnHand,
                     String.class)),
-    QOO("O.O.",
+    QOO(new String[] {"O.O.", "OO", "QOO"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     String.class,
                     CdkDto :: setQuantityOnOrder,
                     String.class)),
-    STATUS("SS",
+    STATUS(new String[] {"SS"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     String.class,
                     CdkDto :: setStatus,
                     String.class)),
-    MNS("MNS",
+    MNS(new String[] {"MNS"},
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
                     String.class,
                     CdkDto :: setMns,
                     Long.class)),
-    MNR("MNR",
+    MNR(new String[] {"MNR"},
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
                     Long.class,
                     CdkDto :: setMnr,
                     Long.class)),
-    LAST_SALE("SALEDATE",
+    LAST_SALE(new String[] {"SALEDATE"},
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getLocalDateTimeCellValue,
                     LocalDate.class,
                     CdkDto :: setSaleDate,
                     LocalDate.class)),
-    LAST_RECEIPT("RDATE",
+    LAST_RECEIPT(new String[] {"RDATE"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     LocalDate.class,
                     CdkDto :: setrDate,
                     LocalDate.class)),
-    ENTRY("ENTRY",
+    ENTRY(new String[] {"ENTRY"},
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getLocalDateTimeCellValue,
                     LocalDate.class,
                     CdkDto :: setEntry,
                     LocalDate.class)),
-    JAN("JAN",
+    JAN(new String[] {"JAN"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setJan,
                     String.class)),
-    FEB("FEB",
+    FEB(new String[] {"FEB"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setFeb,
                     String.class)),
-    MAR("MAR",
+    MAR(new String[] {"MAR"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setMar,
                     String.class)),
-    APR("APR",
+    APR(new String[] {"APR"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setApr,
                     String.class)),
-    MAY("MAY",
+    MAY(new String[] {"MAY"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setMay,
                     String.class)),
-    JUN("JUN",
+    JUN(new String[] {"JUN"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setJun,
                     String.class)),
-    JUL("JUL",
+    JUL(new String[] {"JUL"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setJul,
                     String.class)),
-    AUG("AUG",
+    AUG(new String[] {"AUG"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setAug,
                     String.class)),
-    SEP("SEP",
+    SEP(new String[] {"SEP"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setSep,
                     String.class)),
-    OCT("OCT",
+    OCT(new String[] {"OCT"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setOct,
                     String.class)),
-    NOV("NOV",
+    NOV(new String[] {"NOV"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setNov,
                     String.class)),
-    DEC("DEC",
+    DEC(new String[] {"DEC"},
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
                     Long.class,
                     CdkDto :: setDec,
                     String.class)),
-    YRSL("YRSL",
+    YRSL(new String[] {"YRSL", "YTD"},
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -194,17 +195,21 @@ public enum CdkInventoryField {
                     Long.class)),
     ;
 
-    private final String fieldName;
+    private final String[] fieldNames;
     private final CellDefinition<CdkDto, ?, ?> definition;
     private static final Map<String, com.admi.data.enums.CdkInventoryField> map = new HashMap<>(values().length, 1);
 
-    private CdkInventoryField(String fieldName, CellDefinition<CdkDto, ?, ?> definition) {
-        this.fieldName = fieldName;
+    private CdkInventoryField(String[] fieldNames, CellDefinition<CdkDto, ?, ?> definition) {
+        this.fieldNames = fieldNames;
         this.definition = definition;
     }
 
     static {
-        for (com.admi.data.enums.CdkInventoryField c : values()) map.put(c.fieldName, c);
+        for (com.admi.data.enums.CdkInventoryField c : values()){
+            for(String fieldName: c.fieldNames){
+                map.put(fieldName, c);
+            }
+        }
     }
 
     public static com.admi.data.enums.CdkInventoryField of(String fieldName) {
@@ -215,19 +220,19 @@ public enum CdkInventoryField {
     }
 
     /**
-     * Copied from RRField--modified because we only have one column name
+     * Accounts for more than one possible column name
      */
     public static CdkInventoryField findByColumnName(String columnName) {
         for (CdkInventoryField field : values()) {
-            if (field.fieldName.equals(columnName)){
+            if (Arrays.asList(field.fieldNames).contains(columnName)){
                 return field;
             }
         }
         return null;
     }
 
-    public String getFieldName() {
-        return fieldName;
+    public String[] getfieldNames() {
+        return fieldNames;
     }
 
     public CellDefinition<CdkDto, ?, ?> getDefinition() {

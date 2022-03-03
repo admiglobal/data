@@ -57,8 +57,7 @@ public class CdkDto {
         inv.setDealerId(dealerId);
         inv.setPartNo(partNo);
         inv.setCents(this.costCents == null ? null : Math.toIntExact(this.costCents));
-        Integer qoh = this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand);
-        inv.setQoh(qoh);
+        inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
         inv.setStatus(this.getStatus());
         inv.setLastSale(this.getLastSaleDate());
@@ -72,14 +71,6 @@ public class CdkDto {
         inv.setQoo(this.quantityOnOrder == null ? null : Math.toIntExact(this.quantityOnOrder));
         inv.setTwelveMonthSales(this.yrsl == null ? null : Math.toIntExact(this.yrsl));
         inv.setEntryDate(this.getEntry());
-
-        if(!partNo.equals("XXXX-961614017")){
-            System.out.println("Qoh set to: " + qoh + ". Qoh value is now: " + inv.getQoh());
-            System.out.println("Importing CdkDto: QOH=" + this.quantityOnHand + "; DTO: " + this);
-//            int qoh = this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand);
-            System.out.println("QOH translation: " + qoh);
-            System.out.println("^ Imported to: QOH=" + inv.getQoh() + "; AipInventoryEntity: " + inv);
-        }
 
         return inv;
     }
@@ -126,7 +117,7 @@ public class CdkDto {
      * @param string An arbitrary string
      * @return A string containing only a-z, A-Z, and 0-9
      */
-    private String makeAlphanumeric(String string){
+    public static String makeAlphanumeric(String string){
         if (string != null) {
             return string.replaceAll("[^a-zA-Z0-9]", "");
         } else {
@@ -228,11 +219,12 @@ public class CdkDto {
      * @return The first number in the argument, as a Long value. If unable to parse long, returns a 0
      */
     public Long getFirstMonthsData(String multiMonthString){
-        if(multiMonthString == null){
+        if(multiMonthString == null || multiMonthString.equals("")){
             return null;
         }
 
         try{
+            multiMonthString = multiMonthString.trim();
             double d = Double.parseDouble(multiMonthString.split(" ")[0]);
             return Math.round(d);
         } catch(NumberFormatException nfe){

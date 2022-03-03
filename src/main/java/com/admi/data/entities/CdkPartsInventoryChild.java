@@ -1643,25 +1643,6 @@ public class CdkPartsInventoryChild implements Serializable {
 	@Transient
 	private String getAdmiStatus() {
 		return CdkImportService.getAdmiStatus(this.specialStatus);
-//		String status = "N";
-//
-//		if (this.specialStatus != null) {
-//			switch(this.specialStatus) {
-//				case "AP":
-//				case "MO":
-//					status = "S";
-//					break;
-//				case "SP":
-//				case "NS":
-//				case "DEL":
-//					status = "N";
-//					break;
-//			}
-//		} else {
-//			status = "S";
-//		}
-//
-//		return status;
 	}
 
 	@Transient
