@@ -56,13 +56,9 @@ public class CdkImportService {
 	 * Parses a sheet into a list of AipInventoryEntity's for the given dealer
 	 */
 	public List<AipInventoryEntity> importInventory(Sheet sheet, Long dealerId) throws NoSuchFieldException, IllegalAccessException {
-//		Row topRow = sheet.getRow(0);
-//		List<CdkInventoryField> headers = getHeaderList(topRow);
-
 		Headers headersObject = new Headers(sheet);
 		List<CdkInventoryField> headers = headersObject.headerList;
 		int headerRowNum = headersObject.headerRowNum;
-//		List<CdkInventoryField> headers = getHeaderList(sheet);
 
 
 		List<AipInventoryEntity> inventoryList = new ArrayList<>();
