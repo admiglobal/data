@@ -1,3 +1,7 @@
+/**
+ * This class represents an uploaded Motorcraft order, with order info, order content, and upload issues.
+ */
+
 package com.admi.data.dto;
 
 import com.admi.data.entities.DowOrderRow;
@@ -33,6 +37,22 @@ public class MotorcraftOrderSet {
 			);
 		}
 		return newOrders;
+	}
+
+	public Float getTotalOrderCost(){
+		Float total = 0F;
+		for(McOrdersContentEntity part: orderContent){
+			total += part.getPrice();
+		}
+		return total;
+	}
+
+	public Long getTotalOrderQuantity(){
+		Long count = 0L;
+		for(McOrdersContentEntity part: orderContent){
+			count += part.getQty();
+		}
+		return count;
 	}
 
 

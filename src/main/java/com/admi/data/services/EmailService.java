@@ -35,9 +35,10 @@ public class EmailService {
 		String[] bcc = {"kmowers@admiglobal.com"};
 		String subject = "Motorcraft Order Status - " + paCode;
 
-		String message = "Your order has been received and will be uploaded to DOW on your desired order upload date. " +
+		String message = "Your order has been received and will be uploaded to DOW within 72 hours of your desired order upload date. " +
 				"You can check it's status on the Motorcraft Order Site under the 'Orders' tab. " +
-				"If there was any issues with any of your order forms, they will be listed below.";
+				"Please note, orders will not be uploaded the same day they are submitted. " +
+				"If there were any issues with any of your order forms, they will be listed below.";
 
 		Context context = new Context();
 
