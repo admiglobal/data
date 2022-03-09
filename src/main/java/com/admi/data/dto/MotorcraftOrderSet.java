@@ -39,12 +39,12 @@ public class MotorcraftOrderSet {
 		return newOrders;
 	}
 
-	public Float getTotalOrderCost(){
+	public String getTotalOrderCost(){
 		Float total = 0F;
 		for(McOrdersContentEntity part: orderContent){
 			total += part.getPrice();
 		}
-		return total;
+		return "$" + total;
 	}
 
 	public Long getTotalOrderQuantity(){
@@ -54,7 +54,6 @@ public class MotorcraftOrderSet {
 		}
 		return count;
 	}
-
 
 	public McOrdersEntity getOrder() {
 		return order;
