@@ -34,9 +34,6 @@ public class EmailService {
 		List<ImportIssue> issues = new ArrayList<>();
 		orders.forEach((MotorcraftOrderSet order) -> issues.addAll(order.getIssues()));
 
-//		List<McOrdersEntity> orderSummaries = new ArrayList<>();
-//		orders.forEach((MotorcraftOrderSet order) -> orderSummaries.add(order.getOrder()));
-
 		if (userEmail == null) {
 			userEmail = testEmail;
 		}
