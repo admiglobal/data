@@ -50,6 +50,9 @@ public class ImportService {
 	RRImportService rrImportService;
 
 	@Autowired
+	CdkImportService cdkImportService;
+
+	@Autowired
 	AipInventoryRepository inventoryRepo;
 
 	@Autowired
@@ -79,6 +82,7 @@ public class ImportService {
 		} else if (Objects.equals(fileType, "application/vnd.ms-excel")) {
 			inventory = importXlsInventoryFile(file, dealerId, dmsId);
 		} else {
+//			System.out.println("Inside runAipInventory (line 85 of ImportService.java)");
 			inventory = importXlsxInventoryFile(file, dealerId, dmsId);
 		}
 
@@ -283,6 +287,7 @@ public class ImportService {
 	public List<AipInventoryEntity> importInventoryFile(InputStream file, Long dealerId, int dmsId)
 			throws InvalidFormatException, IllegalAccessException, NoSuchFieldException, IOException {
 		List<AipInventoryEntity> inventory;
+//		System.out.println("Inside importInventoryFile, line 290 of ImportService.java");
 		inventory = importXlsxInventoryFile(file, dealerId, dmsId);
 
 		return inventory;
@@ -424,10 +429,18 @@ public class ImportService {
 
 		switch(dmsId) {
 			case 0:
-			case 1:
-			case 48:
-			case 50:
+			case 1: 	//R&R
+			case 48: 	//R&R
+			case 50:	//R&R
 				inventory = rrImportService.importInventory(sheet, dealerId);
+				break;
+			case 8:		//CDK
+			case 35:	//CDK
+			case 37:	//CDK
+			case 53:	//CDK
+			case 54:	//CDK
+			case 61:	//CDK
+				inventory = cdkImportService.importInventory(sheet, dealerId);
 				break;
 			default:
 				break;

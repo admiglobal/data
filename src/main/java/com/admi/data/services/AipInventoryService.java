@@ -5,6 +5,7 @@ import com.admi.data.repositories.AipInventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -23,9 +24,13 @@ public class AipInventoryService {
 	AipInventoryRepository inventoryRepo;
 
 	public void saveAll(List<AipInventoryEntity> inventory, Long dealerId, String paCode) {
+		System.out.println("Saving inventory...");
+		long aipSaveStart = System.currentTimeMillis();
+
 		try {
 			inventoryRepo.saveAll(inventory);
 		} catch (Exception e) {
+			e.printStackTrace();
 			for (AipInventoryEntity part : inventory) {
 				try {
 					inventoryRepo.save(part);
@@ -37,7 +42,11 @@ public class AipInventoryService {
 				}
 			}
 		}
+		System.out.println("Finished saving parts. Processing inventory...");
 		processInventory(inventory, dealerId, paCode);
+
+		long aipSaveEnd = System.currentTimeMillis();
+		System.out.println("Total time taken to save: " + (aipSaveEnd-aipSaveStart)/1000 + "s.");
 	}
 
 	public void processInventory(List<AipInventoryEntity> inventory, Long dealerId, String paCode) {

@@ -1,6 +1,7 @@
 package com.admi.data.entities;
 
 import com.admi.data.entities.keys.CdkInventoryPK;
+import com.admi.data.services.CdkImportService;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import javax.persistence.*;
@@ -1641,25 +1642,7 @@ public class CdkPartsInventoryChild implements Serializable {
 
 	@Transient
 	private String getAdmiStatus() {
-		String status = "N";
-
-		if (this.specialStatus != null) {
-			switch(this.specialStatus) {
-				case "AP":
-				case "MO":
-					status = "S";
-					break;
-				case "SP":
-				case "NS":
-				case "DEL":
-					status = "N";
-					break;
-			}
-		} else {
-			status = "S";
-		}
-
-		return status;
+		return CdkImportService.getAdmiStatus(this.specialStatus);
 	}
 
 	@Transient
