@@ -29,8 +29,8 @@ public enum RRField implements InventoryField {
 			new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setBin)),
 	MAKE(new String [] {"MAKE"},
 			new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setMake)),
-	MFG_CONTROL(new String [] {"MFR-CONTROLLED"},
-			new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setMfgControlled)),
+//	MFG_CONTROL(new String [] {"MFR-CONTROLLED"},
+//			new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setMfgControlled)),
 	MIN(new String [] {"MIN"},
 			new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setMin)),
 	MAX(new String [] {"MAX"},
@@ -44,7 +44,9 @@ public enum RRField implements InventoryField {
 	HIST_12(new String [] {"HIST-12"},
 			new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setHistory12)),
 	HIST_24(new String [] {"HIST-24"},
-			new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto:: setHistory24));
+			new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto:: setHistory24)),
+	MFR_STAT(new String [] {"MFR-STAT"},
+			new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setMfgControlled));
 
 	private final String [] columnNames;
 	private final FieldDefinition<RRDto, ?> field;
