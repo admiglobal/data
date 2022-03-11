@@ -49,7 +49,7 @@ public class DealerTrackInventoryRow {
 		part.setCents(getStringAsCents(this.cost));
 		part.setQoh(getStringAsInteger(this.qoh));
 		part.setDescription(this.description.trim());
-		part.setStatus(this.status.trim());
+		part.setStatus(getStatusWithPhaseOut());
 		part.setAdmiStatus(getAdmiStatus());
 		part.setLastSale(getStringAsLocalDate(this.lastSaleDate, formatter));
 		part.setLastReceipt(getStringAsLocalDate(this.lastReceiptDate, formatter));
@@ -141,6 +141,15 @@ public class DealerTrackInventoryRow {
 				break;
 		}
 		return newStatus;
+	}
+
+	private String getStatusWithPhaseOut() {
+		String currentStatus = this.status.trim();
+
+		if (currentStatus.equals("N") && this.phaseOut != null)
+			return "P";
+		else
+			return currentStatus;
 	}
 
 	private Integer getTwelveMonthSales() {
