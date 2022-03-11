@@ -24,30 +24,21 @@ public class EmailService {
 	TemplateEngine templateEngine = new TemplateEngine();
 
 	public void sendMotorcraftOrderEmail(String userEmail, List<MotorcraftOrderSet> orders, String paCode) throws MessagingException {
-		boolean test = true;
-		String testEmail = "kmowers@admiglobal.com";
-		if(test){
-			testEmail = "jbetzig@admiglobal.com";
-		}
-
+		boolean test = false;
+		String devEmail = (test)? "jbetzig@admiglobal.com":"kmowers@admiglobal.com";
 
 		List<ImportIssue> issues = new ArrayList<>();
 		orders.forEach((MotorcraftOrderSet order) -> issues.addAll(order.getIssues()));
 
 		if (userEmail == null) {
-			userEmail = testEmail;
+			userEmail = devEmail;
 		}
 
 		String recipientEmail = userEmail;
 
 		String from = "Motorcraft@admiglobal.com";
-		String cc = "";
-		if(test){
-			cc = testEmail;
-		} else{
-			cc = "Motorcraft@admiglobal.com"; //want this live
-		}
-		String[] bcc = {testEmail};
+		String cc = (test)? devEmail: "Motorcraft@admiglobal.com";
+		String[] bcc = {devEmail};
 		String subject = "Motorcraft Order Status - " + paCode;
 
 		String message = "Your order has been received and will be uploaded to DOW within 72 hours of your desired order upload date. " +
@@ -67,7 +58,7 @@ public class EmailService {
 			emailUtility.sendMimeMessage(recipientEmail, from, cc, bcc, subject, html);
 		} catch (MailSendException e) {
 
-			emailUtility.sendMimeMessage(testEmail, from, bcc,"Order Failed to Send - " + subject, html);
+			emailUtility.sendMimeMessage(devEmail, from, bcc,"Order Failed to Send - " + subject, html);
 			throw e;
 		}
 	}
