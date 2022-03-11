@@ -88,7 +88,9 @@ public class ProcessService {
 
 			Files.createDirectories(Paths.get(filePath));
 
-			String fileName = order.getOrder().getPaCode() + "_" + DateService.getFileTimeString(order.getOrder().getPlaced()) + ".xlsx";
+//			String fileName = order.getOrder().getPaCode() + "_" + DateService.getFileTimeString(order.getOrder().getPlaced()) + ".xlsx";
+			//updated format to use ADMI Order Number: always unique filename
+			String fileName = order.getOrder().getPaCode() + "_" + order.getOrder().getPoNumber() + "_" + order.getOrder().getOrderNumber() + ".xlsx";
 
 			OutputStream fileOut = new FileOutputStream(filePath + fileName, false);
 			workbook.write(fileOut);

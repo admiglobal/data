@@ -137,6 +137,41 @@
 							<h4>Hello, </h4>
 							<p th:text="${message}">Message here</p>
 
+							<br>
+							<h4>Order Summary:</h4>
+							<table style="background-color: #eeeeee; text-align: center; width: 600px;">
+								<tr>
+									<th>
+										P&A Number
+									</th>
+									<th>
+										Purchase<br>Order #
+									</th>
+									<th>
+										Order Date
+									</th>
+									<th>
+										Order<br>Quantity
+									</th>
+									<th>
+										Order Value
+									</th>
+									<th>
+										Requested<br>DOW Upload<br>Date
+									</th>
+								</tr>
+
+								<!--/*@thymesVar id="orders" type="java.util.List<com.admi.data.dto.MotorcraftOrderSet>"*/-->
+								<tr th:each="order: ${orders}">
+									<td th:text="${order.getOrder().getPaCode()}"></td>
+									<td th:text="${order.getOrder().getPoNumber()}"></td>
+									<td th:text="${order.getOrder().getPlaced().toLocalDate()}"></td>
+									<td th:text="${order.getTotalOrderQuantity()}"></td>
+									<td th:text="${order.getTotalOrderCost()}"></td>
+									<td th:text="${order.getOrder().getOrderDate()}"></td>
+								</tr>
+							</table>
+							<br>
 
 							<!--/*@thymesVar id="issues" type="java.util.List<com.admi.data.dto.ImportIssue>"*/-->
 							<div th:if="${issues.size() > 0}? true">

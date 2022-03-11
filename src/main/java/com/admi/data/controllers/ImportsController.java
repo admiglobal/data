@@ -186,7 +186,7 @@ public class ImportsController {
 
 	@GetMapping("/motorcraft")
 	public String selectMotorocraftOrder(Model model) {
-		model.addAttribute("action", "/imports/motorcraft");
+		model.addAttribute("action", "/imports/motorcraftTest");
 		return getPage("upload", "Motorcraft", model);
 	}
 
