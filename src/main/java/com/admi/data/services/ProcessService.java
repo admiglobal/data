@@ -102,6 +102,50 @@ public class ProcessService {
 		}
 	}
 
+	/**
+	 * Deletes the Motorcraft order file from the P: drive that corresponds to this order number.
+	 * Files can have one of three formats. This function searches for all three:
+	 *         1) P&A_PlacedDatetime.xlsx  **Datetime of format yyyy-MM-dd_HH-nn-ss
+	 *         2) P&A_AdmiOrderNumber.xlsx
+	 *         3) P&A_PoNumber_AdmiOrderNumber.xlsx
+	 * Note that formats 1 and 2 are deprecated file formats.
+	 * @return true if successful, false if otherwise
+	 */
+	public Boolean deleteMotorcraftOrderFile(String orderNumber){
+		McOrdersEntity order = ordersRepo.findByOrderNumber(orderNumber);
+
+		String filePathRoot = File.separator + File.separator +
+				"192.168.254.1" + File.separator +
+				"Public" + File.separator +
+				"Development" + File.separator +
+				"Motorcraft_Orders" + File.separator +
+				"DOW Orders" + File.separator +
+				order.getOrderDate() + File.separator +
+				order.getPaCode() + "_";
+		String[] orderFileFormats = {
+				filePathRoot + DateService.getFileTimeString(order.getPlaced()) + ".xlsx",
+				filePathRoot + order.getOrderNumber() + ".xlsx",
+				filePathRoot + order.getPoNumber() + "_" + order.getOrderNumber() + ".xlsx"
+		};
+
+		//try each filename format
+		for(String orderFileFormat : orderFileFormats){
+			try {
+				File file = new File(orderFileFormat);
+				if(file.delete()){
+					System.out.println("Successfully deleted file from P: drive for Motorcraft order #" + orderNumber + ": " + orderFileFormat);
+					return true;
+				}
+
+			} catch (SecurityException se) {
+				se.printStackTrace();
+			}
+		}
+
+		System.out.println("Unable to delete file from P: drive for Motorcraft order #" + orderNumber);
+		return false;
+	}
+
 	public MotorcraftOrderSet getOrderSet(Long orderNumber) {
 		McOrdersEntity order = ordersRepo.findByOrderNumber(orderNumber.toString());
 		List<McOrdersContentEntity> orderContent = ordersContentRepo.findAllByPaCodeAndOrderNumber(order.getPaCode(), order.getOrderNumber());
