@@ -1,5 +1,7 @@
 package com.admi.data.services;
 
+import com.admi.data.dto.CdkDto;
+import com.admi.data.dto.CellDefinition;
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.CdkDealersEntity;
 import com.admi.data.entities.CdkPartsInventoryChild;
@@ -43,7 +45,10 @@ public class CdkImportService {
 
 		CdkDealersEntity dealer = cdkDealersRepo.findFirstByAdmiDealerIdAndEndDateIsNull(dealerId);
 		List<CdkPartsInventoryChild> inventory = cdkRepo.findAllByDealerIdAndInventoryDate(dealer.getDealerId(), localDate);
-		List<AipInventoryEntity> aipInventory = inventory.stream().map(part -> part.toAipInventoryEntity(dealerId)).collect(Collectors.toList());
+		List<AipInventoryEntity> aipInventory = inventory
+				.stream()
+				.map(part -> part.toAipInventoryEntity(dealerId))
+				.collect(Collectors.toList());
 
 		aipInventoryService.saveAll(aipInventory, dealerId, paCode);
 

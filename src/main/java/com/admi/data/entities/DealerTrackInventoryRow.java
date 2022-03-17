@@ -146,7 +146,9 @@ public class DealerTrackInventoryRow {
 	private String getStatusWithPhaseOut() {
 		String currentStatus = this.status.trim();
 
-		if (currentStatus.equals("N") && this.phaseOut != null)
+		if (currentStatus.equals("N")
+				&& this.phaseOut != null
+				&& !this.phaseOut.trim().equals("Not Avail"))
 			return "P";
 		else
 			return currentStatus;

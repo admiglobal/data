@@ -59,7 +59,7 @@ public class RRImportService {
 					}
 				}
 
-				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now(), false));
+				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now(), true));
 			}
 		}
 		System.out.println("Row Count: " + inventoryList.size());
@@ -90,7 +90,7 @@ public class RRImportService {
 					setDtoField(value, dto, field.getField());
 				}
 			}
-			inventory.add(dto.toAipInventory(dealerId, LocalDate.now(), false));
+			inventory.add(dto.toAipInventory(dealerId, LocalDate.now(), true));
 		}
 		return inventory;
 	}
@@ -111,7 +111,7 @@ public class RRImportService {
 		enumMap.put(SRC, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setSource));
 		enumMap.put(BIN, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setBin));
 		enumMap.put(MAKE, new FieldDefinition<>(CellType.STRING, String.class, RRDto :: setMake));
-		enumMap.put(MFG_CONTROL, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setMfgControlled));
+//		enumMap.put(MFG_CONTROL, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setMfgControlled));
 		enumMap.put(MIN, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setMin));
 		enumMap.put(MAX, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setMax));
 		enumMap.put(BSL_CAT, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto ::setBestStockingLevel));
@@ -119,6 +119,7 @@ public class RRImportService {
 		enumMap.put(HIST_6, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setHistory6));
 		enumMap.put(HIST_12, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setHistory12));
 		enumMap.put(HIST_24, new FieldDefinition<>(CellType.NUMERIC, Long.class, RRDto :: setHistory24));
+		enumMap.put(MFR_STAT, new FieldDefinition<RRDto, String>(CellType.STRING, String.class, RRDto :: setMfgControlled));
 
 		return enumMap;
 	}
