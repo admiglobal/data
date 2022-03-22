@@ -44,7 +44,7 @@ public class MotorcraftOrderSet {
 		for(McOrdersContentEntity part: orderContent){
 			total += part.getPrice();
 		}
-		return "$" + total;
+		return "$" + String.format("%.2f", total); //currency format
 	}
 
 	public Long getTotalOrderQuantity(){
