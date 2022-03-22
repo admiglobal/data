@@ -144,13 +144,14 @@ public class ImportService {
 		Boolean skipOrder = false;
 
 		if (paCode == null || paCode.equals("")) {
-			paCode = job.getPaCode();
+//			paCode = job.getPaCode();
 			issues.add(new ImportIssue(
 					"Missing P&A Code",
-					"Order was submitted without a P&A Code",
+					"Order was uploaded without a P&A Code",
 					sheet.getSheetName(),
-					"The order has been imported using your account's P&A Code." )
+					"Please re-upload this sheet with a P&A Code." )
 			);
+			skipOrder = true;
 		}
 
 		Cell poNumberCell = sheet.getRow(1).getCell(1);
@@ -160,7 +161,7 @@ public class ImportService {
 		if (poNumber.equals("") || poNumber == null) {
 			issues.add(new ImportIssue(
 					"Missing PO Number",
-					"Order was submitted without a PO Number",
+					"Order was uploaded without a PO Number",
 					sheet.getSheetName(),
 					"Please re-upload this sheet with a PO Number." )
 			);
