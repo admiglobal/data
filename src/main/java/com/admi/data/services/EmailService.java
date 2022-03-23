@@ -46,9 +46,14 @@ public class EmailService {
 				"Please note, orders will not be uploaded the same day they are submitted. " +
 				"If there were any issues with any of your order forms, they will be listed below.";
 
+		String issuesMessage = "**Note: " +
+				"Be sure only to re-upload those orders that contain errors and require re-submission. " +
+				"If you need further assistance, contact the support center at Motorcraft@admigobal.com.";
+
 		Context context = new Context();
 
 		context.setVariable("message", message);
+		context.setVariable("issuesMessage", issuesMessage);
 		context.setVariable("issues", issues);
 		context.setVariable("orders", orders);
 
