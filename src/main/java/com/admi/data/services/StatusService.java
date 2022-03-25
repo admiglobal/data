@@ -47,6 +47,14 @@ public class StatusService {
         }
     }
 
+//    @Async("asyncExecutor")
+//    @Scheduled(cron="0 21 14 * * ?") //2:12pm every day
+//    public void runStatusValuesForDummy(){
+//        System.out.println("Running status values for CDK dummy...");
+//        runStatusValuesForToday(enrollmentService.getCdkDummy());
+//        System.out.println("Finished running for CDK dummy.");
+//    }
+
     private void runStatusValuesForToday(EnrollmentEntity dealer) {
         DateTimeFormatter dataDateFormatter = DateTimeFormatter.ofPattern("yyyyMM");
         Long dataDate = Long.parseLong(dataDateFormatter.format(LocalDate.now()));

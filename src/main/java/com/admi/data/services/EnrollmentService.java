@@ -26,4 +26,8 @@ public class EnrollmentService {
     public List<? extends EnrollmentEntity> getAllAipDealers() {
         return aipEnrollRepo.findAllByOrderByPaCode();
     }
+
+    public EnrollmentEntity getCdkDummy(){
+        return aipEnrollRepo.findFirstByPaCode("000001");
+    }
 }

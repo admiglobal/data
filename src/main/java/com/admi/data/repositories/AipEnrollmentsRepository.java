@@ -8,5 +8,6 @@ import java.util.List;
 public interface AipEnrollmentsRepository extends JpaRepository<AipEnrollmentsEntity, Long> {
 
     List<AipEnrollmentsEntity> findAllByOrderByPaCode();
+    AipEnrollmentsEntity findFirstByPaCode(String paCode);
 
 }

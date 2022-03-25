@@ -1,41 +1,36 @@
 package com.admi.data.entities;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
 
 public class StatusTotalsEntityPK implements Serializable {
-    @Column(name = "DEALER_ID")
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int dealerId;
-    @Column(name = "DATA_DATE")
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int dataDate;
-    @Column(name = "STATUS")
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long dealerId;
+    private Long dataDate;
     private String status;
 
-    public int getDealerId() {
+    @Column(name = "DEALER_ID", nullable = false, precision = 0)
+    @Id
+    public Long getDealerId() {
         return dealerId;
     }
 
-    public void setDealerId(int dealerId) {
+    public void setDealerId(Long dealerId) {
         this.dealerId = dealerId;
     }
 
-    public int getDataDate() {
+    @Column(name = "DATA_DATE", nullable = false, precision = 0)
+    @Id
+    public Long getDataDate() {
         return dataDate;
     }
 
-    public void setDataDate(int dataDate) {
+    public void setDataDate(Long dataDate) {
         this.dataDate = dataDate;
     }
 
+    @Column(name = "STATUS", nullable = false)
+    @Id
     public String getStatus() {
         return status;
     }
@@ -51,18 +46,16 @@ public class StatusTotalsEntityPK implements Serializable {
 
         StatusTotalsEntityPK that = (StatusTotalsEntityPK) o;
 
-        if (dealerId != that.dealerId) return false;
-        if (dataDate != that.dataDate) return false;
-        if (status != null ? !status.equals(that.status) : that.status != null) return false;
+        if (dealerId != null ? !dealerId.equals(that.dealerId) : that.dealerId != null) return false;
+        if (dataDate != null ? !dataDate.equals(that.dataDate) : that.dataDate != null) return false;
 
         return true;
     }
 
     @Override
     public int hashCode() {
-        int result = dealerId;
-        result = 31 * result + dataDate;
-        result = 31 * result + (status != null ? status.hashCode() : 0);
+        int result = dealerId != null ? dealerId.hashCode() : 0;
+        result = 31 * result + (dataDate != null ? dataDate.hashCode() : 0);
         return result;
     }
 }
