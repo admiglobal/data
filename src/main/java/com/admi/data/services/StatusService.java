@@ -5,18 +5,25 @@ import com.admi.data.entities.KpiEntity;
 import com.admi.data.entities.StatusTotalsEntity;
 import com.admi.data.entities.ZigEntity;
 import com.admi.data.enums.statuses.*;
+import com.admi.data.repositories.AipEnrollmentsRepository;
 import com.admi.data.repositories.KpiRepository;
 import com.admi.data.repositories.StatusTotalsRepository;
 import com.admi.data.repositories.ZigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Service
 public class StatusService {
 
     @Autowired
@@ -28,7 +35,21 @@ public class StatusService {
     @Autowired
     StatusTotalsRepository statusTotalsRepo;
 
-    private void runStatusValuesForToday(EnrollmentEntity dealer, Long dataDate) {
+    @Autowired
+    EnrollmentService enrollmentService;
+
+    @Async("asyncExecutor")
+    @Scheduled(cron="0 0 5 * * ?") //5am every day
+    public void runStatusValuesForTodayForAllDealers(){
+        List<EnrollmentEntity> allAipDealers = enrollmentService.getAllDealers();
+        for(EnrollmentEntity dealer : allAipDealers){
+            runStatusValuesForToday(dealer);
+        }
+    }
+
+    private void runStatusValuesForToday(EnrollmentEntity dealer) {
+        DateTimeFormatter dataDateFormatter = DateTimeFormatter.ofPattern("yyyyMM");
+        Long dataDate = Long.parseLong(dataDateFormatter.format(LocalDate.now()));
 
         ZigEntity zigEntityForDate = zigRepo.findFirstByPaCode(dealer.getPaCode());
 
