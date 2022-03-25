@@ -48,7 +48,7 @@ public class StatusService {
     }
 
 //    @Async("asyncExecutor")
-//    @Scheduled(cron="0 21 14 * * ?") //2:12pm every day
+//    @Scheduled(cron="0 43 14 * * ?") //schedule for when you want to test
 //    public void runStatusValuesForDummy(){
 //        System.out.println("Running status values for CDK dummy...");
 //        runStatusValuesForToday(enrollmentService.getCdkDummy());
