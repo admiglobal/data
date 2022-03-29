@@ -1,17 +1,9 @@
 package com.admi.data.services;
 
-import com.admi.data.entities.EnrollmentEntity;
-import com.admi.data.entities.KpiEntity;
-import com.admi.data.entities.StatusTotalsEntity;
-import com.admi.data.entities.ZigEntity;
+import com.admi.data.entities.*;
 import com.admi.data.enums.statuses.*;
-import com.admi.data.repositories.AipEnrollmentsRepository;
-import com.admi.data.repositories.KpiRepository;
-import com.admi.data.repositories.StatusTotalsRepository;
-import com.admi.data.repositories.ZigRepository;
+import com.admi.data.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -36,26 +28,11 @@ public class StatusService {
     StatusTotalsRepository statusTotalsRepo;
 
     @Autowired
-    EnrollmentService enrollmentService;
+    DealerMasterRepository dealerMasterRepo;
 
-    @Async("asyncExecutor")
-    @Scheduled(cron="0 0 5 * * ?") //5am every day
-    public void runStatusValuesForTodayForAllDealers(){
-        List<EnrollmentEntity> allAipDealers = enrollmentService.getAllDealers();
-        for(EnrollmentEntity dealer : allAipDealers){
-            runStatusValuesForToday(dealer);
-        }
-    }
+    public void runStatusValuesForToday(Long dealerId) {
+        DealerMasterEntity dealer = dealerMasterRepo.findByDealerId(dealerId);
 
-//    @Async("asyncExecutor")
-//    @Scheduled(cron="0 43 14 * * ?") //schedule for when you want to test
-//    public void runStatusValuesForDummy(){
-//        System.out.println("Running status values for CDK dummy...");
-//        runStatusValuesForToday(enrollmentService.getCdkDummy());
-//        System.out.println("Finished running for CDK dummy.");
-//    }
-
-    private void runStatusValuesForToday(EnrollmentEntity dealer) {
         DateTimeFormatter dataDateFormatter = DateTimeFormatter.ofPattern("yyyyMM");
         Long dataDate = Long.parseLong(dataDateFormatter.format(LocalDate.now()));
 
@@ -75,7 +52,7 @@ public class StatusService {
         List<ZigEntity> supportedParts = zigRepo.findAllSupportedParts(
                 dealer.getPaCode(),
                 todayDate,
-                getStockStatusString(dealer.getDms())
+                getStockStatusString(dealer.getDmsId())
         );
 
         KpiEntity kpiEntity = kpiRepo.findByDealerIdAndDataDate(dealer.getDealerId(), dataDate);
@@ -101,14 +78,14 @@ public class StatusService {
         rimTotals.put(KpiTitle.NON_RIM.toString(), allPartsTotal.subtract(rimAllTotal));
 
         maps.put(0, supportedTotals);
-        maps.put(1, totalPartsByStatus(allParts, dealer.getDms()));
+        maps.put(1, totalPartsByStatus(allParts, dealer.getDmsId()));
         maps.put(2, rimTotals);
 
         maps.forEach((k,v) -> saveStatusFromMap(v, dealer, k, dataDate));
     }
 
     private void saveStatusFromMap(Map<String, BigDecimal> map,
-                                   EnrollmentEntity dealer,
+                                   DealerMasterEntity dealer,
                                    Integer graphNumber,
                                    Long dataDate) {
         map.forEach((k,v) -> statusTotalsRepo.save(
@@ -118,7 +95,7 @@ public class StatusService {
                         k,
                         v.floatValue(),
                         graphNumber,
-                        dealer.getDms()
+                        dealer.getDmsId()
                 )
         ));
         statusTotalsRepo.flush();

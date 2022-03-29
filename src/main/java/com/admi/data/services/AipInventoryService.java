@@ -23,6 +23,9 @@ public class AipInventoryService {
 	@Autowired
 	AipInventoryRepository inventoryRepo;
 
+	@Autowired
+	StatusService statusService;
+
 	public void saveAll(List<AipInventoryEntity> inventory, Long dealerId, String paCode) {
 		System.out.println("Saving inventory...");
 		long aipSaveStart = System.currentTimeMillis();
@@ -53,6 +56,7 @@ public class AipInventoryService {
 		zigService.saveAsZig(inventory, paCode);
 		rimService.addOrUpdateRimParts(dealerId, inventory);
 		processService.calculateAisKpi(inventory);
+		statusService.runStatusValuesForToday(dealerId);
 	}
 
 }
