@@ -112,4 +112,12 @@ public interface ZigRepository extends JpaRepository<ZigEntity, Long> {
 			"  and to_date(nvl(Lr_DATE, nvl(LS_DATE, sysdate)), 'YYYY-MM-DD') > add_months(sysdate, -13)",
 			nativeQuery = true)
 	List<ZigEntity> findAllSupportedParts(String paCode, LocalDateTime dataDate, String stockStatus);
+
+	@Query(value = "select zig.*\n" +
+			"from AIS_ZIG_NEW zig\n" +
+			"where zig.PA_CODE = ?1\n" +
+			"  and DATA_DATE = ?2\n" +
+			"  and QOH >= 0",
+			nativeQuery = true)
+	List<ZigEntity> findAllNonnegativeQohByPaCodeAndDataDateOrderByDmsStatus(String paCode, LocalDateTime dataDate);
 }

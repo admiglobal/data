@@ -46,7 +46,7 @@ public class StatusService {
             todayDate = zigEntityForDate.getDataDate();
         }
 
-        List<ZigEntity> allParts = zigRepo.findAllByPaCodeAndDataDateOrderByDmsStatus(dealer.getPaCode(), todayDate);
+        List<ZigEntity> nonnegativeQohParts = zigRepo.findAllNonnegativeQohByPaCodeAndDataDateOrderByDmsStatus(dealer.getPaCode(), todayDate);
         List<ZigEntity> rimActiveParts = zigRepo.findAllRimActivePartsByPaCode(dealer.getPaCode(), todayDate);
         List<ZigEntity> rimInactiveParts = zigRepo.findAllRimInactivePartsByPaCode(dealer.getPaCode(), todayDate);
         List<ZigEntity> supportedParts = zigRepo.findAllSupportedParts(
@@ -78,7 +78,7 @@ public class StatusService {
         rimTotals.put(KpiTitle.NON_RIM.toString(), allPartsTotal.subtract(rimAllTotal));
 
         maps.put(0, supportedTotals);
-        maps.put(1, totalPartsByStatus(allParts, dealer.getDmsId()));
+        maps.put(1, totalPartsByStatus(nonnegativeQohParts, dealer.getDmsId()));
         maps.put(2, rimTotals);
 
         maps.forEach((k,v) -> saveStatusFromMap(v, dealer, k, dataDate));
@@ -151,6 +151,14 @@ public class StatusService {
         return total;
     }
 
+    /**
+     * Returns a map that maps DMS status name to total value of that status in inventory;
+     * that is, the sum of all cost*QOH for all parts of that status.
+     * Note: DOES include parts with a negative on-hand value. This will skew results if not omitted from the inventory argument.
+     * @param inventory All parts in this dealer's inventory
+     * @param dms The DMS ID for this dealer
+     * @return A HashMap of: DMS status name -> status total
+     */
     public HashMap<String, BigDecimal> totalPartsByStatus(List<ZigEntity> inventory, int dms) {
         HashMap<String, BigDecimal> totals = new HashMap<>();
 
