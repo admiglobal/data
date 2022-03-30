@@ -172,6 +172,28 @@ public class CdkImportService {
 		return status;
 	}
 
+	public static String getModifiedPartNumber(String partNumber, int hashCode) {
+		if(partNumber == null || partNumber.trim().equals("")){
+			return "XXXX-" + hashCode;
+		} else {
+			return makeAlphanumeric(partNumber);
+		}
+
+	}
+
+	/**
+	 * Returns the argument string, having removed any non-alphanumeric characters.
+	 * @param string An arbitrary string
+	 * @return A string containing only a-z, A-Z, and 0-9
+	 */
+	public static String makeAlphanumeric(String string){
+		if (string != null) {
+			return string.replaceAll("[^a-zA-Z0-9]", "");
+		} else {
+			return null;
+		}
+	}
+
 	/**
 	 * Takes a Cell of NUMERIC or STRING CellType and returns its value as a String.
 	 * If the cell is blank or null, returns a null String.

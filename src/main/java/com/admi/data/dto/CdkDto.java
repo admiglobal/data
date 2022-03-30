@@ -48,14 +48,8 @@ public class CdkDto {
 
         AipInventoryEntity inv = new AipInventoryEntity();
 
-        //can't have null part numbers: make stand-in of format "XXXX-[hashCode]"
-        String partNo = this.getPartNo();
-        if(partNo == null || partNo.equals("")){
-            partNo = "XXXX-" + this.hashCode();
-        }
-
         inv.setDealerId(dealerId);
-        inv.setPartNo(partNo);
+        inv.setPartNo(CdkImportService.getModifiedPartNumber(partNo, this.hashCode()));
         inv.setCents(this.costCents == null ? null : Math.toIntExact(this.costCents));
         inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
@@ -113,24 +107,11 @@ public class CdkDto {
     }
 
     /**
-     * Returns the argument string, having removed any non-alphanumeric characters.
-     * @param string An arbitrary string
-     * @return A string containing only a-z, A-Z, and 0-9
-     */
-    public static String makeAlphanumeric(String string){
-        if (string != null) {
-            return string.replaceAll("[^a-zA-Z0-9]", "");
-        } else {
-            return null;
-        }
-    }
-
-    /**
      * Makes the given part number alphanumeric, if not null.
      * @param partNo
      */
     public void setPartNo(String partNo) {
-        this.partNo = makeAlphanumeric(partNo);
+        this.partNo = CdkImportService.makeAlphanumeric(partNo);
     }
 
     public String getPartNo() {

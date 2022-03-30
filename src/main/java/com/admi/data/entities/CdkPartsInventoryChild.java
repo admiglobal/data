@@ -1605,12 +1605,12 @@ public class CdkPartsInventoryChild implements Serializable {
 		AipInventoryEntity aip = new AipInventoryEntity();
 
 		aip.setDealerId(dealerId);
-		aip.setPartNo(this.partNumber.replaceAll("[^a-zA-Z0-9]", "").toUpperCase());
+		aip.setPartNo(getModifiedPartNumber());
 		aip.setCents(getPricing());
 		aip.setQoh(Objects.nonNull(this.onHand) ? Math.toIntExact(this.onHand) : 0);
 		aip.setDescription(this.description);
 		aip.setStatus(getModifiedSpecialStatus());
-		aip.setAdmiStatus(this.getAdmiStatus());
+		aip.setAdmiStatus(getAdmiStatus());
 		aip.setLastSale(getLastReceiptOrSale(this.lastSaleDate, this.monthsNoSale));
 		aip.setLastReceipt(getLastReceiptOrSale(this.dateLastReceipted, this.monthsNoReceipt));
 		aip.setBin(this.bin1);
@@ -1674,6 +1674,11 @@ public class CdkPartsInventoryChild implements Serializable {
 				date = date.minusMonths(monthNoDate + 1);
 		}
 		return date;
+	}
+
+	@Transient
+	private String getModifiedPartNumber() {
+		return CdkImportService.getModifiedPartNumber(this.partNumber, this.hashCode());
 	}
 
 	@Override
