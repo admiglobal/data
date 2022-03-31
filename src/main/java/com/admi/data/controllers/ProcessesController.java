@@ -4,9 +4,11 @@ import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.KpiEntity;
 import com.admi.data.services.AisKpiService;
 import com.admi.data.repositories.AipInventoryRepository;
+import com.admi.data.services.CpcKpiService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
@@ -21,6 +23,9 @@ public class ProcessesController {
 	AisKpiService aisKpiService;
 
 	@Autowired
+	CpcKpiService cpcService;
+
+	@Autowired
 	AipInventoryRepository aipInventoryRepo;
 
 	@ResponseBody
@@ -33,4 +38,11 @@ public class ProcessesController {
 		return kpis.toString();
 	}
 
+	@ResponseBody
+	@GetMapping("/cpc")
+	public String processCpcKpi() {
+		cpcService.runCpcDealers();
+
+		return "It did the thing.";
+	}
 }
