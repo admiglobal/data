@@ -2,6 +2,8 @@ package com.admi.data.enums.statuses;
 
 import com.admi.data.enums.statuses.DmsStatus;
 
+import java.util.List;
+
 public enum RREraStatus implements DmsStatus {
 
 	STOCK("Stock/Active"),
@@ -30,11 +32,20 @@ public enum RREraStatus implements DmsStatus {
 		return statusName;
 	}
 
-	public DmsStatus getStockStatus() {
-		return RREraStatus.STOCK;
+	public List<DmsStatus> getStockStatuses() {
+		return List.of(STOCK, AP, MO, DP, RB);
 	}
 
-	public DmsStatus getNonStockStatus() {
-		return RREraStatus.NS;
+	public List<DmsStatus> getNonStockStatuses() {
+		return List.of(NS, NP, OB, RBH);
 	}
+
+	public List<DmsStatus> getActiveStatuses() {
+		return List.of(STOCK, MO, RB);
+	}
+
+	public List<DmsStatus> getInactiveStatuses() {
+		return List.of(NS, AP, DP, NP, OB, RBH);
+	}
+
 }

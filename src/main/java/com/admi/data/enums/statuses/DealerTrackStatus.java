@@ -2,6 +2,8 @@ package com.admi.data.enums.statuses;
 
 import com.admi.data.enums.statuses.DmsStatus;
 
+import java.util.List;
+
 public enum DealerTrackStatus implements DmsStatus {
 
 	//	DealerTrack Status
@@ -26,11 +28,19 @@ public enum DealerTrackStatus implements DmsStatus {
 		return statusName;
 	}
 
-	public DmsStatus getStockStatus() {
-		return DealerTrackStatus.A;
+	public List<DmsStatus> getStockStatuses() {
+		return List.of(A, P, R);
 	}
 
-	public DmsStatus getNonStockStatus() {
-		return DealerTrackStatus.N;
+	public List<DmsStatus> getNonStockStatuses() {
+		return List.of(N, C);
+	}
+
+	public List<DmsStatus> getActiveStatuses() {
+		return List.of(A);
+	}
+
+	public List<DmsStatus> getInactiveStatuses() {
+		return List.of(N, P, R);
 	}
 }

@@ -2,12 +2,14 @@ package com.admi.data.enums.statuses;
 
 import com.admi.data.enums.statuses.DmsStatus;
 
+import java.util.List;
+
 public enum AutosoftStatus implements DmsStatus {
 
 	//	Autosoft Status
 	Y("Stock/Active"),
-	S("Special Order"),
-	N("Non-Stock"),
+	S("Non Stock/Special Order"),
+	N("Manual Order"),
 	C("Old Part Number Change"),
 	L("Lost Sale"),
 	O("Obsolete"),
@@ -28,11 +30,19 @@ public enum AutosoftStatus implements DmsStatus {
 		return statusName;
 	}
 
-	public DmsStatus getStockStatus() {
-		return AutosoftStatus.Y;
+	public List<DmsStatus> getStockStatuses() {
+		return List.of(Y, N, C, R);
 	}
 
-	public DmsStatus getNonStockStatus() {
-		return AutosoftStatus.N;
+	public List<DmsStatus> getNonStockStatuses() {
+		return List.of(S, L, O, P);
+	}
+
+	public List<DmsStatus> getActiveStatuses() {
+		return List.of(Y, N);
+	}
+
+	public List<DmsStatus> getInactiveStatuses() {
+		return List.of(S, L, O, P);
 	}
 }

@@ -2,6 +2,8 @@ package com.admi.data.enums.statuses;
 
 import com.admi.data.enums.statuses.DmsStatus;
 
+import java.util.List;
+
 public enum LightyearStatus implements DmsStatus {
 
 	//	Lightyear Status
@@ -26,11 +28,19 @@ public enum LightyearStatus implements DmsStatus {
 		return statusName;
 	}
 
-	public DmsStatus getStockStatus() {
-		return LightyearStatus.S;
+	public List<DmsStatus> getStockStatuses() {
+		return List.of(S, P, X);
 	}
 
-	public DmsStatus getNonStockStatus() {
-		return LightyearStatus.N;
+	public List<DmsStatus> getNonStockStatuses() {
+		return List.of(N);
+	}
+
+	public List<DmsStatus> getActiveStatuses() {
+		return List.of(S, X);
+	}
+
+	public List<DmsStatus> getInactiveStatuses() {
+		return List.of(N, P);
 	}
 }

@@ -1,13 +1,19 @@
 package com.admi.data.enums.statuses;
 
+import java.util.List;
+
 public interface DmsStatus {
 
 	public String getStatusName();
 
-	public DmsStatus getStockStatus();
+	public List<DmsStatus> getStockStatuses();
 
-	public DmsStatus getNonStockStatus();
+	public List<DmsStatus> getNonStockStatuses();
 
 	public String toString();
+
+	public List<DmsStatus> getActiveStatuses();
+
+	public List<DmsStatus> getInactiveStatuses();
 
 }

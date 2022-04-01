@@ -2,6 +2,8 @@ package com.admi.data.enums.statuses;
 
 import com.admi.data.enums.statuses.DmsStatus;
 
+import java.util.List;
+
 public enum GenericStatus implements DmsStatus {
 
 	NONE("No Status"),
@@ -32,6 +34,14 @@ public enum GenericStatus implements DmsStatus {
 
 	public DmsStatus getNonStockStatus() {
 		return GenericStatus.NON_STOCK;
+	}
+
+	public List<DmsStatus> getActiveStatuses() {
+		return List.of();
+	}
+
+	public List<DmsStatus> getInactiveStatuses() {
+		return List.of();
 	}
 
 }

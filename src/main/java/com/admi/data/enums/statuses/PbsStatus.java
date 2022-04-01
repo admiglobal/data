@@ -3,6 +3,7 @@ package com.admi.data.enums.statuses;
 import com.admi.data.enums.statuses.DmsStatus;
 
 import java.util.Arrays;
+import java.util.List;
 
 public enum PbsStatus implements DmsStatus {
 
@@ -17,7 +18,7 @@ public enum PbsStatus implements DmsStatus {
 	R("Replaced", new String[]{"R"}),
 	MANUAL_ORDER("Manual Order", new String[]{"MANUAL ORDER", "MANUAL_ORDER"}),
 	MEMO("Memo", new String[]{"MEMO"}),
-	SUPERSEDED("Replaced", new String[]{"SUPERSEDED"}),
+	SUPERSEDED("Superseded", new String[]{"SUPERSEDED"}),
 	O("Other", new String[]{"O"});
 
 	private final String statusName;
@@ -45,11 +46,20 @@ public enum PbsStatus implements DmsStatus {
 		return statusName;
 	}
 
-	public DmsStatus getStockStatus() {
-		return PbsStatus.STOCK;
+	public List<DmsStatus> getStockStatuses() {
+		return List.of(STOCK, R, MANUAL_ORDER, SUPERSEDED);
 	}
 
-	public DmsStatus getNonStockStatus() {
-		return PbsStatus.TEST;
+	public List<DmsStatus> getNonStockStatuses() {
+		return List.of(TEST, C, O, MEMO);
 	}
+
+	public List<DmsStatus> getActiveStatuses() {
+		return List.of(STOCK, MANUAL_ORDER);
+	}
+
+	public List<DmsStatus> getInactiveStatuses() {
+		return List.of(TEST, O, R, SUPERSEDED, MEMO);
+	}
+
 }

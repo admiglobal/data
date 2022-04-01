@@ -2,6 +2,8 @@ package com.admi.data.enums.statuses;
 
 import com.admi.data.enums.statuses.DmsStatus;
 
+import java.util.List;
+
 public enum AutomateStatus implements DmsStatus {
 
 	//  Automate Status,
@@ -25,12 +27,20 @@ public enum AutomateStatus implements DmsStatus {
 		return statusName;
 	}
 
-	public DmsStatus getStockStatus() {
-		return AutomateStatus.STOCKED;
+	public List<DmsStatus> getStockStatuses() {
+		return List.of(STOCKED, AUTO_PHASE_OUT, PHASE_OUT, MANUAL);
 	}
 
-	public DmsStatus getNonStockStatus() {
-		return AutomateStatus.NOT_STOCKED;
+	public List<DmsStatus> getNonStockStatuses() {
+		return List.of(NOT_STOCKED);
+	}
+
+	public List<DmsStatus> getActiveStatuses() {
+		return List.of(STOCKED, MANUAL);
+	}
+
+	public List<DmsStatus> getInactiveStatuses() {
+		return List.of(NOT_STOCKED, AUTO_PHASE_OUT);
 	}
 
 }

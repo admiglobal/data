@@ -2,6 +2,8 @@ package com.admi.data.enums.statuses;
 
 import com.admi.data.enums.statuses.DmsStatus;
 
+import java.util.List;
+
 public enum CdkStatus implements DmsStatus {
 
 	//	CDK Status
@@ -27,11 +29,19 @@ public enum CdkStatus implements DmsStatus {
 		return statusName;
 	}
 
-	public DmsStatus getStockStatus() {
-		return CdkStatus.STOCK;
+	public List<DmsStatus> getStockStatuses() {
+		return List.of(STOCK, AP, MO, DP);
 	}
 
-	public DmsStatus getNonStockStatus() {
-		return CdkStatus.NS;
+	public List<DmsStatus> getNonStockStatuses() {
+		return List.of(NS, SP);
+	}
+
+	public List<DmsStatus> getActiveStatuses() {
+		return List.of(STOCK, MO);
+	}
+
+	public List<DmsStatus> getInactiveStatuses() {
+		return List.of(NS, AP, SP, DP);
 	}
 }
