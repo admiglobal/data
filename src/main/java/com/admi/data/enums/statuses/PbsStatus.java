@@ -32,10 +32,19 @@ public enum PbsStatus implements DmsStatus {
 		}
 	}
 
+	/**
+	 * Returns the corresponding PBS status object for this status name.
+	 * Accounts for multiple possible names for a status.
+	 * Case-insensitive.
+	 * @param statusName A string of arbitrary case describing a PBS status
+	 * @return The corresponding PBS status object.
+	 */
 	public static PbsStatus findStatus(String statusName) {
 		for (PbsStatus status : values()) {
-			if (Arrays.asList(status.statusNameArray).contains(statusName)) {
-				return status;
+			for(String name : status.statusNameArray){
+				if(statusName.equalsIgnoreCase(name)){
+					return status;
+				}
 			}
 		}
 		return null;
