@@ -32,22 +32,20 @@ public class CpcKpiService {
     @Autowired
     PriceTapeRepository priceTapeRepo;
 
-    public void runCpcDealers() {
+    public void runCpcDealers(LocalDate inventoryDate) {
 
         List<CpcDealerProfileEntity> profiles = cpcDealerProfileRepo.findAll();
 
         for (CpcDealerProfileEntity profile : profiles) {
-            CpcKpiEntity cpcKpi = calculateCpcKpi(profile.getDealerId(), LocalDate.of(2022, 3, 24), profile.getPartsList(), profile.getTierList());
-            kpiRepo.save(cpcKpi);
+            runSingleCpcDealer(profile.getDealerId(), inventoryDate, profile.getPartsList(), profile.getTierList());
         }
 
-//        Capital Ford (00978)
-//        CpcKpiEntity cpcKpi = calculateCpcKpi(951L, LocalDate.of(2022, 3, 24), "AT", (short) 2000);
-//        kpiRepo.save(cpcKpi);
+//        Capital Ford (00978) - 951L
+//        Capitol Ford (06637) - 3051L
+    }
 
-//        Capitol Ford (06637)
-//        CpcKpiEntity cpcKpi = calculateCpcKpi(30511L, LocalDate.of(2022, 3, 24), "NC", (short) 1500);
-//        kpiRepo.save(cpcKpi);
+    public void runSingleCpcDealer(Long dealerId, LocalDate inventoryDate, String partsList, Short tierList) {
+        calculateCpcKpi(dealerId, inventoryDate, partsList, tierList);
     }
 
     private BigDecimal getTotalInvestment(List<AipInventoryEntity> inventory, List<PriceTapeEntity> priceTapeParts) {
@@ -120,7 +118,7 @@ public class CpcKpiService {
         return onHandCpcParts;
     }
 
-    public CpcKpiEntity calculateCpcKpi(Long dealerId, LocalDate dataDate, String partsList, Short tierList) {
+    public void calculateCpcKpi(Long dealerId, LocalDate dataDate, String partsList, Short tierList) {
 
         List<AipInventoryEntity> collisionParts = inventoryRepo.findAllCollisionPartsInInventory(dealerId, dataDate);
         List<AipInventoryEntity> nonCollisionParts = inventoryRepo.findAllNonCollisionPartsInInventory(dealerId, dataDate);
@@ -133,30 +131,35 @@ public class CpcKpiService {
         long totalNonCollisionSku = nonCollisionParts.size();
         long totalCpcListSku = onHandCpcParts.size();
 
-        BigDecimal totalCollisionInvestment = getTotalInvestment(collisionParts, allOnHandDealerPartsInPriceTape);
-        BigDecimal totalNonCollisionInvestment = getTotalInvestment(nonCollisionParts, allOnHandDealerPartsInPriceTape);
-        BigDecimal totalCpcListInvestment = getTotalInvestment(onHandCpcParts, allOnHandDealerPartsInPriceTape);
+        if (totalCollisionSku > 1 || totalNonCollisionSku > 1) {
+            BigDecimal totalCollisionInvestment = getTotalInvestment(collisionParts, allOnHandDealerPartsInPriceTape);
+            BigDecimal totalNonCollisionInvestment = getTotalInvestment(nonCollisionParts, allOnHandDealerPartsInPriceTape);
+            BigDecimal totalCpcListInvestment = getTotalInvestment(onHandCpcParts, allOnHandDealerPartsInPriceTape);
 
-        BigDecimal cpcListPartsPriceTotal = BigDecimal.ZERO;
+            BigDecimal cpcListPartsPriceTotal = BigDecimal.ZERO;
 
-        for (PriceTapeEntity part : allCpcListPartsInPriceTape) {
-            cpcListPartsPriceTotal = cpcListPartsPriceTotal.add(part.getPcValue());
+            for (PriceTapeEntity part : allCpcListPartsInPriceTape) {
+                cpcListPartsPriceTotal = cpcListPartsPriceTotal.add(part.getPcValue());
+            }
+
+            BigDecimal cpcListPartsPriceAverage = cpcListPartsPriceTotal.divide(BigDecimal.valueOf(tierList), 2, RoundingMode.HALF_EVEN);
+
+            BigDecimal cpcObjective = cpcListPartsPriceAverage.multiply(BigDecimal.valueOf((0.85 * tierList) - totalCpcListSku));
+            cpcObjective = cpcObjective.setScale(0, RoundingMode.HALF_EVEN);
+
+            CpcKpiEntity cpcKpi =  new CpcKpiEntity(
+                    dealerId,
+                    dataDate,
+                    tierList,
+                    totalCollisionSku,
+                    totalNonCollisionSku,
+                    totalCpcListSku,
+                    totalCollisionInvestment,
+                    totalNonCollisionInvestment,
+                    totalCpcListInvestment,
+                    cpcObjective);
+
+            kpiRepo.save(cpcKpi);
         }
-
-        BigDecimal cpcListPartsPriceAverage = cpcListPartsPriceTotal.divide(BigDecimal.valueOf(tierList), 2, RoundingMode.HALF_EVEN);
-
-        BigDecimal cpcObjective = cpcListPartsPriceAverage.multiply(BigDecimal.valueOf((0.85 * tierList) - totalCpcListSku));
-        cpcObjective = cpcObjective.setScale(0, RoundingMode.HALF_EVEN);
-
-        return new CpcKpiEntity(dealerId,
-                dataDate,
-                tierList,
-                totalCollisionSku,
-                totalNonCollisionSku,
-                totalCpcListSku,
-                totalCollisionInvestment,
-                totalNonCollisionInvestment,
-                totalCpcListInvestment,
-                cpcObjective);
     }
 }

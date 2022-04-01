@@ -28,20 +28,21 @@ public enum GenericStatus implements DmsStatus {
 		return statusName;
 	}
 
-	public DmsStatus getStockStatus() {
-		return GenericStatus.STOCK;
+	public List<DmsStatus> getStockStatuses() {
+		return List.of(STOCK);
 	}
 
-	public DmsStatus getNonStockStatus() {
-		return GenericStatus.NON_STOCK;
+	public List<DmsStatus> getNonStockStatuses() {
+		return List.of(NON_STOCK);
 	}
 
 	public List<DmsStatus> getActiveStatuses() {
-		return List.of();
+		return List.of(STOCK);
 	}
 
 	public List<DmsStatus> getInactiveStatuses() {
-		return List.of();
+		return List.of(NON_STOCK);
 	}
+
 
 }

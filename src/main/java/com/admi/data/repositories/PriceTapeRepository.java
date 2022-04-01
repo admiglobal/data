@@ -19,9 +19,8 @@ public interface PriceTapeRepository extends JpaRepository<PriceTapeEntity, Long
             "WHERE FPT.TAPE = 'FORD_US'\n" +
             "AND CPL.PARTS_LIST = :partsList\n" +
             "AND CPL.RANK <= :tierList", nativeQuery = true)
-    List<PriceTapeEntity> findAllCpcListPartsInPriceTape(
-            @Param("partsList") String partsList,
-            @Param("tierList") Short tierList);
+    List<PriceTapeEntity> findAllCpcListPartsInPriceTape(@Param("partsList") String partsList,
+                                                         @Param("tierList") Short tierList);
 
     @Query( value = "SELECT FPT.*\n" +
             "FROM FORD_PT FPT\n" +
@@ -36,7 +35,6 @@ public interface PriceTapeRepository extends JpaRepository<PriceTapeEntity, Long
             "AND DM.TERMINATION_DATE IS NULL\n" +
             "AND DM.DEALERSHIP_COUNTRY = 'USA'\n" +
             "AND FDI.QOH > 0", nativeQuery = true)
-    List<PriceTapeEntity> findAllOnHandDealerPartsInPriceTape(
-            @Param("dealerId") Long dealerId,
-            @Param("dataDate") LocalDate dataDate);
+    List<PriceTapeEntity> findAllOnHandDealerPartsInPriceTape(@Param("dealerId") Long dealerId,
+                                                              @Param("dataDate") LocalDate dataDate);
 }

@@ -1,7 +1,9 @@
 package com.admi.data.controllers;
 
 import com.admi.data.entities.AipInventoryEntity;
+import com.admi.data.entities.CpcDealerProfileEntity;
 import com.admi.data.entities.KpiEntity;
+import com.admi.data.repositories.CpcDealerProfileRepository;
 import com.admi.data.services.AisKpiService;
 import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.services.CpcKpiService;
@@ -24,13 +26,19 @@ import java.util.List;
 public class ProcessesController {
 
 	@Autowired
-	AisKpiService aisKpiService;
-
-	@Autowired
 	AipInventoryRepository aipInventoryRepo;
 
 	@Autowired
+	CpcDealerProfileRepository cpcDealerProfileRepo;
+
+	@Autowired
+	AisKpiService aisKpiService;
+
+	@Autowired
 	ProcessService processService;
+
+	@Autowired
+	CpcKpiService cpcService;
 
 	@ResponseBody
 //	@GetMapping("/processTest")
@@ -55,10 +63,27 @@ public class ProcessesController {
 	}
 
 	@ResponseBody
-	@GetMapping("/cpc")
-	public String processCpcKpi() {
-		cpcService.runCpcDealers();
+	@GetMapping("/cpc/{dateString}")
+	public String processCpcKpi(@PathVariable("dateString") String dateString) {
+		LocalDate date = LocalDate.parse(dateString);
+
+		cpcService.runCpcDealers(date);
 
 		return "It did the thing.";
+	}
+
+	@ResponseBody
+	@GetMapping("/cpc/{dealerId}/{dateString}")
+	public String processSingleCpcDealer(@PathVariable("dealerId") Long dealerId,
+	                                     @PathVariable("dateString") String dateString) {
+		LocalDate date = LocalDate.parse(dateString);
+		CpcDealerProfileEntity profile = cpcDealerProfileRepo.findByDealerId(dealerId);
+
+		if (profile != null) {
+			cpcService.runSingleCpcDealer(dealerId, date, profile.getPartsList(), profile.getTierList());
+			return "CPC Dealer " + dealerId + " ran.";
+		} else {
+			return "Dealer " + dealerId + " not found.";
+		}
 	}
 }
