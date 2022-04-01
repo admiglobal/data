@@ -4,11 +4,15 @@ import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.KpiEntity;
 import com.admi.data.services.AisKpiService;
 import com.admi.data.repositories.AipInventoryRepository;
+import com.admi.data.services.CpcKpiService;
 import com.admi.data.services.ProcessService;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -50,4 +54,11 @@ public class ProcessesController {
 		return deleteSuccessful.toString();
 	}
 
+	@ResponseBody
+	@GetMapping("/cpc")
+	public String processCpcKpi() {
+		cpcService.runCpcDealers();
+
+		return "It did the thing.";
+	}
 }
