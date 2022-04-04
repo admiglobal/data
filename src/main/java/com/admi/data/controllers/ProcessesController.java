@@ -9,6 +9,7 @@ import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.services.CpcKpiService;
 import com.admi.data.services.ProcessService;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -63,8 +64,18 @@ public class ProcessesController {
 	}
 
 	@ResponseBody
+	@GetMapping("/cpc")
+	public String processCpcKpi() {
+		LocalDate date = aipInventoryRepo.getMaxDate();
+
+		cpcService.runCpcDealers(date);
+
+		return "It did the thing.";
+	}
+
+	@ResponseBody
 	@GetMapping("/cpc/{dateString}")
-	public String processCpcKpi(@PathVariable("dateString") String dateString) {
+	public String processCpcKpiByDate(@PathVariable("dateString") String dateString) {
 		LocalDate date = LocalDate.parse(dateString);
 
 		cpcService.runCpcDealers(date);
