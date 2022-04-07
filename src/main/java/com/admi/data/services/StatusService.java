@@ -233,7 +233,7 @@ public class StatusService {
                 break;
             case 30:
                 try {
-                    status = PbsStatus.valueOf(statusString);
+                    status = PbsStatus.findStatus(statusString); //case-insensitive
                 } catch (NullPointerException | IllegalArgumentException e) {
                     status = PbsStatus.TEST;
                 }

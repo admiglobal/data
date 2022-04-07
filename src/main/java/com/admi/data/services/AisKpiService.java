@@ -87,6 +87,8 @@ public class AisKpiService {
 			kpi.setPieceCount(pieceCount);
 		}
 
+
+//		TODO: Move into IF statement?
 		kpi.convertAllCentsToDollars();
 
 		kpiRepo.saveAndFlush(kpi);
