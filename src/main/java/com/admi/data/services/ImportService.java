@@ -50,6 +50,9 @@ public class ImportService {
 	RRImportService rrImportService;
 
 	@Autowired
+	RRPowerImportService rrPowerImportService;
+
+	@Autowired
 	CdkImportService cdkImportService;
 
 	@Autowired
@@ -426,10 +429,12 @@ public class ImportService {
 
 		switch(dmsId) {
 			case 0:
-			case 1: 	//R&R
-			case 48: 	//R&R
-			case 50:	//R&R
+			case 1: 	//R&R ERA
+			case 50:	//R&R Ignite
 				inventory = rrImportService.importInventory(sheet, dealerId);
+				break;
+			case 48: 	//R&R Power
+				inventory = rrPowerImportService.importInventory(sheet, dealerId);
 				break;
 			case 8:		//CDK
 			case 35:	//CDK
