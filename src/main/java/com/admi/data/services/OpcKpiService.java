@@ -30,18 +30,24 @@ public class OpcKpiService {
     FordDealerInventoryRepository fordDealerInventoryRepo;
 
     @Async("asyncExecutor")
-    @Scheduled(cron="0 43 14 * * ?")
+    @Scheduled(cron="0 38 15 * * ?")
     public void tester(){
-        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
-        int count = 1;
+        //testing QL dealers list
+//        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
+//        int count = 1;
+//
+//        for(DealerMasterEntity dealer : quickLaneDealers){
+//            System.out.print(count++ + ": ");
+//            System.out.println(dealer);
+//        }
 
-        for(DealerMasterEntity dealer : quickLaneDealers){
-            System.out.print(count++ + ": ");
-            System.out.println(dealer);
-//            String paCode = dealer.getPaCode();
-//            updateOpc200Data(paCode);
-//            takePerformanceSnapshot(paCode); //take snapshot AFTER updating
-        }
+        //testing performance snapshot method
+            //issues: SpringBoot doesn't want to convert LocalDate to sql.Date. IDK why.
+//        takePerformanceSnapshot("02960");
+
+        //testing OPC data process
+        List<OpcTsp200DataEntity> newOpc200Data = opcTsp200DataRepo.findAllByPaCodeFromFordDealerInventory("02960");
+        System.out.println("Number of new parts found: " + newOpc200Data.size());
     }
 
 //    @Async("asyncExecutor")

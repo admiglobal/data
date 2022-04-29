@@ -16,7 +16,7 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
      * This is useful for updating OPC_TSP_200_DATA with new data from FORD_DEALER_INVENTORY,
      * since the latter updates weekly.
      */
-    @Query( value = "SELECT inv.PA_CODE, opc.OC_PART_NUMBER, inv.QOH\n" +
+    @Query( value = "SELECT inv.PA_CODE, opc.OC_PART_NUMBER PART_NUMBER, inv.QOH\n" +
             "FROM FORD_DEALER_INVENTORY inv\n" +
             "INNER JOIN OPC_TSP_200 opc\n" +
             "ON (opc.SERVICE_PART_NUMBER = inv.PARTNO\n" +
@@ -32,8 +32,8 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
      */
     @Query( value = "SELECT COUNT(*)\n" +
             "FROM OPC_TSP_200_DATA\n" +
-            "WHERE inv.QOH > 0\n" +
-            "AND inv.PA_CODE = :paCode"
+            "WHERE QOH > 0\n" +
+            "AND PA_CODE = :paCode"
             , nativeQuery = true)
     int findSkuQohByPaCode(
             @Param("paCode") String paCode);
