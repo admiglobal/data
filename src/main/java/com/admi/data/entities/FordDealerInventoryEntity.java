@@ -57,7 +57,7 @@ public class FordDealerInventoryEntity {
     @Basic
     @Column(name = "ENTRY_DATE")
     private LocalDate entryDate;
-    @Id
+    @Basic
     @Column(name = "PA_CODE")
     private String paCode;
 

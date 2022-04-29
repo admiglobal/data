@@ -30,7 +30,22 @@ public class OpcKpiService {
     FordDealerInventoryRepository fordDealerInventoryRepo;
 
     @Async("asyncExecutor")
-    @Scheduled(cron="0 0 23 L * ?") //runs at 11pm to prevent overlap with the main OPC process
+    @Scheduled(cron="0 43 14 * * ?")
+    public void tester(){
+        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
+        int count = 1;
+
+        for(DealerMasterEntity dealer : quickLaneDealers){
+            System.out.print(count++ + ": ");
+            System.out.println(dealer);
+//            String paCode = dealer.getPaCode();
+//            updateOpc200Data(paCode);
+//            takePerformanceSnapshot(paCode); //take snapshot AFTER updating
+        }
+    }
+
+//    @Async("asyncExecutor")
+//    @Scheduled(cron="0 0 23 L * ?") //runs at 11pm to prevent overlap with the main OPC process
     public void takeMonthEndSnapshots(){
         List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
 
@@ -44,8 +59,8 @@ public class OpcKpiService {
      * If we didn't receive new inventory data, doesn't delete old data but still takes a new snapshot.
      * Runs 10pm every Wednesday since Ford data received weekly anytime Mon-Wed
      */
-    @Async("asyncExecutor")
-    @Scheduled(cron="0 0 22 * * 4")
+//    @Async("asyncExecutor")
+//    @Scheduled(cron="0 0 22 * * 4")
     public void runOpcProcess(){
         List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
 

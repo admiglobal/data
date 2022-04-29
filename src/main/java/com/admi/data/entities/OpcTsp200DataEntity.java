@@ -8,12 +8,12 @@ public class OpcTsp200DataEntity {
     @Id
     @Column(name = "PA_CODE")
     private String paCode;
-    @Id
+    @Basic
     @Column(name = "PART_NUMBER")
     private String partNumber;
     @Basic
     @Column(name = "QOH")
-    private Short qoh;
+    private Long qoh;
 
     public String getPaCode() {
         return paCode;
@@ -31,11 +31,11 @@ public class OpcTsp200DataEntity {
         this.partNumber = partNumber;
     }
 
-    public Short getQoh() {
+    public Long getQoh() {
         return qoh;
     }
 
-    public void setQoh(Short qoh) {
+    public void setQoh(Long qoh) {
         this.qoh = qoh;
     }
 
