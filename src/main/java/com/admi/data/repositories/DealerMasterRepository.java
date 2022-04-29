@@ -1,12 +1,10 @@
 package com.admi.data.repositories;
 
 import com.admi.data.entities.DealerMasterEntity;
-import com.admi.data.entities.ZigEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -25,7 +23,7 @@ public interface DealerMasterRepository extends JpaRepository<DealerMasterEntity
 			"  and g.COUNTRY_CODE = 'USA' \n" +
 			"  and dm.PRIMARY_MANUFACTURER_ID = 1 \n" +
 			"  and dm.TERMINATION_DATE is null \n" +
-			"  and dm.DEALERSHIP_COUNTRY = 'USA' \n" +
+			"  and (dm.DEALERSHIP_COUNTRY = 'USA' or dm.DEALERSHIP_COUNTRY is null) \n" +
 			"order by dm.PA_CODE",
 			nativeQuery = true)
 	List<DealerMasterEntity> findAllQuickLaneDealers();
