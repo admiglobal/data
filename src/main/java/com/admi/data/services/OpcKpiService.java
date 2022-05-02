@@ -30,7 +30,7 @@ public class OpcKpiService {
     FordDealerInventoryRepository fordDealerInventoryRepo;
 
     @Async("asyncExecutor")
-    @Scheduled(cron="0 38 15 * * ?")
+    @Scheduled(cron="0 43 10 * * ?")
     public void tester(){
         //testing QL dealers list
 //        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
@@ -43,11 +43,11 @@ public class OpcKpiService {
 
         //testing performance snapshot method
             //issues: SpringBoot doesn't want to convert LocalDate to sql.Date. IDK why.
-//        takePerformanceSnapshot("02960");
+        takePerformanceSnapshot("02960");
 
         //testing OPC data process
-        List<OpcTsp200DataEntity> newOpc200Data = opcTsp200DataRepo.findAllByPaCodeFromFordDealerInventory("02960");
-        System.out.println("Number of new parts found: " + newOpc200Data.size());
+//        List<OpcTsp200DataEntity> newOpc200Data = opcTsp200DataRepo.findAllByPaCodeFromFordDealerInventory("02960");
+//        System.out.println("Number of new parts found: " + newOpc200Data.size());
     }
 
 //    @Async("asyncExecutor")
@@ -95,13 +95,15 @@ public class OpcKpiService {
      * Saves a performance snapshot for number of OPC200 SKU's a particular dealer has on hand.
      * The "snapshot date" is LocalDate.now().
      */
-    private void takePerformanceSnapshot(String paCode){
+    public void takePerformanceSnapshot(String paCode){
         OpcWeeklyPerformanceEntity snapshot = new OpcWeeklyPerformanceEntity();
         snapshot.setPaCode(paCode);
         snapshot.setSnapshotDate(LocalDate.now());
         snapshot.setQoh(opcTsp200DataRepo.findSkuQohByPaCode(paCode));
+        System.out.println(snapshot);
 
         opcWeeklyPerformanceRepo.save(snapshot);
+        System.out.println("Saved to db.");
     }
 
 }

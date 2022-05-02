@@ -6,6 +6,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
 import java.sql.Date;
+import java.time.LocalDate;
 
 public class OpcWeeklyPerformanceEntityPK implements Serializable {
     @Column(name = "PA_CODE")
@@ -16,7 +17,7 @@ public class OpcWeeklyPerformanceEntityPK implements Serializable {
     @Column(name = "SNAPSHOT_DATE")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Date snapshotDate;
+    private LocalDate snapshotDate;
 
     public String getPaCode() {
         return paCode;
@@ -26,11 +27,11 @@ public class OpcWeeklyPerformanceEntityPK implements Serializable {
         this.paCode = paCode;
     }
 
-    public Date getSnapshotDate() {
+    public LocalDate getSnapshotDate() {
         return snapshotDate;
     }
 
-    public void setSnapshotDate(Date snapshotDate) {
+    public void setSnapshotDate(LocalDate snapshotDate) {
         this.snapshotDate = snapshotDate;
     }
 

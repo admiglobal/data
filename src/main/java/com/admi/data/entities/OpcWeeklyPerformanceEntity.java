@@ -68,4 +68,13 @@ public class OpcWeeklyPerformanceEntity {
         result = 31 * result + (qoh != null ? qoh.hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "OpcWeeklyPerformanceEntity{" +
+                "paCode='" + paCode + '\'' +
+                ", snapshotDate=" + snapshotDate +
+                ", qoh=" + qoh +
+                '}';
+    }
 }

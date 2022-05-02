@@ -7,6 +7,7 @@ import com.admi.data.repositories.CpcDealerProfileRepository;
 import com.admi.data.services.AisKpiService;
 import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.services.CpcKpiService;
+import com.admi.data.services.OpcKpiService;
 import com.admi.data.services.ProcessService;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.tomcat.jni.Local;
@@ -40,6 +41,9 @@ public class ProcessesController {
 
 	@Autowired
 	CpcKpiService cpcService;
+
+	@Autowired
+	OpcKpiService opcKpiService;
 
 	@ResponseBody
 //	@GetMapping("/processTest")
@@ -96,5 +100,13 @@ public class ProcessesController {
 		} else {
 			return "Dealer " + dealerId + " not found.";
 		}
+	}
+
+	@ResponseBody
+	@GetMapping("/opc/{paCode}")
+	public String processSingleOpcDealer(@PathVariable("paCode") String paCode) {
+		opcKpiService.takePerformanceSnapshot(paCode);
+
+		return "Ran single OPC dealer (P&A Code " + paCode + ").";
 	}
 }
