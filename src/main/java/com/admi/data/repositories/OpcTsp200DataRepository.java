@@ -30,12 +30,32 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
     /**
      * Finds the number of OPC200 SKU's on hand for a particular PA code
      */
-    @Query( value = "SELECT COUNT(*)\n" +
-            "FROM OPC_TSP_200_DATA\n" +
-            "WHERE QOH > 0\n" +
-            "AND PA_CODE = :paCode"
+    @Query( value = "SELECT SUM(CASE WHEN d.qoh is null THEN 0 ELSE 1 END) total_qoh\n" +
+            "FROM OPC_TSP_200 opc\n" +
+            "left join (\n" +
+            "select * from OPC_TSP_200_DATA\n" +
+            "where PA_CODE = :paCode\n" +
+            "and QOH > 0\n" +
+            ") d\n" +
+            "on (d.PART_NUMBER = opc.SERVICE_PART_NUMBER\n" +
+            "or d.PART_NUMBER = opc.OC_PART_NUMBER)"
             , nativeQuery = true)
     int findSkuQohByPaCode(
             @Param("paCode") String paCode);
 
+    /**
+     * Finds value of the OPC 200 parts on hand for a particular PA code
+     */
+    @Query( value = "SELECT SUM((opc.DEALER_NET * nvl(d.QOH, 0))) total_value\n" +
+            "FROM OPC_TSP_200 opc\n" +
+            "left join (\n" +
+            "select * from OPC_TSP_200_DATA\n" +
+            "where PA_CODE = :paCode\n" +
+            "and QOH > 0\n" +
+            ") d\n" +
+            "on (d.PART_NUMBER = opc.SERVICE_PART_NUMBER\n" +
+            "or d.PART_NUMBER = opc.OC_PART_NUMBER)"
+            , nativeQuery = true)
+    double findTotalOpcValueByPaCode(
+            @Param("paCode") String paCode);
 }

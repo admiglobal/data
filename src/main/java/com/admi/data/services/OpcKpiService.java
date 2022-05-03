@@ -1,5 +1,6 @@
 package com.admi.data.services;
 
+import com.admi.data.dto.OpcKpiDto;
 import com.admi.data.entities.DealerMasterEntity;
 import com.admi.data.entities.OpcTsp200DataEntity;
 import com.admi.data.entities.OpcWeeklyPerformanceEntity;
@@ -96,14 +97,73 @@ public class OpcKpiService {
      * The "snapshot date" is LocalDate.now().
      */
     public void takePerformanceSnapshot(String paCode){
+//        Integer opcQoh = opcTsp200DataRepo.findSkuQohByPaCode(paCode);
+//        Double d = opcTsp200DataRepo.findTotalOpcValueByPaCode(paCode) * 100;
+//        Integer opcValue = d.intValue();
+//
+//        List<OpcKpiDto> brandData = opcWeeklyPerformanceRepo.findBrandAndValueAndSkuByPaCode(paCode);
+////        for(OpcKpiDto brand : brandData){
+////            System.out.println("brand: " + brand.getBrand() + "; value: " + brand.value());
+////        }
+//
+//        OpcWeeklyPerformanceEntity snapshot = new OpcWeeklyPerformanceEntity();
+//        snapshot.setPaCode(paCode);
+//        snapshot.setSnapshotDate(LocalDate.now());
+//        snapshot.setQoh(opcQoh);
+//        snapshot.setOpcValueCents(opcValue);
+//        snapshot.setTotalSku(0); //default these to zeros: may not be data for all of them
+//        snapshot.setTotalValueCents(0);
+//        snapshot.setMcSku(0);
+//        snapshot.setMcValueCents(0);
+//        snapshot.setFordSku(0);
+//        snapshot.setFordValueCents(0);
+//        snapshot.setOtherOcSku(0);
+//        snapshot.setOtherOcValueCents(0);
+//
+//        int ocValue = 0;
+//        int ocSku = 0;
+//        int totalValue = 0;
+//        int totalSku = 0;
+//
+//        for(OpcKpiDto brandRow : brandData){
+//            Double b = brandRow.getValue() * 100;
+//            Integer valueCents = b.intValue();
+//
+//            totalValue += valueCents;
+//            totalSku += brandRow.getSku();
+//
+//            String brand = (brandRow.getBrand() == null) ? "" : brandRow.getBrand();
+//            switch(brand){
+//                case "Q":   //OnmiCraft
+//                            ocValue = valueCents;
+//                            ocSku = brandRow.getSku();
+//                            break;
+//                case "A":   //Motorcraft
+//                            snapshot.setMcSku(brandRow.getSku());
+//                            snapshot.setMcValueCents(valueCents);
+//                            break;
+//                default:    //BlueBox or null brand (count both as Ford)
+//                            snapshot.setFordSku(snapshot.getFordSku() + brandRow.getSku());
+//                            snapshot.setFordValueCents(snapshot.getFordValueCents() + valueCents);
+//                            break;
+//            }
+//
+//        }
+//
+//        snapshot.setTotalSku(totalSku);
+//        snapshot.setTotalValueCents(totalValue);
+//        //subtract OPC from other OC parts
+//        snapshot.setOtherOcSku(ocSku - opcQoh);
+//        snapshot.setOtherOcValueCents(ocValue - opcValue);
+//
+//        System.out.println(snapshot);
+
         OpcWeeklyPerformanceEntity snapshot = new OpcWeeklyPerformanceEntity();
         snapshot.setPaCode(paCode);
         snapshot.setSnapshotDate(LocalDate.now());
-        snapshot.setQoh(opcTsp200DataRepo.findSkuQohByPaCode(paCode));
-        System.out.println(snapshot);
-
         opcWeeklyPerformanceRepo.save(snapshot);
         System.out.println("Saved to db.");
+
     }
 
 }

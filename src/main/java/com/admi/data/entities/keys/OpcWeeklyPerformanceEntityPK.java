@@ -5,20 +5,15 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
-import java.sql.Date;
 import java.time.LocalDate;
 
 public class OpcWeeklyPerformanceEntityPK implements Serializable {
+    private String paCode;
+    private LocalDate snapshotDate;
+
     @Column(name = "PA_CODE")
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private String paCode;
-
-    @Column(name = "SNAPSHOT_DATE")
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private LocalDate snapshotDate;
-
     public String getPaCode() {
         return paCode;
     }
@@ -27,12 +22,19 @@ public class OpcWeeklyPerformanceEntityPK implements Serializable {
         this.paCode = paCode;
     }
 
+    @Column(name = "SNAPSHOT_DATE")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public LocalDate getSnapshotDate() {
         return snapshotDate;
     }
 
     public void setSnapshotDate(LocalDate snapshotDate) {
-        this.snapshotDate = snapshotDate;
+        try{
+            this.snapshotDate = snapshotDate;
+        } catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     @Override
