@@ -103,10 +103,19 @@ public class ProcessesController {
 	}
 
 	@ResponseBody
+	@GetMapping("/opc")
+	public String processOpcKpi(@PathVariable("paCode") String paCode) {
+		opcKpiService.runOpcProcess();
+
+		return "Ran OPC KPI process: transferred OPC 200 data and took KPI performance snapshots for each OPC dealer.";
+	}
+
+	@ResponseBody
 	@GetMapping("/opc/{paCode}")
 	public String processSingleOpcDealer(@PathVariable("paCode") String paCode) {
 		opcKpiService.updateOpc200Data(paCode);
+		opcKpiService.takePerformanceSnapshot(paCode); //take snapshot AFTER updating
 
-		return "Ran single OPC dealer (P&A Code " + paCode + ").";
+		return "Ran single OPC dealer (P&A Code " + paCode + "): transferred OPC 200 data and took KPI performance snapshot.";
 	}
 }

@@ -5,7 +5,7 @@ import com.admi.data.entities.keys.OpcTsp200DataEntityPK;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "OPC_TSP_200_DATA", schema = "ADMI", catalog = "")
+@Table(name = "OPC_TSP_200_DATA", schema = "ADMI")
 @IdClass(OpcTsp200DataEntityPK.class)
 public class OpcTsp200DataEntity {
     private String paCode;

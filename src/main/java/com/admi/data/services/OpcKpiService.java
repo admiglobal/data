@@ -9,6 +9,8 @@ import com.admi.data.repositories.FordDealerInventoryRepository;
 import com.admi.data.repositories.OpcTsp200DataRepository;
 import com.admi.data.repositories.OpcWeeklyPerformanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -27,35 +29,6 @@ public class OpcKpiService {
 
     @Autowired
     FordDealerInventoryRepository fordDealerInventoryRepo;
-
-    public void tester(String paCode){
-        //testing QL dealers list
-//        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
-//        int count = 1;
-//
-//        for(DealerMasterEntity dealer : quickLaneDealers){
-//            System.out.print(count++ + ": ");
-//            System.out.println(dealer);
-//        }
-
-        //testing performance snapshot method
-            //issues: SpringBoot doesn't want to convert LocalDate to sql.Date. IDK why.
-//        takePerformanceSnapshot("02960");
-
-        //testing OPC data process
-//        List<OpcTsp200DataEntity> newOpc200Data = opcTsp200DataRepo.findAllByPaCodeFromFordDealerInventory("02960");
-//        System.out.println("Number of new parts found: " + newOpc200Data.size());
-    }
-
-//    @Async("asyncExecutor")
-//    @Scheduled(cron="0 0 23 L * ?")
-    public void takeMonthEndSnapshots(){
-        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
-
-        for(DealerMasterEntity dealer : quickLaneDealers){
-            takePerformanceSnapshot(dealer.getPaCode());
-        }
-    }
 
     /**
      * Updates OPC_TSP_200_DATA and takes a performance snapshot.
