@@ -2,6 +2,7 @@ package com.admi.data.services;
 
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.KpiEntity;
+import com.admi.data.enums.statuses.DmsStatus;
 import com.admi.data.repositories.KpiRepository;
 import com.admi.data.repositories.ZigRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -104,6 +105,18 @@ public class AisKpiService {
 		}
 	}
 
+//	private <T> Long getPartTotalByField(AipInventoryEntity part, List<DmsStatus> statusList, Function<AipInventoryEntity, T> fieldGetter) {
+//		T status = fieldGetter.apply(part);
+//
+////		if ()
+//
+//		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
+//			return (long) part.getQoh() * part.getCents();
+//		} else {
+//			return 0L;
+//		}
+//	}
+
 	private <T> Long getSkuCountByField(AipInventoryEntity part, T valueToMatch, Function<AipInventoryEntity, T> fieldGetter) {
 		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
 			return 1L;
@@ -113,10 +126,10 @@ public class AisKpiService {
 	}
 
 	private Long getPartTotalByStatusBetweenDate(AipInventoryEntity part,
-	                                            String status,
-	                                            Long startDayCount,
-	                                            Long endDayCount,
-	                                            Function<AipInventoryEntity, LocalDate> dateGetter) {
+	                                             String status,
+	                                             Long startDayCount,
+	                                             Long endDayCount,
+	                                             Function<AipInventoryEntity, LocalDate> dateGetter) {
 		LocalDate startDate = LocalDate.now().minusDays(startDayCount);
 		LocalDate endDate = LocalDate.now().minusDays(endDayCount);
 		LocalDate partDate = dateGetter.apply(part);

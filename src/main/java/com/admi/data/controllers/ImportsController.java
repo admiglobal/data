@@ -26,6 +26,33 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
 
+/**
+ * The ImportsController is used as one of the two ways to interface with this server. This is the front door
+ * for any automated import process controlled by this server.
+ *
+ * This {@link org.springframework.stereotype.Controller} pulls in many different services to handle most the
+ * underlying processes. We try to keep logic outy of this controller and put it in the hands of the relevant
+ * service.
+ *
+ * Some of these methods are accessed directly from a web page, and others are accessed by the AIP Server, or
+ * the DDD AIP server as HTTP calls.
+ *
+ * Programs/Imports handled through here:
+ * <ul>
+ *     <li>"Plan B" Inventory Import - Dealer uploads inventory file through the AIP</li>
+ *     <li>Motorcraft Battery Order Import, Order Generation</li>
+ *     <li>Calculation of all AIP data using various sources: DDD API, FTP Files, Dealer Upload</li>
+ *     <li>Upload of FCSD Credits for DPOC program</li>
+ * </ul>
+ *
+ *{@link org.springframework.ui.Model} is used in almost every method to hold context for the templates return by
+ * said methods.
+ *{@link org.springframework.security.core.Authentication} is also used in almost every method in order to get some
+ * detail of a users session (username, userId, {@link com.admi.dashboard.entities.UsersEntity} etc.).
+ *
+ * @author kmowers, jbetzig, igrisham
+ */
+
 @Controller
 @CrossOrigin
 @RequestMapping("/imports")
@@ -158,15 +185,8 @@ public class ImportsController {
 			default:
 				throw new ApiNotSupportedException("This API is not currently supported by this import process.");
 		}
+
 		return apiName.toUpperCase() + " Dealer " + dealerMasterEntity.getPaCode() + " Processing";
-
-
-//		try {
-//		} catch (Exception e) {
-//			System.out.println(e.getMessage());
-//			System.out.println(Arrays.toString(e.getStackTrace()));
-//			return "There was an issue importing " + dealerId;
-//		}
 	}
 
 	@GetMapping("/rimDashUpload")

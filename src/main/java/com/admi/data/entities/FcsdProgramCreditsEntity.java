@@ -22,6 +22,8 @@ public class FcsdProgramCreditsEntity {
 	private BigDecimal wf;
 	private BigDecimal sixtyDay;
 	private BigDecimal nr;
+	private BigDecimal wj;
+	private BigDecimal wec;
 
 	@Id
 	@Column(name = "DEALER_ID", nullable = false, precision = 0)
@@ -131,6 +133,26 @@ public class FcsdProgramCreditsEntity {
 
 	public void setNr(BigDecimal nr) {
 		this.nr = nr;
+	}
+
+	@Basic
+	@Column(name = "WJ", nullable = true, precision = 2)
+	public BigDecimal getWj() {
+		return wj;
+	}
+
+	public void setWj(BigDecimal wj) {
+		this.wj = wj;
+	}
+
+	@Basic
+	@Column(name = "WEC", nullable = true, precision = 2)
+	public BigDecimal getWec() {
+		return wec;
+	}
+
+	public void setWec(BigDecimal wec) {
+		this.wec = wec;
 	}
 
 	@Override

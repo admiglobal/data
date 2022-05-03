@@ -7,6 +7,7 @@ import com.admi.data.repositories.CpcDealerProfileRepository;
 import com.admi.data.services.AisKpiService;
 import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.services.CpcKpiService;
+import com.admi.data.services.FordDealerKpiService;
 import com.admi.data.services.ProcessService;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.tomcat.jni.Local;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/process")
@@ -40,6 +42,9 @@ public class ProcessesController {
 
 	@Autowired
 	CpcKpiService cpcService;
+
+	@Autowired
+	FordDealerKpiService fordDealerKpiService;
 
 	@ResponseBody
 //	@GetMapping("/processTest")
@@ -97,4 +102,52 @@ public class ProcessesController {
 			return "Dealer " + dealerId + " not found.";
 		}
 	}
+
+	@ResponseBody
+	@GetMapping("/dpoc")
+	public String processInventoryForDpocSite() {
+
+		fordDealerKpiService.runAllFordDealers();
+
+		return "DPOC dealers ran.";
+	}
+
+	@ResponseBody
+	@GetMapping("/test/aisStatusList")
+	public String testAisStatusListCalc() {
+		List<AipInventoryEntity> partList = new ArrayList<>();
+
+//		CDK Test
+		AipInventoryEntity part1 = new AipInventoryEntity();
+
+		part1.setPartNo("ABC1");
+		part1.setStatus("STOCK");
+		part1.setQoh(5);
+		part1.setCents(1000);
+
+		partList.add(part1);
+
+
+		AipInventoryEntity part2 = new AipInventoryEntity();
+
+		part2.setPartNo("ABC2");
+		part2.setStatus("NS");
+		part2.setQoh(10);
+		part2.setCents(1000);
+
+		partList.add(part2);
+
+		AipInventoryEntity part3 = new AipInventoryEntity();
+
+		part3.setPartNo("ABC3");
+		part3.setStatus("AP");
+		part3.setQoh(15);
+		part3.setCents(1000);
+
+		partList.add(part3);
+
+		return "ok.";
+	}
+
+
 }
