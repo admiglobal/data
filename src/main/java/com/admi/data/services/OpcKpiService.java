@@ -9,8 +9,6 @@ import com.admi.data.repositories.FordDealerInventoryRepository;
 import com.admi.data.repositories.OpcTsp200DataRepository;
 import com.admi.data.repositories.OpcWeeklyPerformanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -30,9 +28,7 @@ public class OpcKpiService {
     @Autowired
     FordDealerInventoryRepository fordDealerInventoryRepo;
 
-    @Async("asyncExecutor")
-    @Scheduled(cron="0 43 10 * * ?")
-    public void tester(){
+    public void tester(String paCode){
         //testing QL dealers list
 //        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
 //        int count = 1;
@@ -44,7 +40,7 @@ public class OpcKpiService {
 
         //testing performance snapshot method
             //issues: SpringBoot doesn't want to convert LocalDate to sql.Date. IDK why.
-        takePerformanceSnapshot("02960");
+//        takePerformanceSnapshot("02960");
 
         //testing OPC data process
 //        List<OpcTsp200DataEntity> newOpc200Data = opcTsp200DataRepo.findAllByPaCodeFromFordDealerInventory("02960");
@@ -52,7 +48,7 @@ public class OpcKpiService {
     }
 
 //    @Async("asyncExecutor")
-//    @Scheduled(cron="0 0 23 L * ?") //runs at 11pm to prevent overlap with the main OPC process
+//    @Scheduled(cron="0 0 23 L * ?")
     public void takeMonthEndSnapshots(){
         List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
 
@@ -64,10 +60,7 @@ public class OpcKpiService {
     /**
      * Updates OPC_TSP_200_DATA and takes a performance snapshot.
      * If we didn't receive new inventory data, doesn't delete old data but still takes a new snapshot.
-     * Runs 10pm every Wednesday since Ford data received weekly anytime Mon-Wed
      */
-//    @Async("asyncExecutor")
-//    @Scheduled(cron="0 0 22 * * 4")
     public void runOpcProcess(){
         List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
 
@@ -81,19 +74,21 @@ public class OpcKpiService {
     /**
      * Copies over data from FORD_DEALER_INVENTORY to replace data in OPC_TSP_200_DATA table
      * by comparing it to the OPC_TSP_200 list.
-     * Goes one dealer at a time: if we haven't received new data, don't overwrite the old data.
+     * If we haven't received new data for this dealer, don't overwrite the old data.
      */
-    private void updateOpc200Data(String paCode){
-        //If there's no data for this PA code in ford_dealer_inventory, don't override our old OPC data (do nothing)
+    public void updateOpc200Data(String paCode){
+        //If there's no data for this PA code in ford_dealer_inventory, don't override our old OPC data
         if(fordDealerInventoryRepo.findFirstByPaCode(paCode) != null){
             List<OpcTsp200DataEntity> newOpc200Data = opcTsp200DataRepo.findAllByPaCodeFromFordDealerInventory(paCode);
-            opcTsp200DataRepo.deleteByPaCode(paCode);
+            opcTsp200DataRepo.deleteAllByPaCode(paCode);
             opcTsp200DataRepo.saveAll(newOpc200Data);
+        } else{
+            System.out.println("No OPC inventory data received for PA code " + paCode + ".");
         }
     }
 
     /**
-     * Saves a performance snapshot for number of OPC200 SKU's a particular dealer has on hand.
+     * Saves a performance snapshot for a particular dealer's inventory breakdown by brand.
      * The "snapshot date" is LocalDate.now().
      */
     public void takePerformanceSnapshot(String paCode){

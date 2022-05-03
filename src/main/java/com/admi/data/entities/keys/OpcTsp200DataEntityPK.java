@@ -1,19 +1,17 @@
-package com.admi.data.entities;
+package com.admi.data.entities.keys;
 
-import com.admi.data.entities.keys.OpcTsp200DataEntityPK;
+import javax.persistence.Column;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import java.io.Serializable;
 
-import javax.persistence.*;
-
-@Entity
-@Table(name = "OPC_TSP_200_DATA", schema = "ADMI", catalog = "")
-@IdClass(OpcTsp200DataEntityPK.class)
-public class OpcTsp200DataEntity {
+public class OpcTsp200DataEntityPK implements Serializable {
     private String paCode;
     private String partNumber;
-    private Integer qoh;
 
-    @Id
     @Column(name = "PA_CODE")
+    @Id
     public String getPaCode() {
         return paCode;
     }
@@ -22,8 +20,8 @@ public class OpcTsp200DataEntity {
         this.paCode = paCode;
     }
 
-    @Id
     @Column(name = "PART_NUMBER")
+    @Id
     public String getPartNumber() {
         return partNumber;
     }
@@ -32,26 +30,15 @@ public class OpcTsp200DataEntity {
         this.partNumber = partNumber;
     }
 
-    @Basic
-    @Column(name = "QOH")
-    public Integer getQoh() {
-        return qoh;
-    }
-
-    public void setQoh(Integer qoh) {
-        this.qoh = qoh;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        OpcTsp200DataEntity that = (OpcTsp200DataEntity) o;
+        OpcTsp200DataEntityPK that = (OpcTsp200DataEntityPK) o;
 
         if (paCode != null ? !paCode.equals(that.paCode) : that.paCode != null) return false;
         if (partNumber != null ? !partNumber.equals(that.partNumber) : that.partNumber != null) return false;
-        if (qoh != null ? !qoh.equals(that.qoh) : that.qoh != null) return false;
 
         return true;
     }
@@ -60,16 +47,6 @@ public class OpcTsp200DataEntity {
     public int hashCode() {
         int result = paCode != null ? paCode.hashCode() : 0;
         result = 31 * result + (partNumber != null ? partNumber.hashCode() : 0);
-        result = 31 * result + (qoh != null ? qoh.hashCode() : 0);
         return result;
-    }
-
-    @Override
-    public String toString() {
-        return "OpcTsp200DataEntity{" +
-                "paCode='" + paCode + '\'' +
-                ", partNumber='" + partNumber + '\'' +
-                ", qoh=" + qoh +
-                '}';
     }
 }

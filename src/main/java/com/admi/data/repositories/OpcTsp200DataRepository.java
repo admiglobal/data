@@ -4,12 +4,16 @@ import com.admi.data.entities.OpcTsp200DataEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEntity, Long> {
 
-    void deleteByPaCode(String paCode);
+    @Async
+    @Transactional
+    void deleteAllByPaCode(String paCode);
 
     /**
      * Selects OPC 200 data by P&A code, but from FORD_DEALER_INVENTORY instead of from OPC_TSP_200_DATA itself.

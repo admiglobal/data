@@ -105,7 +105,7 @@ public class ProcessesController {
 	@ResponseBody
 	@GetMapping("/opc/{paCode}")
 	public String processSingleOpcDealer(@PathVariable("paCode") String paCode) {
-		opcKpiService.takePerformanceSnapshot(paCode);
+		opcKpiService.updateOpc200Data(paCode);
 
 		return "Ran single OPC dealer (P&A Code " + paCode + ").";
 	}
