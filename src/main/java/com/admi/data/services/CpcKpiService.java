@@ -30,6 +30,9 @@ public class CpcKpiService {
     CpcPartsOnHandRepository cpcPartsOnHandRepo;
 
     @Autowired
+    CpcObjectivesRepository cpcObjectivesRepo;
+
+    @Autowired
     PriceTapeRepository priceTapeRepo;
 
     public void runCpcDealers(LocalDate inventoryDate) {
@@ -126,6 +129,7 @@ public class CpcKpiService {
         List<PriceTapeEntity> allOnHandDealerPartsInPriceTape = priceTapeRepo.findAllOnHandDealerPartsInPriceTape(dealerId, dataDate);
         List<PriceTapeEntity> allCpcListPartsInPriceTape = priceTapeRepo.findAllCpcListPartsInPriceTape(partsList, tierList);
         List<AipInventoryEntity> onHandCpcParts = getOnHandCpcParts(collisionParts, cpcParts);
+        CpcObjectivesEntity objectiveMonth = cpcObjectivesRepo.findByObjectiveMonth(dataDate.withDayOfMonth(1));
 
         long totalCollisionSku = collisionParts.size();
         long totalNonCollisionSku = nonCollisionParts.size();
@@ -144,7 +148,8 @@ public class CpcKpiService {
 
             BigDecimal cpcListPartsPriceAverage = cpcListPartsPriceTotal.divide(BigDecimal.valueOf(tierList), 2, RoundingMode.HALF_EVEN);
 
-            BigDecimal cpcObjective = cpcListPartsPriceAverage.multiply(BigDecimal.valueOf((0.85 * tierList) - totalCpcListSku));
+            BigDecimal cpcObjective = cpcListPartsPriceAverage
+                    .multiply(BigDecimal.valueOf((objectiveMonth.getCpcPercent() * tierList) - totalCpcListSku));
             cpcObjective = cpcObjective.setScale(0, RoundingMode.HALF_EVEN);
 
             CpcKpiEntity cpcKpi =  new CpcKpiEntity(
