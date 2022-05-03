@@ -11,4 +11,8 @@ public interface OpcKpiDto {
     public Double getValue();
     public Integer getSku();
 
+    default String print(){
+        return "OpcKpiDto: {brand: " + this.getBrand() + "; value: " + this.getValue() + "; sku: " + this.getSku() + "}";
+    }
+
 }

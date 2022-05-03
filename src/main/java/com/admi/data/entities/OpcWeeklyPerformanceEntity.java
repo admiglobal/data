@@ -22,7 +22,6 @@ public class OpcWeeklyPerformanceEntity {
     private Integer fordSku;
     private Integer fordValueCents;
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "PA_CODE")
     public String getPaCode() {
@@ -33,7 +32,6 @@ public class OpcWeeklyPerformanceEntity {
         this.paCode = paCode;
     }
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "SNAPSHOT_DATE")
     public LocalDate getSnapshotDate() {
@@ -190,5 +188,23 @@ public class OpcWeeklyPerformanceEntity {
         result = 31 * result + (fordSku != null ? fordSku.hashCode() : 0);
         result = 31 * result + (fordValueCents != null ? fordValueCents.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "OpcWeeklyPerformanceEntity{" +
+                "paCode='" + paCode + '\'' +
+                ", snapshotDate=" + snapshotDate +
+                ", qoh=" + qoh +
+                ", opcValueCents=" + opcValueCents +
+                ", totalSku=" + totalSku +
+                ", totalValueCents=" + totalValueCents +
+                ", otherOcSku=" + otherOcSku +
+                ", otherOcValueCents=" + otherOcValueCents +
+                ", mcSku=" + mcSku +
+                ", mcValueCents=" + mcValueCents +
+                ", fordSku=" + fordSku +
+                ", fordValueCents=" + fordValueCents +
+                '}';
     }
 }

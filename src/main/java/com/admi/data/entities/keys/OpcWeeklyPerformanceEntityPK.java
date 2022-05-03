@@ -13,7 +13,6 @@ public class OpcWeeklyPerformanceEntityPK implements Serializable {
 
     @Column(name = "PA_CODE")
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public String getPaCode() {
         return paCode;
     }
@@ -24,7 +23,6 @@ public class OpcWeeklyPerformanceEntityPK implements Serializable {
 
     @Column(name = "SNAPSHOT_DATE")
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     public LocalDate getSnapshotDate() {
         return snapshotDate;
     }
