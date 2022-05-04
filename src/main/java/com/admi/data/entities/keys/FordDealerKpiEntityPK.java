@@ -13,7 +13,6 @@ public class FordDealerKpiEntityPK implements Serializable {
 
 	@Column(name = "DEALER_ID", nullable = false, precision = 0)
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Long getDealerId() {
 		return dealerId;
 	}
@@ -24,7 +23,6 @@ public class FordDealerKpiEntityPK implements Serializable {
 
 	@Column(name = "DATE_UPDATED", nullable = false)
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public LocalDate getDateUpdated() {
 		return dateUpdated;
 	}

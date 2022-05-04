@@ -4,6 +4,7 @@ import com.admi.data.entities.keys.FordDealerKpiEntityPK;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "FORD_DEALER_KPI", schema = "ADMI")
@@ -20,10 +21,11 @@ public class FordDealerKpiEntity {
 	private Integer rimSkuCount;
 	private Integer sOver9M;
 	private Integer nsOver60;
+	private Integer nsUnder60;
 
 	public FordDealerKpiEntity() {}
 
-	public FordDealerKpiEntity(Long dealerId, LocalDate dateUpdated, Integer totalSValue, Integer totalNsValue, Integer totalRimValue, Integer sSkuCount, Integer nsSkuCount, Integer rimSkuCount, Integer sOver9M, Integer nsOver60) {
+	public FordDealerKpiEntity(Long dealerId, LocalDate dateUpdated, Integer totalSValue, Integer totalNsValue, Integer totalRimValue, Integer sSkuCount, Integer nsSkuCount, Integer rimSkuCount, Integer sOver9M, Integer nsOver60, Integer nsUnder60) {
 		this.dealerId = dealerId;
 		this.dateUpdated = dateUpdated;
 		this.totalSValue = totalSValue;
@@ -34,9 +36,9 @@ public class FordDealerKpiEntity {
 		this.rimSkuCount = rimSkuCount;
 		this.sOver9M = sOver9M;
 		this.nsOver60 = nsOver60;
+		this.nsUnder60 = nsUnder60;
 	}
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	@Column(name = "DEALER_ID", nullable = false)
 	public Long getDealerId() {
@@ -47,7 +49,6 @@ public class FordDealerKpiEntity {
 		this.dealerId = dealerId;
 	}
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	@Column(name = "DATE_UPDATED", nullable = false)
 	public LocalDate getDateUpdated() {
@@ -138,6 +139,16 @@ public class FordDealerKpiEntity {
 		this.nsOver60 = nsOver60;
 	}
 
+	@Basic
+	@Column(name = "NS_UNDER_60", nullable = true)
+	public Integer getNsUnder60() {
+		return nsUnder60;
+	}
+
+	public void setNsUnder60(Integer nsUnder60) {
+		this.nsUnder60 = nsUnder60;
+	}
+
 	@Override
 	public String toString() {
 		return "FordDealerKpiEntity{" +
@@ -151,6 +162,7 @@ public class FordDealerKpiEntity {
 				", rimSkuCount=" + rimSkuCount +
 				", sOver9M=" + sOver9M +
 				", nsOver60=" + nsOver60 +
+				", nsUnder60=" + nsUnder60 +
 				'}';
 	}
 
@@ -158,36 +170,12 @@ public class FordDealerKpiEntity {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-
 		FordDealerKpiEntity that = (FordDealerKpiEntity) o;
-
-		if (dealerId != null ? !dealerId.equals(that.dealerId) : that.dealerId != null) return false;
-		if (dateUpdated != null ? !dateUpdated.equals(that.dateUpdated) : that.dateUpdated != null) return false;
-		if (totalSValue != null ? !totalSValue.equals(that.totalSValue) : that.totalSValue != null) return false;
-		if (totalNsValue != null ? !totalNsValue.equals(that.totalNsValue) : that.totalNsValue != null) return false;
-		if (totalRimValue != null ? !totalRimValue.equals(that.totalRimValue) : that.totalRimValue != null)
-			return false;
-		if (sSkuCount != null ? !sSkuCount.equals(that.sSkuCount) : that.sSkuCount != null) return false;
-		if (nsSkuCount != null ? !nsSkuCount.equals(that.nsSkuCount) : that.nsSkuCount != null) return false;
-		if (rimSkuCount != null ? !rimSkuCount.equals(that.rimSkuCount) : that.rimSkuCount != null) return false;
-		if (sOver9M != null ? !sOver9M.equals(that.sOver9M) : that.sOver9M != null) return false;
-		if (nsOver60 != null ? !nsOver60.equals(that.nsOver60) : that.nsOver60 != null) return false;
-
-		return true;
+		return Objects.equals(dealerId, that.dealerId) && Objects.equals(dateUpdated, that.dateUpdated) && Objects.equals(totalSValue, that.totalSValue) && Objects.equals(totalNsValue, that.totalNsValue) && Objects.equals(totalRimValue, that.totalRimValue) && Objects.equals(sSkuCount, that.sSkuCount) && Objects.equals(nsSkuCount, that.nsSkuCount) && Objects.equals(rimSkuCount, that.rimSkuCount) && Objects.equals(sOver9M, that.sOver9M) && Objects.equals(nsOver60, that.nsOver60) && Objects.equals(nsUnder60, that.nsUnder60);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = dealerId != null ? dealerId.hashCode() : 0;
-		result = 31 * result + (dateUpdated != null ? dateUpdated.hashCode() : 0);
-		result = 31 * result + (totalSValue != null ? totalSValue.hashCode() : 0);
-		result = 31 * result + (totalNsValue != null ? totalNsValue.hashCode() : 0);
-		result = 31 * result + (totalRimValue != null ? totalRimValue.hashCode() : 0);
-		result = 31 * result + (sSkuCount != null ? sSkuCount.hashCode() : 0);
-		result = 31 * result + (nsSkuCount != null ? nsSkuCount.hashCode() : 0);
-		result = 31 * result + (rimSkuCount != null ? rimSkuCount.hashCode() : 0);
-		result = 31 * result + (sOver9M != null ? sOver9M.hashCode() : 0);
-		result = 31 * result + (nsOver60 != null ? nsOver60.hashCode() : 0);
-		return result;
+		return Objects.hash(dealerId, dateUpdated, totalSValue, totalNsValue, totalRimValue, sSkuCount, nsSkuCount, rimSkuCount, sOver9M, nsOver60, nsUnder60);
 	}
 }

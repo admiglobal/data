@@ -30,6 +30,7 @@ public class FordDealerKpiService {
 		List<DealerMasterEntity> dealers = dealerRepo.findAllInInventory();
 
 		for(DealerMasterEntity dealer : dealers) {
+			System.out.println("Running dealer " + dealer.getPaCode() + " - " + dealer.getDealershipName());
 			runSingleDealer(dealer);
 		}
 	}
@@ -51,6 +52,7 @@ public class FordDealerKpiService {
 
 			int totalNonStockValue = 0;
 			int totalNonStockSkus = 0;
+			int totalNonStockValueUnder60 = 0;
 			int totalNonStockValueOver60 = 0;
 
 			for (AipInventoryEntity part : inventory) {
@@ -69,12 +71,13 @@ public class FordDealerKpiService {
 
 						totalNonStockValue += getPartTotalByField(part, "N", AipInventoryEntity :: getAdmiStatus);
 						totalNonStockSkus += getSkuCountByField(part, "N", AipInventoryEntity :: getAdmiStatus);
-						totalNonStockValueOver60 += getPartTotalByStatusBeforeDate(part, "N", 9, AipInventoryEntity :: getLastSaleOrReceipt, AipInventoryEntity :: getAdmiStatus);
+						totalNonStockValueUnder60 += getPartTotalByStatusAfterDate(part, "N", 2, AipInventoryEntity :: getLastSaleOrReceipt, AipInventoryEntity :: getAdmiStatus);
+						totalNonStockValueOver60 += getPartTotalByStatusBeforeDate(part, "N", 2, AipInventoryEntity :: getLastSaleOrReceipt, AipInventoryEntity :: getAdmiStatus);
 					}
 				}
 			}
 
-			kpi = new FordDealerKpiEntity(dealer.getDealerId(), invDate, totalStockValue, totalNonStockValue, totalRimValue, totalStockSkus, totalNonStockSkus, totalRimSkus, totalStockValueOver9M, totalNonStockValueOver60);
+			kpi = new FordDealerKpiEntity(dealer.getDealerId(), invDate, totalStockValue, totalNonStockValue, totalRimValue, totalStockSkus, totalNonStockSkus, totalRimSkus, totalStockValueOver9M, totalNonStockValueOver60, totalNonStockValueUnder60);
 			kpiRepo.save(kpi);
 		}
 	}
@@ -105,6 +108,23 @@ public class FordDealerKpiService {
 
 		if (partDate != null
 				&& partDate.isBefore(date)
+				&& stringGetter.apply(part).equalsIgnoreCase(status)) {
+			return part.getCents() * part.getQoh();
+		} else {
+			return 0;
+		}
+	}
+
+	private Integer getPartTotalByStatusAfterDate(AipInventoryEntity part,
+	                                               String status,
+	                                               Integer monthCount,
+	                                               Function<AipInventoryEntity, LocalDate> dateGetter,
+	                                               Function<AipInventoryEntity, String> stringGetter) {
+		LocalDate date = LocalDate.now().minusMonths(monthCount);
+		LocalDate partDate = dateGetter.apply(part);
+
+		if (partDate != null
+				&& partDate.isAfter(date)
 				&& stringGetter.apply(part).equalsIgnoreCase(status)) {
 			return part.getCents() * part.getQoh();
 		} else {
