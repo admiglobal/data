@@ -37,8 +37,13 @@ public class OpcKpiService {
 
         for(DealerMasterEntity dealer : quickLaneDealers){
             String paCode = dealer.getPaCode();
-            updateOpc200Data(paCode);
-            takePerformanceSnapshot(paCode); //take snapshot AFTER updating
+            try{
+                updateOpc200Data(paCode);
+                takePerformanceSnapshot(paCode); //take snapshot AFTER updating
+            } catch (Exception e){
+                e.printStackTrace();
+                System.out.println("Failed to run OPC process for P&A Code " + paCode + ".");
+            }
         }
     }
 
@@ -147,8 +152,15 @@ public class OpcKpiService {
      */
     public void copyLastSnapshotForToday(String paCode){
         OpcWeeklyPerformanceEntity latestSnapshot = opcWeeklyPerformanceRepo.findFirstByPaCodeOrderBySnapshotDateDesc(paCode);
-        latestSnapshot.setSnapshotDate(LocalDate.now());
-        opcWeeklyPerformanceRepo.save(latestSnapshot);
+        if(latestSnapshot != null){
+            latestSnapshot.setSnapshotDate(LocalDate.now());
+            opcWeeklyPerformanceRepo.save(latestSnapshot);
+        } else{ //if we don't have any prior snapshot data, return all nulls
+            latestSnapshot = new OpcWeeklyPerformanceEntity();
+            latestSnapshot.setPaCode(paCode);
+            latestSnapshot.setSnapshotDate(LocalDate.now());
+            opcWeeklyPerformanceRepo.save(latestSnapshot);
+        }
     }
 
 }
