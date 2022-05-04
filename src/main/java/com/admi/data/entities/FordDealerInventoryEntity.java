@@ -1,66 +1,35 @@
 package com.admi.data.entities;
 
-import javax.persistence.*;
+import javax.persistence.Basic;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.LocalDate;
 
 @Entity
 @Table(name = "FORD_DEALER_INVENTORY", schema = "ADMI")
 public class FordDealerInventoryEntity {
-    @Basic
-    @Column(name = "DEALER_ID")
     private Long dealerId;
-    @Id
-    @Column(name = "PARTNO")
     private String partno;
-    @Basic
-    @Column(name = "CENTS")
     private Long cents;
-    @Basic
-    @Column(name = "QOH")
     private Long qoh;
-    @Basic
-    @Column(name = "DESCRIPTION")
     private String description;
-    @Basic
-    @Column(name = "STATUS")
     private String status;
-    @Basic
-    @Column(name = "LAST_SALE")
     private LocalDate lastSale;
-    @Basic
-    @Column(name = "LAST_RECEIPT")
     private LocalDate lastReceipt;
-    @Basic
-    @Column(name = "BIN")
     private String bin;
-    @Basic
-    @Column(name = "SOURCE")
     private String source;
-    @Basic
-    @Column(name = "MFG_CONTROLLED")
     private Boolean mfgControlled;
-    @Basic
-    @Column(name = "DATA_DATE")
     private LocalDate dataDate;
-    @Basic
-    @Column(name = "ADMI_STATUS")
     private String admiStatus;
-    @Basic
-    @Column(name = "MANUFACTURER")
     private String manufacturer;
-    @Basic
-    @Column(name = "QOO")
     private Long qoo;
-    @Basic
-    @Column(name = "TWELVE_MONTH_SALES")
     private Long twelveMonthSales;
-    @Basic
-    @Column(name = "ENTRY_DATE")
     private LocalDate entryDate;
-    @Basic
-    @Column(name = "PA_CODE")
     private String paCode;
 
+    @Basic
+    @Column(name = "DEALER_ID")
     public Long getDealerId() {
         return dealerId;
     }
@@ -69,6 +38,8 @@ public class FordDealerInventoryEntity {
         this.dealerId = dealerId;
     }
 
+    @Basic
+    @Column(name = "PARTNO")
     public String getPartno() {
         return partno;
     }
@@ -77,6 +48,8 @@ public class FordDealerInventoryEntity {
         this.partno = partno;
     }
 
+    @Basic
+    @Column(name = "CENTS")
     public Long getCents() {
         return cents;
     }
@@ -85,6 +58,8 @@ public class FordDealerInventoryEntity {
         this.cents = cents;
     }
 
+    @Basic
+    @Column(name = "QOH")
     public Long getQoh() {
         return qoh;
     }
@@ -93,6 +68,8 @@ public class FordDealerInventoryEntity {
         this.qoh = qoh;
     }
 
+    @Basic
+    @Column(name = "DESCRIPTION")
     public String getDescription() {
         return description;
     }
@@ -101,6 +78,8 @@ public class FordDealerInventoryEntity {
         this.description = description;
     }
 
+    @Basic
+    @Column(name = "STATUS")
     public String getStatus() {
         return status;
     }
@@ -109,6 +88,8 @@ public class FordDealerInventoryEntity {
         this.status = status;
     }
 
+    @Basic
+    @Column(name = "LAST_SALE")
     public LocalDate getLastSale() {
         return lastSale;
     }
@@ -117,6 +98,8 @@ public class FordDealerInventoryEntity {
         this.lastSale = lastSale;
     }
 
+    @Basic
+    @Column(name = "LAST_RECEIPT")
     public LocalDate getLastReceipt() {
         return lastReceipt;
     }
@@ -125,6 +108,8 @@ public class FordDealerInventoryEntity {
         this.lastReceipt = lastReceipt;
     }
 
+    @Basic
+    @Column(name = "BIN")
     public String getBin() {
         return bin;
     }
@@ -133,6 +118,8 @@ public class FordDealerInventoryEntity {
         this.bin = bin;
     }
 
+    @Basic
+    @Column(name = "SOURCE")
     public String getSource() {
         return source;
     }
@@ -141,6 +128,8 @@ public class FordDealerInventoryEntity {
         this.source = source;
     }
 
+    @Basic
+    @Column(name = "MFG_CONTROLLED")
     public Boolean getMfgControlled() {
         return mfgControlled;
     }
@@ -149,6 +138,8 @@ public class FordDealerInventoryEntity {
         this.mfgControlled = mfgControlled;
     }
 
+    @Basic
+    @Column(name = "DATA_DATE")
     public LocalDate getDataDate() {
         return dataDate;
     }
@@ -157,6 +148,8 @@ public class FordDealerInventoryEntity {
         this.dataDate = dataDate;
     }
 
+    @Basic
+    @Column(name = "ADMI_STATUS")
     public String getAdmiStatus() {
         return admiStatus;
     }
@@ -165,6 +158,8 @@ public class FordDealerInventoryEntity {
         this.admiStatus = admiStatus;
     }
 
+    @Basic
+    @Column(name = "MANUFACTURER")
     public String getManufacturer() {
         return manufacturer;
     }
@@ -173,6 +168,8 @@ public class FordDealerInventoryEntity {
         this.manufacturer = manufacturer;
     }
 
+    @Basic
+    @Column(name = "QOO")
     public Long getQoo() {
         return qoo;
     }
@@ -181,6 +178,8 @@ public class FordDealerInventoryEntity {
         this.qoo = qoo;
     }
 
+    @Basic
+    @Column(name = "TWELVE_MONTH_SALES")
     public Long getTwelveMonthSales() {
         return twelveMonthSales;
     }
@@ -189,6 +188,8 @@ public class FordDealerInventoryEntity {
         this.twelveMonthSales = twelveMonthSales;
     }
 
+    @Basic
+    @Column(name = "ENTRY_DATE")
     public LocalDate getEntryDate() {
         return entryDate;
     }
@@ -197,6 +198,8 @@ public class FordDealerInventoryEntity {
         this.entryDate = entryDate;
     }
 
+    @Basic
+    @Column(name = "PA_CODE")
     public String getPaCode() {
         return paCode;
     }
