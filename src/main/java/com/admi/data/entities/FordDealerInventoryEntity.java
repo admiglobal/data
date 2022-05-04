@@ -1,9 +1,6 @@
 package com.admi.data.entities;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.time.LocalDate;
 
 @Entity
@@ -38,7 +35,7 @@ public class FordDealerInventoryEntity {
         this.dealerId = dealerId;
     }
 
-    @Basic
+    @Id
     @Column(name = "PARTNO")
     public String getPartno() {
         return partno;
@@ -260,5 +257,29 @@ public class FordDealerInventoryEntity {
         result = 31 * result + (entryDate != null ? entryDate.hashCode() : 0);
         result = 31 * result + (paCode != null ? paCode.hashCode() : 0);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "FordDealerInventoryEntity{" +
+                "dealerId=" + dealerId +
+                ", partno='" + partno + '\'' +
+                ", cents=" + cents +
+                ", qoh=" + qoh +
+                ", description='" + description + '\'' +
+                ", status='" + status + '\'' +
+                ", lastSale=" + lastSale +
+                ", lastReceipt=" + lastReceipt +
+                ", bin='" + bin + '\'' +
+                ", source='" + source + '\'' +
+                ", mfgControlled=" + mfgControlled +
+                ", dataDate=" + dataDate +
+                ", admiStatus='" + admiStatus + '\'' +
+                ", manufacturer='" + manufacturer + '\'' +
+                ", qoo=" + qoo +
+                ", twelveMonthSales=" + twelveMonthSales +
+                ", entryDate=" + entryDate +
+                ", paCode='" + paCode + '\'' +
+                '}';
     }
 }

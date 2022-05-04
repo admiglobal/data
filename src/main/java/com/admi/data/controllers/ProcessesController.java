@@ -3,6 +3,7 @@ package com.admi.data.controllers;
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.CpcDealerProfileEntity;
 import com.admi.data.entities.KpiEntity;
+import com.admi.data.entities.OpcTsp200DataEntity;
 import com.admi.data.repositories.CpcDealerProfileRepository;
 import com.admi.data.services.AisKpiService;
 import com.admi.data.repositories.AipInventoryRepository;
@@ -104,7 +105,7 @@ public class ProcessesController {
 
 	@ResponseBody
 	@GetMapping("/opc")
-	public String processOpcKpi(@PathVariable("paCode") String paCode) {
+	public String processOpcKpi() {
 		opcKpiService.runOpcProcess();
 
 		return "Ran OPC KPI process: transferred OPC 200 data and took KPI performance snapshots for each OPC dealer.";
@@ -117,5 +118,12 @@ public class ProcessesController {
 		opcKpiService.takePerformanceSnapshot(paCode); //take snapshot AFTER updating
 
 		return "Ran single OPC dealer (P&A Code " + paCode + "): transferred OPC 200 data and took KPI performance snapshot.";
+	}
+
+	@ResponseBody
+	@GetMapping("/opc/test")
+	public String opcTester() {
+		opcKpiService.tester();
+		return "Ran OPC tester method.";
 	}
 }

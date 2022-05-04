@@ -45,6 +45,13 @@ public class OpcKpiService {
     }
 
     /**
+     * For testing purposes only
+     */
+    public void tester(){
+        System.out.println(fordDealerInventoryRepo.findFirstByPaCode("00000"));
+    }
+
+    /**
      * Copies over data from FORD_DEALER_INVENTORY to replace data in OPC_TSP_200_DATA table
      * by comparing it to the OPC_TSP_200 list.
      * If we haven't received new data for this dealer, don't overwrite the old data.
