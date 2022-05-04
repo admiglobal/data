@@ -9,9 +9,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface OpcWeeklyPerformanceRepository extends JpaRepository<OpcWeeklyPerformanceEntity, Long> {
+    OpcWeeklyPerformanceEntity findFirstByPaCodeOrderBySnapshotDateDesc(String paCode);
+
     /**
      * Finds the total sku and value for the different brands in FORD_DEALER_INVENTORY for a certain pa code.
-     *
      */
     @Query( value = "SELECT pt.brand,\n" +
             "nvl(sum(pt.PC_VALUE * inv.QOH), 0) value,\n" +

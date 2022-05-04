@@ -9,8 +9,6 @@ import com.admi.data.repositories.FordDealerInventoryRepository;
 import com.admi.data.repositories.OpcTsp200DataRepository;
 import com.admi.data.repositories.OpcWeeklyPerformanceRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -68,10 +66,22 @@ public class OpcKpiService {
     }
 
     /**
+     * Takes an inventory breakdown performance snapshot for a particular dealer.
+     * If we haven't received new data from this dealer from Ford, we just copy our last snapshot.
+     */
+    public void takePerformanceSnapshot(String paCode){
+        if(fordDealerInventoryRepo.findFirstByPaCode(paCode) != null){
+            takePerformanceSnapshotFromInventory(paCode);
+        } else{
+            copyLastSnapshotForToday(paCode);
+        }
+    }
+
+    /**
      * Saves a performance snapshot for a particular dealer's inventory breakdown by brand.
      * The "snapshot date" is LocalDate.now().
      */
-    public void takePerformanceSnapshot(String paCode){
+    public void takePerformanceSnapshotFromInventory(String paCode){
         Integer opcQoh = opcTsp200DataRepo.findSkuQohByPaCode(paCode);
         Double d = opcTsp200DataRepo.findTotalOpcValueByPaCode(paCode) * 100;
         Integer opcValue = d.intValue();
@@ -129,6 +139,16 @@ public class OpcKpiService {
         snapshot.setOtherOcValueCents(ocValue - opcValue);
 
         opcWeeklyPerformanceRepo.save(snapshot);
+    }
+
+    /**
+     * Copies the most recent performance snapshot to today for a certain dealer.
+     * (Useful for when we don't receive new data from Ford, but still want a snapshot).
+     */
+    public void copyLastSnapshotForToday(String paCode){
+        OpcWeeklyPerformanceEntity latestSnapshot = opcWeeklyPerformanceRepo.findFirstByPaCodeOrderBySnapshotDateDesc(paCode);
+        latestSnapshot.setSnapshotDate(LocalDate.now());
+        opcWeeklyPerformanceRepo.save(latestSnapshot);
     }
 
 }
