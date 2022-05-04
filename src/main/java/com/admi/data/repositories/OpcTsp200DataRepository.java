@@ -20,11 +20,10 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
      * This is useful for updating OPC_TSP_200_DATA with new data from FORD_DEALER_INVENTORY,
      * since the latter updates weekly.
      */
-    @Query( value = "SELECT inv.PA_CODE, opc.OC_PART_NUMBER PART_NUMBER, inv.QOH\n" +
+    @Query( value = "SELECT inv.PA_CODE, inv.PARTNO PART_NUMBER, inv.QOH\n" +
             "FROM FORD_DEALER_INVENTORY inv\n" +
             "INNER JOIN OPC_TSP_200 opc\n" +
-            "ON (opc.SERVICE_PART_NUMBER = inv.PARTNO\n" +
-            "OR opc.OC_PART_NUMBER = inv.PARTNO)\n" +
+            "ON (opc.SERVICE_PART_NUMBER = inv.PARTNO)\n" +
             "WHERE inv.QOH <> 0\n" +
             "AND inv.PA_CODE = :paCode"
             , nativeQuery = true)
@@ -34,31 +33,31 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
     /**
      * Finds the number of OPC200 SKU's on hand for a particular PA code
      */
-    @Query( value = "SELECT SUM(CASE WHEN d.qoh is null THEN 0 ELSE 1 END) total_qoh\n" +
-            "FROM OPC_TSP_200 opc\n" +
-            "left join (\n" +
-            "select * from OPC_TSP_200_DATA\n" +
-            "where PA_CODE = :paCode\n" +
-            "and QOH > 0\n" +
-            ") d\n" +
-            "on (d.PART_NUMBER = opc.SERVICE_PART_NUMBER\n" +
-            "or d.PART_NUMBER = opc.OC_PART_NUMBER)"
+    @Query( value = "SELECT COUNT(*)\n" +
+            "FROM FORD_DEALER_INVENTORY inv\n" +
+            "INNER JOIN OPC_TSP_200 opc\n" +
+            "ON (opc.SERVICE_PART_NUMBER = inv.PARTNO)\n" +
+            "WHERE inv.QOH <> 0\n" +
+            "AND inv.PA_CODE = :paCode"
             , nativeQuery = true)
     int findSkuQohByPaCode(
             @Param("paCode") String paCode);
 
     /**
-     * Finds value of the OPC 200 parts on hand for a particular PA code
+     * Finds value of the OPC 200 parts on hand for a particular PA code.
+     * FORD_PT is our source of pricing information (NOT opc_tsp_200)
      */
-    @Query( value = "SELECT SUM((opc.DEALER_NET * nvl(d.QOH, 0))) total_value\n" +
-            "FROM OPC_TSP_200 opc\n" +
-            "left join (\n" +
-            "select * from OPC_TSP_200_DATA\n" +
-            "where PA_CODE = :paCode\n" +
-            "and QOH > 0\n" +
-            ") d\n" +
-            "on (d.PART_NUMBER = opc.SERVICE_PART_NUMBER\n" +
-            "or d.PART_NUMBER = opc.OC_PART_NUMBER)"
+    @Query( value = "SELECT SUM(nvl((pt.PC_VALUE * inv.QOH), 0) ) total_value\n" +
+            "FROM FORD_DEALER_INVENTORY inv\n" +
+            "INNER JOIN OPC_TSP_200 opc\n" +
+            "ON (opc.SERVICE_PART_NUMBER = inv.PARTNO)\n" +
+            "inner join (\n" +
+            "select * from ford_pt\n" +
+            " where tape = 'FORD_US'\n" +
+            ") pt\n" +
+            "on (opc.SERVICE_PART_NUMBER = pt.PARTNO)\n" +
+            "WHERE inv.QOH <> 0\n" +
+            "AND inv.PA_CODE = :paCode"
             , nativeQuery = true)
     double findTotalOpcValueByPaCode(
             @Param("paCode") String paCode);

@@ -64,7 +64,20 @@ public class OpcKpiService {
         if(fordDealerInventoryRepo.findFirstByPaCode(paCode) != null){
             List<OpcTsp200DataEntity> newOpc200Data = opcTsp200DataRepo.findAllByPaCodeFromFordDealerInventory(paCode);
             opcTsp200DataRepo.deleteAllByPaCode(paCode);
-            opcTsp200DataRepo.saveAll(newOpc200Data);
+            try{
+                opcTsp200DataRepo.saveAll(newOpc200Data);
+            } catch (Exception e){
+                System.out.println("Unable to save all new OPC_TSP_200_DATA for P&A " + paCode + ".");
+                e.printStackTrace();
+                for(OpcTsp200DataEntity datan : newOpc200Data){
+                    try{
+                        opcTsp200DataRepo.save(datan);
+                    } catch (Exception f){
+                        System.out.println("Unable to save the following part to opc_tsp_200_data for P&A " + paCode + ": " + datan);
+                        f.printStackTrace();
+                    }
+                }
+            }
         } else{
             System.out.println("No OPC inventory data received for PA code " + paCode + ".");
         }
