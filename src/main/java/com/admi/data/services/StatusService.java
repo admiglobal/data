@@ -33,9 +33,6 @@ public class StatusService {
     public void runStatusValuesForToday(Long dealerId) {
         DealerMasterEntity dealer = dealerMasterRepo.findByDealerId(dealerId);
 
-        DateTimeFormatter dataDateFormatter = DateTimeFormatter.ofPattern("yyyyMM");
-        Long dataDate = Long.parseLong(dataDateFormatter.format(LocalDate.now()));
-
         ZigEntity zigEntityForDate = zigRepo.findFirstByPaCode(dealer.getPaCode());
 
         LocalDateTime todayDate;
@@ -45,6 +42,8 @@ public class StatusService {
         } else {
             todayDate = zigEntityForDate.getDataDate();
         }
+
+        Long dataDate = new DateService().getLongDate(todayDate.toLocalDate().minusDays(1));
 
         List<ZigEntity> nonnegativeQohParts = zigRepo.findAllNonnegativeQohByPaCodeAndDataDateOrderByDmsStatus(dealer.getPaCode(), todayDate);
         List<ZigEntity> rimActiveParts = zigRepo.findAllRimActivePartsByPaCode(dealer.getPaCode(), todayDate);
