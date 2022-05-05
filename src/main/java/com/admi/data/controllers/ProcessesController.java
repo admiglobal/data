@@ -7,10 +7,9 @@ import com.admi.data.repositories.CpcDealerProfileRepository;
 import com.admi.data.services.AisKpiService;
 import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.services.CpcKpiService;
-import com.admi.data.services.FordDealerKpiService;
+import com.admi.data.services.OpcKpiService;
 import com.admi.data.services.ProcessService;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/process")
@@ -35,6 +33,9 @@ public class ProcessesController {
 	CpcDealerProfileRepository cpcDealerProfileRepo;
 
 	@Autowired
+	OpcTsp200DataRepository opcTsp200DataRepo;
+
+	@Autowired
 	AisKpiService aisKpiService;
 
 	@Autowired
@@ -45,6 +46,9 @@ public class ProcessesController {
 
 	@Autowired
 	FordDealerKpiService fordDealerKpiService;
+
+	@Autowired
+	OpcKpiService opcKpiService;
 
 	@ResponseBody
 //	@GetMapping("/processTest")
@@ -101,6 +105,31 @@ public class ProcessesController {
 		} else {
 			return "Dealer " + dealerId + " not found.";
 		}
+	}
+
+	@ResponseBody
+	@GetMapping("/opc")
+	public String processOpcKpi() {
+		opcKpiService.runOpcProcess();
+
+		return "Ran OPC KPI process: transferred OPC 200 data and took KPI performance snapshots for each OPC dealer.";
+	}
+
+	@ResponseBody
+	@GetMapping("/opc/{paCode}")
+	public String processSingleOpcDealer(@PathVariable("paCode") String paCode) {
+		opcKpiService.updateOpc200Data(paCode);
+		opcKpiService.takePerformanceSnapshot(paCode); //take snapshot AFTER updating
+		opcTsp200DataRepo.flush();
+
+		return "Ran single OPC dealer (P&A Code " + paCode + "): transferred OPC 200 data and took KPI performance snapshot.";
+	}
+
+	@ResponseBody
+	@GetMapping("/opc/test")
+	public String opcTester() {
+		opcKpiService.tester();
+		return "Ran OPC tester method.";
 	}
 
 	@ResponseBody
