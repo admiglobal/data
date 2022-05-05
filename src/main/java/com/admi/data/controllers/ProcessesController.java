@@ -5,6 +5,7 @@ import com.admi.data.entities.CpcDealerProfileEntity;
 import com.admi.data.entities.KpiEntity;
 import com.admi.data.entities.OpcTsp200DataEntity;
 import com.admi.data.repositories.CpcDealerProfileRepository;
+import com.admi.data.repositories.OpcTsp200DataRepository;
 import com.admi.data.services.AisKpiService;
 import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.services.CpcKpiService;
@@ -33,6 +34,9 @@ public class ProcessesController {
 
 	@Autowired
 	CpcDealerProfileRepository cpcDealerProfileRepo;
+
+	@Autowired
+	OpcTsp200DataRepository opcTsp200DataRepo;
 
 	@Autowired
 	AisKpiService aisKpiService;
@@ -116,6 +120,7 @@ public class ProcessesController {
 	public String processSingleOpcDealer(@PathVariable("paCode") String paCode) {
 		opcKpiService.updateOpc200Data(paCode);
 		opcKpiService.takePerformanceSnapshot(paCode); //take snapshot AFTER updating
+		opcTsp200DataRepo.flush();
 
 		return "Ran single OPC dealer (P&A Code " + paCode + "): transferred OPC 200 data and took KPI performance snapshot.";
 	}

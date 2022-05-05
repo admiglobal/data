@@ -45,6 +45,8 @@ public class OpcKpiService {
                 System.out.println("Failed to run OPC process for P&A Code " + paCode + ".");
             }
         }
+
+        opcTsp200DataRepo.flush();
     }
 
     /**
@@ -67,17 +69,9 @@ public class OpcKpiService {
             try{
                 opcTsp200DataRepo.saveAll(newOpc200Data);
             } catch (Exception e){
-                System.out.println("Unable to save all new OPC_TSP_200_DATA for P&A " + paCode + ".");
-                e.printStackTrace();
-                for(OpcTsp200DataEntity datan : newOpc200Data){
-                    try{
-                        opcTsp200DataRepo.save(datan);
-                    } catch (Exception f){
-                        System.out.println("Unable to save the following part to opc_tsp_200_data for P&A " + paCode + ": " + datan);
-                        f.printStackTrace();
-                    }
-                }
+                System.out.println("Unable to save OPC 200 Data for P&A code " + paCode + ".");
             }
+
         } else{
             System.out.println("No OPC inventory data received for PA code " + paCode + ".");
         }

@@ -5,13 +5,15 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+@Repository
 public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEntity, Long> {
+    List<OpcTsp200DataEntity> findAllByPaCode(String paCode);
 
-    @Async
     @Transactional
     void deleteAllByPaCode(String paCode);
 
