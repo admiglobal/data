@@ -39,14 +39,15 @@ public class OpcKpiService {
             String paCode = dealer.getPaCode();
             try{
                 updateOpc200Data(paCode);
-                takePerformanceSnapshot(paCode); //take snapshot AFTER updating
             } catch (Exception e){
                 e.printStackTrace();
                 System.out.println("Failed to run OPC process for P&A Code " + paCode + ".");
             }
+            takePerformanceSnapshot(paCode); //take snapshot AFTER updating, even if update fails
         }
 
         opcTsp200DataRepo.flush();
+        System.out.println("Finished running OPC data process.");
     }
 
     /**
@@ -69,7 +70,15 @@ public class OpcKpiService {
             try{
                 opcTsp200DataRepo.saveAll(newOpc200Data);
             } catch (Exception e){
-                System.out.println("Unable to save OPC 200 Data for P&A code " + paCode + ".");
+                for(OpcTsp200DataEntity datan : newOpc200Data){
+                    try{
+                        opcTsp200DataRepo.saveAndFlush(datan);
+                    } catch (Exception f){
+                        f.printStackTrace();
+                        System.out.println("Unable to save the following OPC part for P&A code " + paCode + ": " + datan);
+                        //often caused because QOH is > 5 digits long (a data error)
+                    }
+                }
             }
 
         } else{

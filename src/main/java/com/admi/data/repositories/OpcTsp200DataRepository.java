@@ -49,7 +49,7 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
      * Finds value of the OPC 200 parts on hand for a particular PA code.
      * FORD_PT is our source of pricing information (NOT opc_tsp_200)
      */
-    @Query( value = "SELECT SUM(nvl((pt.PC_VALUE * inv.QOH), 0) ) total_value\n" +
+    @Query( value = "SELECT nvl(SUM(nvl((pt.PC_VALUE * inv.QOH), 0) ), 0) total_value\n" +
             "FROM FORD_DEALER_INVENTORY inv\n" +
             "INNER JOIN OPC_TSP_200 opc\n" +
             "ON (opc.SERVICE_PART_NUMBER = inv.PARTNO)\n" +
