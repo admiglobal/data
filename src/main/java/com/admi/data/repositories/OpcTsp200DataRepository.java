@@ -58,7 +58,7 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
             " where tape = 'FORD_US'\n" +
             ") pt\n" +
             "on (opc.SERVICE_PART_NUMBER = pt.PARTNO)\n" +
-            "WHERE inv.QOH <> 0\n" +
+            "WHERE inv.QOH > 0\n" +
             "AND inv.PA_CODE = :paCode"
             , nativeQuery = true)
     double findTotalOpcValueByPaCode(
