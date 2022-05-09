@@ -39,7 +39,7 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
             "FROM FORD_DEALER_INVENTORY inv\n" +
             "INNER JOIN OPC_TSP_200 opc\n" +
             "ON (opc.SERVICE_PART_NUMBER = inv.PARTNO)\n" +
-            "WHERE inv.QOH <> 0\n" +
+            "WHERE inv.QOH > 0\n" +
             "AND inv.PA_CODE = :paCode"
             , nativeQuery = true)
     int findSkuQohByPaCode(
