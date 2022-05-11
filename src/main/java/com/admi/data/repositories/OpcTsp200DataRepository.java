@@ -4,7 +4,6 @@ import com.admi.data.entities.OpcTsp200DataEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,6 +12,7 @@ import java.util.List;
 @Repository
 public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEntity, Long> {
     List<OpcTsp200DataEntity> findAllByPaCode(String paCode);
+    int countAllByPaCode(String paCode);
 
     @Transactional
     void deleteAllByPaCode(String paCode);
@@ -33,6 +33,7 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
 
     /**
      * Finds the number of OPC200 SKU's on hand for a particular PA code
+     * (by querying ford_dealer_inventory directly)
      */
     @Query( value = "SELECT COUNT(*)\n" +
             "FROM FORD_DEALER_INVENTORY inv, OPC_TSP_200 opc\n" +
@@ -62,5 +63,16 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
             "on (opc_inv.PARTNO = pt.PARTNO)"
             , nativeQuery = true)
     double findTotalOpcValueByPaCode(
+            @Param("paCode") String paCode);
+
+    /**
+     * Finds value of the OPC 200 parts on hand for a particular PA code.
+     * FORD_PT is our source of pricing information (NOT opc_tsp_200)
+     */
+    @Query( value = "SELECT SUM(part_cost_cents)\n" +
+            "FROM OPC_TSP_200_DATA\n" +
+            "WHERE PA_CODE = :paCode"
+            , nativeQuery = true)
+    int sumPartCostCentsByPaCode(
             @Param("paCode") String paCode);
 }

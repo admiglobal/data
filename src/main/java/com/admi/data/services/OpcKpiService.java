@@ -1,18 +1,17 @@
 package com.admi.data.services;
 
+import com.admi.data.dto.Opc200PartDto;
 import com.admi.data.dto.OpcKpiDto;
-import com.admi.data.entities.DealerMasterEntity;
-import com.admi.data.entities.OpcTsp200DataEntity;
-import com.admi.data.entities.OpcWeeklyPerformanceEntity;
-import com.admi.data.repositories.DealerMasterRepository;
-import com.admi.data.repositories.FordDealerInventoryRepository;
-import com.admi.data.repositories.OpcTsp200DataRepository;
-import com.admi.data.repositories.OpcWeeklyPerformanceRepository;
+import com.admi.data.entities.*;
+import com.admi.data.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Service
 public class OpcKpiService {
@@ -27,6 +26,12 @@ public class OpcKpiService {
 
     @Autowired
     FordDealerInventoryRepository fordDealerInventoryRepo;
+
+    @Autowired
+    OpcTsp200Repository opcTsp200Repo;
+
+    @Autowired
+    FordPtRepository fordPtRepo;
 
     /**
      * Updates OPC_TSP_200_DATA and takes a performance snapshot.
@@ -58,6 +63,43 @@ public class OpcKpiService {
     }
 
     /**
+     * Queries the list of OPC parts that a dealer has on-hand, including QOH info
+     */
+    private List<OpcTsp200DataEntity> getOpc200Data(String paCode){
+        List<FordDealerInventoryEntity> inventory = fordDealerInventoryRepo.findAllByPaCode(paCode);
+        List<OpcTsp200Entity> opc200List = opcTsp200Repo.findAll();
+        Set<Opc200PartDto> opcOnHand = new HashSet<>();
+
+        for(FordDealerInventoryEntity part : inventory){
+            for(OpcTsp200Entity opcPart : opc200List){
+                //need to account for both part numbers
+                //also need to account for an inventory having the same OPC200 part under both names--only count this once (use a Set)
+                if(part.getQoh() > 0 &&
+                        (part.getPartno().equals(opcPart.getServicePartNumber())
+                        || part.getPartno().equals(opcPart.getOcPartNumber()))){
+                    System.out.println("Found a match! Opc part: " + opcPart);
+                    opcOnHand.add(new Opc200PartDto(opcPart,
+                                                    part.getQoh(),
+                                                    part.getPartno().equals(opcPart.getServicePartNumber())));
+                    System.out.println("\tOur set now: (size = " + opcOnHand.size() + ")");
+                    System.out.print("\t\t");
+                    for(Opc200PartDto dto : opcOnHand){
+                        System.out.print(dto.getRank() + ", ");
+                    }
+                    System.out.println();
+                }
+            }
+        }
+
+        List<OpcTsp200DataEntity> opcDataOnHand = new ArrayList<>();
+        for(Opc200PartDto partDto : opcOnHand){
+            opcDataOnHand.add(partDto.toOpcTsp200DataEntity(paCode, fordPtRepo));
+        }
+
+        return opcDataOnHand;
+    }
+
+    /**
      * Copies over data from FORD_DEALER_INVENTORY to replace data in OPC_TSP_200_DATA table
      * by comparing it to the OPC_TSP_200 list.
      * If we haven't received new data for this dealer, don't overwrite the old data.
@@ -65,17 +107,17 @@ public class OpcKpiService {
     public void updateOpc200Data(String paCode){
         //If there's no data for this PA code in ford_dealer_inventory, don't override our old OPC data
         if(fordDealerInventoryRepo.findFirstByPaCode(paCode) != null){
-            List<OpcTsp200DataEntity> newOpc200Data = opcTsp200DataRepo.findAllByPaCodeFromFordDealerInventory(paCode);
+            List<OpcTsp200DataEntity> newOpc200Data = getOpc200Data(paCode);
             opcTsp200DataRepo.deleteAllByPaCode(paCode);
             try{
                 opcTsp200DataRepo.saveAll(newOpc200Data);
             } catch (Exception e){
-                for(OpcTsp200DataEntity datan : newOpc200Data){
+                for(OpcTsp200DataEntity part : newOpc200Data){
                     try{
-                        opcTsp200DataRepo.saveAndFlush(datan);
+                        opcTsp200DataRepo.saveAndFlush(part);
                     } catch (Exception f){
                         f.printStackTrace();
-                        System.out.println("Unable to save the following OPC part for P&A code " + paCode + ": " + datan);
+                        System.out.println("Unable to save the following OPC part for P&A code " + paCode + ": " + part);
                         //often caused because QOH is > 5 digits long (a data error)
                     }
                 }
@@ -103,9 +145,8 @@ public class OpcKpiService {
      * The "snapshot date" is LocalDate.now().
      */
     public void takePerformanceSnapshotFromInventory(String paCode){
-        Integer opcQoh = opcTsp200DataRepo.findSkuQohByPaCode(paCode);
-        Double d = opcTsp200DataRepo.findTotalOpcValueByPaCode(paCode) * 100;
-        Integer opcValue = d.intValue();
+        Integer opcQoh = opcTsp200DataRepo.countAllByPaCode(paCode);
+        Integer opcValue = opcTsp200DataRepo.sumPartCostCentsByPaCode(paCode);
 
         List<OpcKpiDto> brandData = opcWeeklyPerformanceRepo.findBrandAndValueAndSkuByPaCode(paCode);
 
