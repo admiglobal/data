@@ -77,16 +77,16 @@ public class OpcKpiService {
                 if(part.getQoh() > 0 &&
                         (part.getPartno().equals(opcPart.getServicePartNumber())
                         || part.getPartno().equals(opcPart.getOcPartNumber()))){
-                    System.out.println("Found a match! Opc part: " + opcPart);
+//                    System.out.println("Found a match! Opc part: " + opcPart);
                     opcOnHand.add(new Opc200PartDto(opcPart,
                                                     part.getQoh(),
                                                     part.getPartno().equals(opcPart.getServicePartNumber())));
-                    System.out.println("\tOur set now: (size = " + opcOnHand.size() + ")");
-                    System.out.print("\t\t");
-                    for(Opc200PartDto dto : opcOnHand){
-                        System.out.print(dto.getRank() + ", ");
-                    }
-                    System.out.println();
+//                    System.out.println("\tOur set now: (size = " + opcOnHand.size() + ")");
+//                    System.out.print("\t\t");
+//                    for(Opc200PartDto dto : opcOnHand){
+//                        System.out.print(dto.getRank() + ", ");
+//                    }
+//                    System.out.println();
                 }
             }
         }
