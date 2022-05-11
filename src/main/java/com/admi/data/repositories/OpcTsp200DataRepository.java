@@ -62,7 +62,7 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
             ") pt\n" +
             "on (opc_inv.PARTNO = pt.PARTNO)"
             , nativeQuery = true)
-    double findTotalOpcValueByPaCode(
+    Double findTotalOpcValueByPaCode(
             @Param("paCode") String paCode);
 
     /**
@@ -73,6 +73,6 @@ public interface OpcTsp200DataRepository extends JpaRepository<OpcTsp200DataEnti
             "FROM OPC_TSP_200_DATA\n" +
             "WHERE PA_CODE = :paCode"
             , nativeQuery = true)
-    int sumPartCostCentsByPaCode(
+    Integer sumPartCostCentsByPaCode(
             @Param("paCode") String paCode);
 }

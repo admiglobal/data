@@ -108,19 +108,30 @@ public class ProcessesController {
 	@ResponseBody
 	@GetMapping("/opc")
 	public String processOpcKpi() {
+		long startTime = System.currentTimeMillis();
+
 		opcKpiService.runOpcProcess();
 
-		return "Ran OPC KPI process: transferred OPC 200 data and took KPI performance snapshots for each OPC dealer.";
+		long endTime = System.currentTimeMillis();
+		Long l = endTime-startTime;
+		double completionTime = (l.doubleValue())/1000;
+
+		return "Ran OPC KPI process: transferred OPC 200 data and took KPI performance snapshots for each OPC dealer." +
+				"Time to complete: " + completionTime + " seconds.";
 	}
 
 	@ResponseBody
 	@GetMapping("/opc/{paCode}")
 	public String processSingleOpcDealer(@PathVariable("paCode") String paCode) {
+		long startTime = System.currentTimeMillis();
 		opcKpiService.updateOpc200Data(paCode);
 		opcKpiService.takePerformanceSnapshot(paCode); //take snapshot AFTER updating
 		opcTsp200DataRepo.flush();
+		long endTime = System.currentTimeMillis();
+		Long l = endTime-startTime;
+		double completionTime = (l.doubleValue())/1000;
 
-		return "Ran single OPC dealer (P&A Code " + paCode + "): transferred OPC 200 data and took KPI performance snapshot.";
+		return "Ran single OPC dealer (P&A Code " + paCode + "): transferred OPC 200 data and took KPI performance snapshot. This took " + completionTime + "s.";
 	}
 
 	@ResponseBody

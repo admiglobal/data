@@ -59,7 +59,27 @@ public class OpcKpiService {
      * For testing purposes only
      */
     public void tester(){
-        System.out.println(fordDealerInventoryRepo.findFirstByPaCode("00000"));
+        System.out.println("Running top 90 OPC dealers");
+        String[] top90Dealers = {"04134", "04196", "04281", "03491", "09217", "09469", "00210", "04921", "08124", "03106", "04113", "01699", "05291", "03554", "01319", "08621", "02960", "03318", "03557", "05591", "01533", "06069", "02405", "04107", "05266", "03360", "01167", "01705", "02737", "04809", "01046", "00912", "05222", "01743", "01880", "03938", "05076", "06314", "00378", "09522", "00377", "08254", "06790", "04517", "06431", "02042", "05448", "09566", "05319", "09193", "01650", "03558", "07670", "08027", "00175", "00601", "03832", "00172", "01412", "00048", "00775", "01417", "02175", "06161", "01487", "08110", "20341", "08155", "04544", "03830", "05928", "05982", "06804", "03569", "06043", "03130", "03897", "01307", "04120", "08615", "01741", "04362", "04410", "00169", "01302", "07192", "09324", "02673", "06758"};
+        int counter = 0;
+        for(String paCode : top90Dealers){
+            double completionTime = processSingleOpcDealer(paCode);
+            System.out.println("(" + ++counter + "/90) Ran process for " + paCode + " in " + completionTime + " seconds.");
+        }
+    }
+
+    /**
+     * Runs process for a single OPC dealer
+     * @return The number of seconds it took to complete
+     */
+    public double processSingleOpcDealer(String paCode){
+        long startTime = System.currentTimeMillis();
+        updateOpc200Data(paCode);
+        takePerformanceSnapshot(paCode); //take snapshot AFTER updating
+        opcTsp200DataRepo.flush();
+        long endTime = System.currentTimeMillis();
+        Long l = endTime-startTime;
+        return (l.doubleValue())/1000;
     }
 
     /**
@@ -74,7 +94,7 @@ public class OpcKpiService {
             for(OpcTsp200Entity opcPart : opc200List){
                 //need to account for both part numbers
                 //also need to account for an inventory having the same OPC200 part under both names--only count this once (use a Set)
-                if(part.getQoh() > 0 &&
+                if(safeReadQoh(part.getQoh()) > 0 &&
                         (part.getPartno().equals(opcPart.getServicePartNumber())
                         || part.getPartno().equals(opcPart.getOcPartNumber()))){
 //                    System.out.println("Found a match! Opc part: " + opcPart);
@@ -145,8 +165,8 @@ public class OpcKpiService {
      * The "snapshot date" is LocalDate.now().
      */
     public void takePerformanceSnapshotFromInventory(String paCode){
-        Integer opcQoh = opcTsp200DataRepo.countAllByPaCode(paCode);
-        Integer opcValue = opcTsp200DataRepo.sumPartCostCentsByPaCode(paCode);
+        Integer opcQoh = zeroIfNull(opcTsp200DataRepo.countAllByPaCode(paCode));
+        Integer opcValue = zeroIfNull(opcTsp200DataRepo.sumPartCostCentsByPaCode(paCode));
 
         List<OpcKpiDto> brandData = opcWeeklyPerformanceRepo.findBrandAndValueAndSkuByPaCode(paCode);
 
@@ -201,6 +221,34 @@ public class OpcKpiService {
         snapshot.setOtherOcValueCents(ocValue - opcValue);
 
         opcWeeklyPerformanceRepo.save(snapshot);
+    }
+
+    private static Integer zeroIfNull(Integer number){
+        if(number == null) return 0;
+        return number;
+    }
+
+    private static Long zeroIfNull(Long number){
+        if(number == null) return 0L;
+        return number;
+    }
+
+    private static long ensureUnderFiveDigits(long number){
+        if(number > 99999 || number < -99999) return -1;
+        return number;
+    }
+
+    /**
+     * Checks if null or if an unreasonably large amount for QOH.
+     * The QOH column in OPC_TSP_200_DATA is only 5 digits long (that is, 99,999 max).
+     * A number any higher will throw an error and is too long to be a real QOH number.
+     * In this case, we mark the QOH as -1 to indicate something's gone wrong.
+     * @param qoh The quantity on hand value
+     * @return The non-null QOH value. Will be -1 if the qoh argument is more than 5 digits long.
+     */
+    private static Long safeReadQoh(Long qoh){
+        return ensureUnderFiveDigits(
+                    zeroIfNull(qoh));
     }
 
     /**
