@@ -138,7 +138,6 @@ public class OpcKpiService {
                     } catch (Exception f){
                         f.printStackTrace();
                         System.out.println("Unable to save the following OPC part for P&A code " + paCode + ": " + part);
-                        //often caused because QOH is > 5 digits long (a data error)
                     }
                 }
             }
