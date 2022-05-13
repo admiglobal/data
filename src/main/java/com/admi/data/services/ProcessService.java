@@ -79,7 +79,7 @@ public class ProcessService {
 
 		try {
 			String filePath = File.separator + File.separator +
-					"192.168.254.1" + File.separator +
+					"192.168.250.90" + File.separator +
 					"Public" + File.separator +
 					"Development" + File.separator +
 					"Motorcraft_Orders" + File.separator +
@@ -115,7 +115,7 @@ public class ProcessService {
 		McOrdersEntity order = ordersRepo.findByOrderNumber(orderNumber);
 
 		String filePathRoot = File.separator + File.separator +
-				"192.168.254.1" + File.separator +
+				"192.168.250.90" + File.separator +
 				"Public" + File.separator +
 				"Development" + File.separator +
 				"Motorcraft_Orders" + File.separator +
