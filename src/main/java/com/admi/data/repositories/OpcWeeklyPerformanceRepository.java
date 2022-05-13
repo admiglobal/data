@@ -18,7 +18,7 @@ public interface OpcWeeklyPerformanceRepository extends JpaRepository<OpcWeeklyP
             "nvl(sum(pt.PC_VALUE * inv.QOH), 0) value,\n" +
             "count(inv.PARTNO) sku\n" +
             "from FORD_DEALER_INVENTORY inv\n" +
-            "join FORD_PT pt on inv.PARTNO = pt.PARTNO\n" +
+            "join FORD_PT pt on (inv.PARTNO = pt.PARTNO or inv.PARTNO = pt.MOTORCRAFT)\n" +
             "where inv.PA_CODE = :paCode\n" +
             "and inv.QOH > 0\n" + //don't count negative QOH
             "and pt.TAPE = 'FORD_US'\n" +
