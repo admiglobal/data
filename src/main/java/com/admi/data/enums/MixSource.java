@@ -10,7 +10,7 @@ public enum MixSource {
 
 	private final String sourceName;
 
-	private MixSource(String sourceName) {
+	MixSource(String sourceName) {
 		this.sourceName = sourceName;
 	}
 

@@ -1,11 +1,11 @@
 package com.admi.data.services;
 
 import com.admi.data.entities.AipInventoryEntity;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.repositories.AipInventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -26,7 +26,7 @@ public class AipInventoryService {
 	@Autowired
 	StatusService statusService;
 
-	public void saveAll(List<AipInventoryEntity> inventory, Long dealerId, String paCode) {
+	public void saveAll(List<AipInventoryEntity> inventory, Long dealerId, String paCode, DmsProvider dms) {
 		System.out.println("Saving inventory...");
 		long aipSaveStart = System.currentTimeMillis();
 
@@ -46,17 +46,19 @@ public class AipInventoryService {
 			}
 		}
 		System.out.println("Finished saving parts. Processing inventory...");
-		processInventory(inventory, dealerId, paCode);
+		processInventory(inventory, dealerId, paCode, dms);
 
 		long aipSaveEnd = System.currentTimeMillis();
 		System.out.println("Total time taken to save: " + (aipSaveEnd-aipSaveStart)/1000 + "s.");
 	}
 
-	public void processInventory(List<AipInventoryEntity> inventory, Long dealerId, String paCode) {
+	public void processInventory(List<AipInventoryEntity> inventory, Long dealerId, String paCode, DmsProvider dms) {
 		zigService.saveAsZig(inventory, paCode);
 		rimService.addOrUpdateRimParts(dealerId, inventory);
-		processService.calculateAisKpi(inventory);
+//		processService.calculateAisKpi(inventory);
+		processService.calculateAisKpi(inventory, dms);
 		statusService.runStatusValuesForToday(dealerId);
+//		statusService.runStatusValuesForToday(dealerId, dms);
 	}
 
 }

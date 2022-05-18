@@ -4,6 +4,7 @@ import com.admi.data.enums.statuses.DmsStatus;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 public enum PbsStatus implements DmsStatus {
 
@@ -24,13 +25,9 @@ public enum PbsStatus implements DmsStatus {
 	private final String statusName;
 	private final String[] statusNameArray;
 
-	private PbsStatus(String statusName, String[] statusNameArray) {
+	PbsStatus(String statusName, String[] statusNameArray) {
 		this.statusNameArray = statusNameArray;
-		if (statusName == null) {
-			this.statusName = "No Status";
-		} else {
-			this.statusName = statusName;
-		}
+		this.statusName = Objects.requireNonNullElse(statusName, "No Status");
 	}
 
 	/**
@@ -53,6 +50,14 @@ public enum PbsStatus implements DmsStatus {
 		return statusName;
 	}
 
+	public DmsStatus getStockStatus() {
+		return STOCK;
+	}
+
+	public DmsStatus getNonStockStatus() {
+		return TEST;
+	}
+
 	public List<DmsStatus> getStockStatuses() {
 		return List.of(STOCK, R, MANUAL_ORDER, SUPERSEDED);
 	}
@@ -66,7 +71,7 @@ public enum PbsStatus implements DmsStatus {
 	}
 
 	public List<DmsStatus> getInactiveStatuses() {
-		return List.of(TEST, O, R, SUPERSEDED, MEMO);
+		return List.of(TEST, O, SUPERSEDED, MEMO);
 	}
 
 }

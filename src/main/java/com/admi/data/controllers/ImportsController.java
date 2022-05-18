@@ -20,8 +20,6 @@ import javax.mail.MessagingException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
@@ -45,10 +43,6 @@ import java.util.*;
  *     <li>Upload of FCSD Credits for DPOC program</li>
  * </ul>
  *
- *{@link org.springframework.ui.Model} is used in almost every method to hold context for the templates return by
- * said methods.
- *{@link org.springframework.security.core.Authentication} is also used in almost every method in order to get some
- * detail of a users session (username, userId, {@link com.admi.dashboard.entities.UsersEntity} etc.).
  *
  * @author kmowers, jbetzig, igrisham
  */
@@ -113,7 +107,8 @@ public class ImportsController {
 	@PostMapping("/inventory/{dealerId}")
 	@ResponseBody
 	public String submitInventoryFile(@PathVariable("dealerId") Long dealerId,
-	                                  @RequestParam("file") MultipartFile file, Model model)
+	                                  @RequestParam("file") MultipartFile file,
+	                                  Model model)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
 		DealerMasterEntity dealer = dealerMasterRepo.findByDealerId(dealerId);
 		String paCode = dealer.getPaCode();
@@ -127,19 +122,19 @@ public class ImportsController {
 		return paCode + " - Dealer ID: " + dealerId + "Complete";
 	}
 
-	@GetMapping("/UDBInventory")
-	public String selectUdbInventoryFile(Model model) {
-		model.addAttribute("action", "/imports/UDBInventory");
-		return getPage("upload", "Inventory", model);
-	}
-
-	@PostMapping("/UDBInventory")
-	@ResponseBody
-	public String submitUdbInventoryFile(@RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
-		List<AipInventoryEntity> inventory = importService.importUdbInventoryFile(file);
-
-		return "UDB File imported.\n \n Lines: " + inventory.size() + "\n \n " + inventory.subList(0,100);
-	}
+//	@GetMapping("/UDBInventory")
+//	public String selectUdbInventoryFile(Model model) {
+//		model.addAttribute("action", "/imports/UDBInventory");
+//		return getPage("upload", "Inventory", model);
+//	}
+//
+//	@PostMapping("/UDBInventory")
+//	@ResponseBody
+//	public String submitUdbInventoryFile(@RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
+//		List<AipInventoryEntity> inventory = importService.importUdbInventoryFile(file);
+//
+//		return "UDB File imported.\n \n Lines: " + inventory.size() + "\n \n " + inventory.subList(0,100);
+//	}
 
 	@GetMapping("/DTInventory/{dealerId}")
 	public String selectDtInventoryFile(@PathVariable("dealerId") Long dealerId, Model model) {
@@ -149,7 +144,10 @@ public class ImportsController {
 
 	@PostMapping("/DTInventory/{dealerId}")
 	@ResponseBody
-	public String submitDtInventoryFile(@PathVariable("dealerId") Long dealerId, @RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
+	public String submitDtInventoryFile(@PathVariable("dealerId") Long dealerId,
+	                                    @RequestParam("file") MultipartFile file,
+	                                    Model model)
+			throws IOException, InvalidFormatException {
 		String paCode = file.getOriginalFilename().substring(0, file.getOriginalFilename().indexOf('.'));
 
 		dtService.runDtInventoryFile(dealerId, file.getInputStream(), paCode);

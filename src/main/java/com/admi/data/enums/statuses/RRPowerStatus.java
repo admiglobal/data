@@ -24,6 +24,14 @@ public enum RRPowerStatus implements DmsStatus {
 		return statusName;
 	}
 
+	public DmsStatus getStockStatus() {
+		return STOCK;
+	}
+
+	public DmsStatus getNonStockStatus() {
+		return N_STK;
+	}
+
 	public List<DmsStatus> getStockStatuses() {
 		return List.of(STOCK, ZEROG);
 	}

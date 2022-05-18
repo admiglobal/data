@@ -3,6 +3,7 @@ package com.admi.data.enums.statuses;
 import com.admi.data.enums.statuses.DmsStatus;
 
 import java.util.List;
+import java.util.Objects;
 
 public enum GenericStatus implements DmsStatus {
 
@@ -17,15 +18,19 @@ public enum GenericStatus implements DmsStatus {
 	private final String statusName;
 
 	GenericStatus(String statusName) {
-		if (statusName == null) {
-			this.statusName = "No Status";
-		} else {
-			this.statusName = statusName;
-		}
+		this.statusName = Objects.requireNonNullElse(statusName, "No Status");
 	}
 
 	public String getStatusName() {
 		return statusName;
+	}
+
+	public DmsStatus getStockStatus() {
+		return STOCK;
+	}
+
+	public DmsStatus getNonStockStatus() {
+		return NON_STOCK;
 	}
 
 	public List<DmsStatus> getStockStatuses() {

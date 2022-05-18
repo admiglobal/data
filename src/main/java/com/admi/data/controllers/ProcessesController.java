@@ -2,13 +2,14 @@ package com.admi.data.controllers;
 
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.CpcDealerProfileEntity;
+import com.admi.data.entities.DealerMasterEntity;
 import com.admi.data.entities.KpiEntity;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.repositories.CpcDealerProfileRepository;
-import com.admi.data.services.AisKpiService;
+import com.admi.data.repositories.DealerMasterRepository;
+import com.admi.data.repositories.OpcTsp200DataRepository;
+import com.admi.data.services.*;
 import com.admi.data.repositories.AipInventoryRepository;
-import com.admi.data.services.CpcKpiService;
-import com.admi.data.services.OpcKpiService;
-import com.admi.data.services.ProcessService;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @RequestMapping("/process")
@@ -36,6 +38,9 @@ public class ProcessesController {
 	OpcTsp200DataRepository opcTsp200DataRepo;
 
 	@Autowired
+	DealerMasterRepository dealerRepo;
+
+	@Autowired
 	AisKpiService aisKpiService;
 
 	@Autowired
@@ -50,15 +55,15 @@ public class ProcessesController {
 	@Autowired
 	OpcKpiService opcKpiService;
 
-	@ResponseBody
-//	@GetMapping("/processTest")
-	public String processTest(Model model) {
-		List<AipInventoryEntity> inventory = aipInventoryRepo.findAllByDealerIdAndDataDate(1969L, LocalDate.of(2021,10,21));
-
-		KpiEntity kpis = aisKpiService.calculateAisKpi(inventory);
-
-		return kpis.toString();
-	}
+//	@ResponseBody
+////	@GetMapping("/processTest")
+//	public String processTest(Model model) {
+//		List<AipInventoryEntity> inventory = aipInventoryRepo.findAllByDealerIdAndDataDate(1969L, LocalDate.of(2021,10,21));
+//
+//		KpiEntity kpis = aisKpiService.calculateAisKpi(inventory);
+//
+//		return kpis.toString();
+//	}
 
 	/**
 	 * Called to delete a Motorcraft order file from the P: drive
@@ -150,6 +155,41 @@ public class ProcessesController {
 		fordDealerKpiService.runAllFordDealers();
 
 		return "DPOC dealers ran.";
+	}
+
+	@ResponseBody
+	@GetMapping("/ford/{dateString}")
+	public String processUDBForAllFordPrograms(@PathVariable("dateString") String dateString) {
+		long startTime = System.currentTimeMillis();
+
+		LocalDate date = LocalDate.parse(dateString);
+
+		cpcService.runCpcDealers(date);
+		fordDealerKpiService.runAllFordDealers();
+		opcKpiService.runOpcProcess();
+
+		long endTime = System.currentTimeMillis();
+		Long l = endTime-startTime;
+		double completionTime = (l.doubleValue())/1000;
+
+		return "Ran UDB Data for Ford programs. " +
+				"Time to complete: " + completionTime + " seconds.";
+	}
+
+	@ResponseBody
+	@GetMapping("/aip/{paCode}")
+	public String runKpisForAIPDealer(@PathVariable("paCode") String paCode) {
+		DealerMasterEntity dealer = dealerRepo.findFirstByPaCodeAndPrimaryManufacturerIdAndTerminationDateIsNull(paCode, 1);
+
+		if (dealer != null) {
+			List<AipInventoryEntity> inventory = aipInventoryRepo.findAllByDealerIdAndDataDate(dealer.getDealerId(), LocalDate.now());
+
+			DmsProvider dms = DmsProvider.findDms(dealer.getDmsId());
+			KpiEntity kpis = aisKpiService.calculateAisKpi(inventory, dms);
+
+			return kpis.toString();
+		}
+		return "Not a dealer.";
 	}
 
 	@ResponseBody

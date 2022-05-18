@@ -14,8 +14,6 @@ public interface AipInventoryRepository extends JpaRepository<AipInventoryEntity
 
 	List<AipInventoryEntity> findAllByDealerIdAndDataDate(Long dealerId, LocalDate dataDate);
 
-
-
 	@Transactional
 	@Modifying
 	@Query( value = "CALL DELETE_AIP_INVENTORY_P()",

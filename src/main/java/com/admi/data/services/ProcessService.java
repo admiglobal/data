@@ -2,6 +2,7 @@ package com.admi.data.services;
 
 import com.admi.data.dto.MotorcraftOrderSet;
 import com.admi.data.entities.*;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.repositories.McOrdersContentRepository;
 import com.admi.data.repositories.McOrdersRepository;
 import org.apache.poi.ss.usermodel.*;
@@ -28,8 +29,9 @@ public class ProcessService {
 	@Autowired
 	McOrdersContentRepository ordersContentRepo;
 
-	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory) {
+	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory, DmsProvider dms) {
 		return aisKpiService.calculateAisKpi(inventory);
+//		return aisKpiService.calculateAisKpi(inventory, dms);
 	}
 
 	public void generateDowOrders(List<MotorcraftOrderSet> orders) throws IOException {

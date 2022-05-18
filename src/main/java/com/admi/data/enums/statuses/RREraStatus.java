@@ -3,6 +3,7 @@ package com.admi.data.enums.statuses;
 import com.admi.data.enums.statuses.DmsStatus;
 
 import java.util.List;
+import java.util.Objects;
 
 public enum RREraStatus implements DmsStatus {
 
@@ -20,16 +21,20 @@ public enum RREraStatus implements DmsStatus {
 
 	private final String statusName;
 
-	private RREraStatus(String statusName) {
-		if (statusName == null) {
-			this.statusName = "Stock/Active";
-		} else {
-			this.statusName = statusName;
-		}
+	RREraStatus(String statusName) {
+		this.statusName = Objects.requireNonNullElse(statusName, "Stock/Active");
 	}
 
 	public String getStatusName() {
 		return statusName;
+	}
+
+	public DmsStatus getStockStatus() {
+		return STOCK;
+	}
+
+	public DmsStatus getNonStockStatus() {
+		return NS;
 	}
 
 	public List<DmsStatus> getStockStatuses() {
@@ -45,7 +50,7 @@ public enum RREraStatus implements DmsStatus {
 	}
 
 	public List<DmsStatus> getInactiveStatuses() {
-		return List.of(NS, AP, DP, NP, OB, RBH);
+		return List.of(NS, AP, NP, OB, RBH);
 	}
 
 }

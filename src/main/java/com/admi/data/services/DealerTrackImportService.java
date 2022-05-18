@@ -3,10 +3,7 @@ package com.admi.data.services;
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.DealerMasterEntity;
 import com.admi.data.entities.DealerTrackInventoryRow;
-import com.admi.data.services.DateService;
-import com.admi.data.services.ProcessService;
-import com.admi.data.services.RimHistoryService;
-import com.admi.data.services.ZigService;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.repositories.DealerMasterRepository;
 import org.apache.commons.csv.CSVFormat;
@@ -80,7 +77,7 @@ public class DealerTrackImportService {
 	public void runDtInventoryFile(Long dealerId, InputStream file, String paCode) throws IOException {
 		List<AipInventoryEntity> aipInventory = importInventoryFile(file, dealerId);
 
-		aipInventoryService.saveAll(aipInventory, dealerId, paCode);
+		aipInventoryService.saveAll(aipInventory, dealerId, paCode, DmsProvider.DEALERTRACK);
 
 		file.close();
 	}

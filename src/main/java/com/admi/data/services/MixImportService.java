@@ -3,6 +3,7 @@ package com.admi.data.services;
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.MixPartsInventoryEntity;
 import com.admi.data.enums.MixSource;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.repositories.MixPartsInventoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,7 +34,7 @@ public class MixImportService {
 				.map(part -> part.toAipInventoryEntity(dms))
 				.collect(Collectors.toList());
 
-		aipInventoryService.saveAll(aipInventory, dealerId, paCode);
+		aipInventoryService.saveAll(aipInventory, dealerId, paCode, DmsProvider.getByMixSource(dms));
 
 		System.out.println("Imported and processed "+ dms.getSourceName() + " " + paCode + " Dealer Id: " + dealerId);
 	}

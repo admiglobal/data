@@ -2,6 +2,7 @@ package com.admi.data.services;
 
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.KpiEntity;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.enums.statuses.DmsStatus;
 import com.admi.data.repositories.KpiRepository;
 import com.admi.data.repositories.ZigRepository;
@@ -97,6 +98,78 @@ public class AisKpiService {
 		return kpi;
 	}
 
+	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory, DmsProvider dms) {
+		KpiEntity kpi = new KpiEntity();
+
+		DmsStatus statuses = dms.getStatusType();
+
+		if (inventory.size() > 0) {
+			kpi.setDealerId(inventory.get(0).getDealerId());
+//			Always treat KPI calculations as though they are for yesterday.
+			kpi.setDataDate(dateService.getLongDate(inventory.get(0).getDataDate().minusDays(1)));
+
+			Long totalDmsSku = 0L;
+			Long totalDmsSkuInStock = 0L;
+			Long pieceCount = 0L;
+
+			for (AipInventoryEntity part : inventory) {
+				totalDmsSku += getSkuCountByField(part, AipInventoryEntity::getStatus, List.of(statuses.getStockStatus()));
+
+				if ((part.getQoh() != null && part.getQoh() > 0)
+						&& (part.getCents() != null && part.getCents() > 0)) {
+
+					Long totalStockValue = getPartTotalByStatus(part, statuses.getStockStatuses(), AipInventoryEntity::getStatus);
+					Long totalNonStockValue = getPartTotalByStatus(part, statuses.getNonStockStatuses(), AipInventoryEntity::getStatus);
+
+					Long totalStockSkuCount = getSkuCountByField(part, AipInventoryEntity::getStatus, statuses.getStockStatuses());
+					Long totalNonStockSkuCount = getSkuCountByField(part, AipInventoryEntity::getStatus, statuses.getNonStockStatuses());
+
+					Long stockOver9m = getPartTotalByStatusBeforeDate(part, 270L, AipInventoryEntity::getLastSaleOrReceipt, statuses.getStockStatuses());
+					Long nonStockOver9m = getPartTotalByStatusBeforeDate(part, 270L, AipInventoryEntity::getLastSaleOrReceipt, statuses.getNonStockStatuses());
+					Long nonStockLT60 = getPartTotalByStatusBetweenDate(part, 0L, 61L, AipInventoryEntity::getLastSaleOrReceipt, statuses.getNonStockStatuses());
+					Long nonStock30To60 = getPartTotalByStatusBetweenDate(part, 29L, 61L, AipInventoryEntity::getLastSaleOrReceipt, statuses.getNonStockStatuses());
+					Long nonStock61To90 = getPartTotalByStatusBetweenDate(part, 60L, 91L, AipInventoryEntity::getLastSaleOrReceipt, statuses.getNonStockStatuses());
+					Long nonStock61To9m = getPartTotalByStatusBetweenDate(part, 60L, 271L, AipInventoryEntity::getLastSaleOrReceipt, statuses.getNonStockStatuses());
+
+					Long preIdle = getPartTotalByStatusBetweenDate(part, 29L, 61L, AipInventoryEntity::getLastReceipt, statuses.getInactiveStatuses());
+					Long newIdle = getPartTotalByStatusBetweenDate(part, 60L, 91L, AipInventoryEntity::getLastReceipt, statuses.getInactiveStatuses());
+
+					Long rimValue = getPartTotalByField(part, true, AipInventoryEntity :: getMfgControlled);
+					Long rimSkuCount = getSkuCountByField(part, true, AipInventoryEntity :: getMfgControlled);
+
+					kpi.setTotalSValue(kpi.getTotalSValue() + totalStockValue);
+					kpi.setTotalNsValue(kpi.getTotalNsValue() + totalNonStockValue);
+
+					kpi.setSSkuCount(kpi.getSSkuCount() + totalStockSkuCount);
+					kpi.setNsSkuCount(kpi.getNsSkuCount() + totalNonStockSkuCount);
+
+					kpi.setSOver9M(kpi.getSOver9M() + stockOver9m);
+					kpi.setNsOver9M(kpi.getNsOver9M() + nonStockOver9m);
+					kpi.setNsLessThan60(kpi.getNsLessThan60() + nonStockLT60);
+					kpi.setNs30To60(kpi.getNs30To60() + nonStock30To60);
+					kpi.setNs61To90(kpi.getNs61To90() + nonStock61To90);
+					kpi.setNs61To9M(kpi.getNs61To9M() + nonStock61To9m);
+					kpi.setNsPreIdle(kpi.getNsPreIdle() + preIdle);
+					kpi.setNsNewIdle(kpi.getNsNewIdle() + newIdle);
+
+					kpi.setTotalRimValue(kpi.getTotalRimValue() + rimValue);
+					kpi.setRimSkuCount(kpi.getRimSkuCount() + rimSkuCount);
+
+					totalDmsSkuInStock += getSkuCountByField(part, AipInventoryEntity::getStatus, List.of(statuses.getStockStatus()));
+					pieceCount += part.getQoh();
+				}
+			}
+			kpi.setDmsPerf(getDmsPerformance(totalDmsSkuInStock, totalDmsSku));
+			kpi.setPieceCount(pieceCount);
+			kpi.convertAllCentsToDollars();
+		}
+
+//		kpiRepo.saveAndFlush(kpi);
+		System.out.println(kpi);
+
+		return kpi;
+	}
+
 	private <T> Long getPartTotalByField(AipInventoryEntity part, T valueToMatch, Function<AipInventoryEntity, T> fieldGetter) {
 		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
 			return (long) part.getQoh() * part.getCents();
@@ -105,20 +178,46 @@ public class AisKpiService {
 		}
 	}
 
-//	private <T> Long getPartTotalByField(AipInventoryEntity part, List<DmsStatus> statusList, Function<AipInventoryEntity, T> fieldGetter) {
-//		T status = fieldGetter.apply(part);
-//
-////		if ()
-//
-//		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
-//			return (long) part.getQoh() * part.getCents();
-//		} else {
-//			return 0L;
-//		}
-//	}
+	private Long getPartTotalByField(AipInventoryEntity part, Function<AipInventoryEntity, Boolean> fieldGetter, boolean valueToMatch) {
+		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
+			return (long) part.getQoh() * part.getCents();
+		} else {
+			return 0L;
+		}
+	}
+
+	private Long getPartTotalByStatus(AipInventoryEntity part, List<DmsStatus> statusList, Function<AipInventoryEntity, String> fieldGetter) {
+		String status = fieldGetter.apply(part);
+
+		System.out.println("Status: " + status);
+
+		if (statusList.stream().anyMatch(s -> Objects.equals(s.toString(), status))) {
+			return (long) part.getQoh() * part.getCents();
+		} else {
+			return 0L;
+		}
+	}
 
 	private <T> Long getSkuCountByField(AipInventoryEntity part, T valueToMatch, Function<AipInventoryEntity, T> fieldGetter) {
 		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
+			return 1L;
+		} else {
+			return 0L;
+		}
+	}
+
+	private Long getSkuCountByField(AipInventoryEntity part, Function<AipInventoryEntity, Boolean> fieldGetter, boolean valueToMatch) {
+		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
+			return 1L;
+		} else {
+			return 0L;
+		}
+	}
+
+	private Long getSkuCountByField(AipInventoryEntity part, Function<AipInventoryEntity, String> fieldGetter, List<DmsStatus> statusList) {
+		String status = fieldGetter.apply(part);
+
+		if (statusList.stream().anyMatch(s -> Objects.equals(s.toString(), status))) {
 			return 1L;
 		} else {
 			return 0L;
@@ -144,6 +243,25 @@ public class AisKpiService {
 		}
 	}
 
+	private Long getPartTotalByStatusBetweenDate(AipInventoryEntity part,
+	                                             Long startDayCount,
+	                                             Long endDayCount,
+	                                             Function<AipInventoryEntity, LocalDate> dateGetter,
+	                                             List<DmsStatus> statusList) {
+		LocalDate startDate = LocalDate.now().minusDays(startDayCount);
+		LocalDate endDate = LocalDate.now().minusDays(endDayCount);
+		LocalDate partDate = dateGetter.apply(part);
+
+		if (partDate != null
+				&& partDate.isBefore(startDate)
+				&& partDate.isAfter(endDate)
+				&& statusList.stream().anyMatch(s -> Objects.equals(s.toString(), part.getStatus()))) {
+			return (long) part.getCents() * part.getQoh();
+		} else {
+			return 0L;
+		}
+	}
+
 	private Long getPartTotalByStatusBeforeDate(AipInventoryEntity part,
 	                                           String status,
 	                                           Long dayCount,
@@ -154,6 +272,22 @@ public class AisKpiService {
 		if (partDate != null
 				&& partDate.isBefore(date)
 				&& part.getAdmiStatus().equalsIgnoreCase(status)) {
+			return (long) part.getCents() * part.getQoh();
+		} else {
+			return 0L;
+		}
+	}
+
+	private Long getPartTotalByStatusBeforeDate(AipInventoryEntity part,
+	                                            Long dayCount,
+	                                            Function<AipInventoryEntity, LocalDate> dateGetter,
+	                                            List<DmsStatus> statusList) {
+		LocalDate date = LocalDate.now().minusDays(dayCount);
+		LocalDate partDate = dateGetter.apply(part);
+
+		if (partDate != null
+				&& partDate.isBefore(date)
+				&& statusList.stream().anyMatch(s -> Objects.equals(s.toString(), part.getStatus()))) {
 			return (long) part.getCents() * part.getQoh();
 		} else {
 			return 0L;

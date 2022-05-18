@@ -1,4 +1,4 @@
-package com.admi.data.enums.statuses;
+package com.admi.data.enums;
 
 public enum KpiTitle {
 
