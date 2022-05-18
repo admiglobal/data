@@ -79,13 +79,13 @@ public class ImportService {
 
 		System.out.println(fileType);
 
-		if (Objects.equals(fileType, ".csv")) {
+		if (Objects.equals(fileType, ".csv")
+				&& dmsId != 48) { //not RR Power
 			System.out.println("CSV file selected");
 			inventory = rrImportService.importCsvInventoryFile(file, dealerId, dmsId);
 		} else if (Objects.equals(fileType, "application/vnd.ms-excel")) {
 			inventory = importXlsInventoryFile(file, dealerId, dmsId);
 		} else {
-//			System.out.println("Inside runAipInventory (line 85 of ImportService.java)");
 			inventory = importXlsxInventoryFile(file, dealerId, dmsId);
 		}
 
@@ -287,7 +287,6 @@ public class ImportService {
 	public List<AipInventoryEntity> importInventoryFile(InputStream file, Long dealerId, int dmsId)
 			throws InvalidFormatException, IllegalAccessException, NoSuchFieldException, IOException {
 		List<AipInventoryEntity> inventory;
-//		System.out.println("Inside importInventoryFile, line 290 of ImportService.java");
 		inventory = importXlsxInventoryFile(file, dealerId, dmsId);
 
 		return inventory;

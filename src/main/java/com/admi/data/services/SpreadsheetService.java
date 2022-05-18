@@ -20,13 +20,14 @@ public class SpreadsheetService {
      * @param cell the Cell we're reading from
      * @return the cell's value as a String
      */
-    private String translateCellIntoString(Cell cell){
+    public static String translateCellIntoString(Cell cell){
         if(cell == null || cell.getCellType().equals(CellType.BLANK)){
             return null;
         } else if(cell.getCellType().equals(CellType.STRING)){
             return cell.getStringCellValue();
         } else if(cell.getCellType().equals(CellType.NUMERIC)){
             //round to prevent decimal of .0 appended to numeric value
+            // TODO: This rounding was probably leftover from the CDK process...but we won't want it everywhere! Make sure the CDK process rounds where it needs, then remove this here
             Long wholeNum = Math.round(cell.getNumericCellValue());
             return wholeNum.toString();
         } else{
@@ -43,7 +44,7 @@ public class SpreadsheetService {
      * @param fallbackValue This value is returned if the cell can't be parsed into a Double. Usually something like null or 0.
      * @return
      */
-    private Double translateCellIntoDouble(Cell cell, Double fallbackValue){
+    public static Double translateCellIntoDouble(Cell cell, Double fallbackValue){
         if(cell == null || cell.getCellType().equals(CellType.BLANK)){
             return null;
         } else if(cell.getCellType().equals(CellType.NUMERIC)){

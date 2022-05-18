@@ -9,7 +9,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
-public enum RRPowerInventoryField {
+public enum RRPowerInventoryField{
     OCT(new String[] {"OCT"},
             new CellDefinition<>(
                     CellType.NUMERIC,

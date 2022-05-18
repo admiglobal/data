@@ -29,6 +29,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+@Service
 public class RRPowerImportService {
     @Autowired
     AipInventoryService aipInventoryService;
@@ -58,7 +59,7 @@ public class RRPowerImportService {
     }
 
     /**
-     * Parses a sheet into a list of AipInventoryEntity's for the given dealer
+     * Parses a sheet into a list of AipInventoryEntities for the given dealer
      */
     public List<AipInventoryEntity> importInventory(Sheet sheet, Long dealerId) throws NoSuchFieldException, IllegalAccessException {
         Headers headersObject = new Headers(sheet);
@@ -120,15 +121,15 @@ public class RRPowerImportService {
         V value = null;
 
         if (setterClass == String.class) {
-            String cellValue = translateCellIntoString(cell);
+            String cellValue = SpreadsheetService.translateCellIntoString(cell);
             value = (V) cellValue;
 
         } else if (setterClass == Long.class) {
-            Double d = translateCellIntoDouble(cell, null);
+            Double d = SpreadsheetService.translateCellIntoDouble(cell, null);
             value = (d == null) ? null : (V) Long.valueOf(Math.round(d));
 
         } else if (setterClass == Double.class) {
-            value = (V) translateCellIntoDouble(cell, null);
+            value = (V) SpreadsheetService.translateCellIntoDouble(cell, null);
 
         } else if (setterClass == LocalDate.class) {
             LocalDate date;
@@ -304,7 +305,7 @@ public class RRPowerImportService {
 
             while(cellIterator.hasNext()) {
                 String cellValue = cellIterator.next().getStringCellValue();
-                RRPowerInventoryField field = RRPowerInventoryField.findByColumnName(cellValue);
+                RRPowerInventoryField field = RRPowerInventoryField.of(cellValue);
                 headers.add(field);
             }
 
