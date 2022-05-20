@@ -14,7 +14,14 @@ public interface AipInventoryRepository extends JpaRepository<AipInventoryEntity
 
 	List<AipInventoryEntity> findAllByDealerIdAndDataDate(Long dealerId, LocalDate dataDate);
 
-
+	@Query(value = "SELECT *\n" +
+			"FROM AIP_INVENTORY\n" +
+			"WHERE DEALER_ID = :dealerId\n" +
+			"AND DATA_DATE = (\n" +
+			"SELECT MAX(i2.DATA_DATE)\n" +
+			"FROM AIP_INVENTORY i2\n" +
+			"WHERE i2.DEALER_ID = :dealerId)", nativeQuery = true)
+	List<AipInventoryEntity> findAllAtMaxDataDateByDealerId(@Param("dealerId") Long dealerId);
 
 	@Transactional
 	@Modifying
