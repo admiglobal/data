@@ -1,24 +1,15 @@
 package com.admi.data.services;
 
 import com.admi.data.dto.CellDefinition;
-import com.admi.data.dto.RRDto;
 import com.admi.data.dto.RRPowerDto;
 import com.admi.data.entities.AipInventoryEntity;
-import com.admi.data.entities.CdkDealersEntity;
-import com.admi.data.entities.CdkPartsInventoryChild;
-import com.admi.data.enums.RRField;
 import com.admi.data.enums.RRPowerInventoryField;
 import com.admi.data.repositories.CdkDealersRepository;
 import com.admi.data.repositories.CdkPartsInventoryRepository;
-import com.sun.istack.NotNull;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
-import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -26,15 +17,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.LocalDate;
-import java.time.Month;
-import java.time.ZoneId;
-import java.time.format.DateTimeParseException;
-import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Locale;
-import java.util.stream.Collectors;
 
 @Service
 public class RRPowerImportService {
@@ -48,24 +33,6 @@ public class RRPowerImportService {
     CdkDealersRepository cdkDealersRepo;
 
     /**
-     * Copies a CDK dealer's inventory from CDK_PARTS_INVENTORY table into AIP_INVENTORY table
-     */
-    @Async("asyncCdkExecutor")
-    public void importInventory(Long dealerId, LocalDate localDate, String paCode) {
-
-        CdkDealersEntity dealer = cdkDealersRepo.findFirstByAdmiDealerIdAndEndDateIsNull(dealerId);
-        List<CdkPartsInventoryChild> inventory = cdkRepo.findAllByDealerIdAndInventoryDate(dealer.getDealerId(), localDate);
-        List<AipInventoryEntity> aipInventory = inventory
-                .stream()
-                .map(part -> part.toAipInventoryEntity(dealerId))
-                .collect(Collectors.toList());
-
-        aipInventoryService.saveAll(aipInventory, dealerId, paCode);
-
-        System.out.println("Imported and processed CDK " + paCode + " Dealer Id: " + dealerId);
-    }
-
-    /**
      * Parses a CSV file into a list of AipInventoryEntities for the given dealer
      */
     public List<AipInventoryEntity> importCsvInventoryFile(InputStream file, Long dealerId) {
@@ -77,7 +44,7 @@ public class RRPowerImportService {
             reader = new InputStreamReader(file);
             parser = new CSVParser(reader, CSVFormat.DEFAULT);
         } catch (IOException ioe){
-            System.out.println("Error with I/O while importing inventory: no records were saved.");
+            System.out.println("Error with I/O while importing inventory for dealer ID " + dealerId + ": no records were saved.");
             ioe.printStackTrace();
             return inventory;
         }

@@ -1,12 +1,11 @@
 /**
- * This class represents a row in the received CDK Excel file
+ * This class represents a row in the received R&R Power CSV file
  * @author Julia Betzig +JMJ+
  * @version 2022-02-15
  */
 package com.admi.data.dto;
 
 import com.admi.data.entities.AipInventoryEntity;
-import com.admi.data.services.RRPowerImportService;
 import com.admi.data.services.SpreadsheetService;
 import com.sun.istack.NotNull;
 

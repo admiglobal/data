@@ -233,7 +233,7 @@ public enum RRPowerInventoryField{
     private final CellDefinition<RRPowerDto, ?, ?> definition;
     private static final Map<String, RRPowerInventoryField> map = new HashMap<>(values().length, 1);
 
-    private RRPowerInventoryField(String[] fieldNames, CellDefinition<RRPowerDto, ?, ?> definition) {
+    RRPowerInventoryField(String[] fieldNames, CellDefinition<RRPowerDto, ?, ?> definition) {
         this.fieldNames = fieldNames;
         this.definition = definition;
     }
@@ -252,18 +252,6 @@ public enum RRPowerInventoryField{
             throw new IllegalArgumentException("Invalid RRPowerInventoryField: " + fieldName);
         return result;
     }
-
-    /** (HOME-MADE VERSION -- JAVA CREATED THE MAP THING)
-     * Accounts for more than one possible column name
-     */
-//    public static RRPowerInventoryField findByColumnName(String columnName) {
-//        for (RRPowerInventoryField field : values()) {
-//            if (Arrays.asList(field.fieldNames).contains(columnName)){
-//                return field;
-//            }
-//        }
-//        return null;
-//    }
 
     public String[] getfieldNames() {
         return fieldNames;
