@@ -38,7 +38,8 @@ public class OpcKpiService {
      * If we didn't receive new inventory data, doesn't delete old data but still takes a new snapshot.
      */
     public void runOpcProcess(){
-        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
+        String[] nonQlPrimariesPaCodes = {"08972"}; //non-QL dealers we want to include because they have a secondary that's a QL
+        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers(nonQlPrimariesPaCodes);
 
         for(DealerMasterEntity dealer : quickLaneDealers){
             String paCode = dealer.getPaCode();
@@ -58,7 +59,7 @@ public class OpcKpiService {
     /**
      * For testing purposes only
      */
-    public void tester(){
+    public void testTop90QlDealers(){
         System.out.println("Running top 90 OPC dealers");
         String[] top90Dealers = {"04134", "04196", "04281", "03491", "09217", "09469", "00210", "04921", "08124", "03106", "04113", "01699", "05291", "03554", "01319", "08621", "02960", "03318", "03557", "05591", "01533", "06069", "02405", "04107", "05266", "03360", "01167", "01705", "02737", "04809", "01046", "00912", "05222", "01743", "01880", "03938", "05076", "06314", "00378", "09522", "00377", "08254", "06790", "04517", "06431", "02042", "05448", "09566", "05319", "09193", "01650", "03558", "07670", "08027", "00175", "00601", "03832", "00172", "01412", "00048", "00775", "01417", "02175", "06161", "01487", "08110", "20341", "08155", "04544", "03830", "05928", "05982", "06804", "03569", "06043", "03130", "03897", "01307", "04120", "08615", "01741", "04362", "04410", "00169", "01302", "07192", "09324", "02673", "06758"};
         int counter = 0;
@@ -66,6 +67,15 @@ public class OpcKpiService {
             double completionTime = processSingleOpcDealer(paCode);
             System.out.println("(" + ++counter + "/90) Ran process for " + paCode + " in " + completionTime + " seconds.");
         }
+    }
+
+    /**
+     * For testing purposes only
+     */
+    public void tester(){
+        String[] nonQlPrimariesPaCodes = {"08972","000002"}; //non-QL dealers we want to include because they have a secondary that's a QL
+        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers(nonQlPrimariesPaCodes);
+        System.out.println("Size of this list: " + quickLaneDealers.size());
     }
 
     /**
