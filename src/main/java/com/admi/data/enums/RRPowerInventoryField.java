@@ -110,11 +110,11 @@ public enum RRPowerInventoryField{
                     Long.class)),
     SOURCE(new String[] {"Source"},
             new CellDefinition<>(
-                    CellType.NUMERIC,
-                    Cell :: getNumericCellValue,
-                    Long.class,
+                    CellType.STRING,
+                    Cell :: getStringCellValue,
+                    String.class,
                     RRPowerDto :: setSource,
-                    Long.class)),
+                    String.class)),
     PART_NUMBER(new String[] {"Part"},
             new CellDefinition<>(
                     CellType.STRING,

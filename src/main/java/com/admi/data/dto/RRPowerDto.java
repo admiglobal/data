@@ -6,6 +6,8 @@
 package com.admi.data.dto;
 
 import com.admi.data.entities.AipInventoryEntity;
+import com.admi.data.services.RRPowerImportService;
+import com.admi.data.services.SpreadsheetService;
 import com.sun.istack.NotNull;
 
 import java.time.LocalDate;
@@ -27,7 +29,7 @@ public class RRPowerDto {
     private Long outstanding;
     private Long minimum;
     private Long maximum;
-    private Long source;
+    private String source;
     private String partNumber;
     private String group;
     private String bin;
@@ -53,24 +55,40 @@ public class RRPowerDto {
         AipInventoryEntity inv = new AipInventoryEntity();
 
         inv.setDealerId(dealerId);
-//        inv.setPartNo(RRPowerImportService.getModifiedPartNumber(partNumber, this.hashCode()));
-//        inv.setCents(this.costCents == null ? null : Math.toIntExact(this.costCents));
-//        inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
-//        inv.setDescription(this.description);
-//        inv.setStatus(this.getStatus());
-//        inv.setLastSale(this.getLastSaleDate());
-//        inv.setLastReceipt(this.getLastReceiptDate());
-//        inv.setBin(this.bin);
-//        inv.setSource(this.source);
-//        //mfgControlled
-//        inv.setDataDate(date);
-//        inv.setAdmiStatus(RRPowerImportService.getAdmiStatus(this.getStatus()));
-//        //manufacturer
-//        inv.setQoo(this.quantityOnOrder == null ? null : Math.toIntExact(this.quantityOnOrder));
-//        inv.setTwelveMonthSales(this.yrsl == null ? null : Math.toIntExact(this.yrsl));
-//        inv.setEntryDate(this.getEntry());
+        inv.setPartNo(SpreadsheetService.getModifiedPartNumber(partNumber, this.hashCode()));
+        inv.setCents((net == null) ? null : Math.toIntExact(net));
+        inv.setQoh(quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
+        inv.setDescription(this.description);
+        inv.setStatus(this.getOverallStatus());
+        inv.setAdmiStatus(this.getAdmiStatus());
+        inv.setLastSale(this.getLastSaleDate());
+        inv.setLastReceipt(this.getReceiptDate());
+        inv.setBin(this.bin);
+        inv.setSource(this.source);
+//        //mfgControlled //TODO - Check if rimState column in DTO gives us mfgControlled info for AipInventoryEntity
+        inv.setDataDate(date);
+//        //manufacturer //TODO - make sure this info isn't in the RR Power file
+        inv.setQoo(this.backorder == null ? null : Math.toIntExact(backorder));
+        inv.setTwelveMonthSales(twelveMonthSalesYr1 == null ? null : Math.toIntExact(twelveMonthSalesYr1));
+        inv.setEntryDate(entry);
+
+        System.out.println("Converted to AipInventoryEntity: " + inv);
 
         return inv;
+    }
+
+    //TODO - double check what the ZEROG status and blanks should translate to in ADMI terms
+    private String getAdmiStatus() {
+        if(overallStatus == null){ return "N"; }
+
+        switch(overallStatus){
+            case "STOCK":
+                return "S";
+            case "N-STK":
+            case "ZEROG":
+            default:
+                return "N";
+        }
     }
 
     private LocalDate getDefaultDateIfNull(LocalDate date) {
@@ -226,11 +244,11 @@ public class RRPowerDto {
         this.maximum = maximum;
     }
 
-    public Long getSource() {
+    public String getSource() {
         return source;
     }
 
-    public void setSource(Long source) {
+    public void setSource(String source) {
         this.source = source;
     }
 

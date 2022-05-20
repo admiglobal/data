@@ -67,7 +67,7 @@ public class RRImportService {
 		return inventoryList;
 	}
 
-	public List<AipInventoryEntity> importCsvInventoryFile(InputStream file, Long dealerId, int dms) throws IOException {
+	public List<AipInventoryEntity> importCsvInventoryFile(InputStream file, Long dealerId) throws IOException {
 		Reader reader = new InputStreamReader(file);
 		CSVParser parser = new CSVParser(reader, CSVFormat.DEFAULT);
 		List<AipInventoryEntity> inventory = new ArrayList<>();

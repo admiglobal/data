@@ -1,23 +1,30 @@
 package com.admi.data.services;
 
 import com.admi.data.dto.CellDefinition;
+import com.admi.data.dto.RRDto;
 import com.admi.data.dto.RRPowerDto;
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.CdkDealersEntity;
 import com.admi.data.entities.CdkPartsInventoryChild;
-import com.admi.data.enums.CdkInventoryField;
+import com.admi.data.enums.RRField;
 import com.admi.data.enums.RRPowerInventoryField;
 import com.admi.data.repositories.CdkDealersRepository;
 import com.admi.data.repositories.CdkPartsInventoryRepository;
 import com.sun.istack.NotNull;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.CellType;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.ZoneId;
@@ -59,213 +66,119 @@ public class RRPowerImportService {
     }
 
     /**
-     * Parses a sheet into a list of AipInventoryEntities for the given dealer
+     * Parses a CSV file into a list of AipInventoryEntities for the given dealer
      */
-    public List<AipInventoryEntity> importInventory(Sheet sheet, Long dealerId) throws NoSuchFieldException, IllegalAccessException {
-        Headers headersObject = new Headers(sheet);
-        List<RRPowerInventoryField> headers = headersObject.headerList;
-        int headerRowNum = headersObject.headerRowNum;
+    public List<AipInventoryEntity> importCsvInventoryFile(InputStream file, Long dealerId) {
+        List<AipInventoryEntity> inventory = new ArrayList<>();
+        Reader reader;
+        CSVParser parser;
+        
+        try{
+            reader = new InputStreamReader(file);
+            parser = new CSVParser(reader, CSVFormat.DEFAULT);
+        } catch (IOException ioe){
+            System.out.println("Error with I/O while importing inventory: no records were saved.");
+            ioe.printStackTrace();
+            return inventory;
+        }
+        Iterator<CSVRecord> recordIterator = parser.iterator();
 
+        List<RRPowerInventoryField> headers = getHeaderList(recordIterator.next().toList());
+        System.out.println(headers);
 
-        List<AipInventoryEntity> inventoryList = new ArrayList<>();
+        while (recordIterator.hasNext()) {
+            CSVRecord row = recordIterator.next();
+            RRPowerDto dto = new RRPowerDto();
 
-        Iterator<Row> rowIterator = sheet.iterator();
-        while (rowIterator.hasNext()) {
-            Row row = rowIterator.next();
-            RRPowerDto rowDTO = new RRPowerDto();
+            if(row.getRecordNumber() < 15){
+                System.out.println("Record: " + row.toString());
+            }
+            
+            System.out.println("Approaching for loop...");
 
-            if (row.getRowNum() > headerRowNum) {
-                short lastCell = row.getLastCellNum();
+            for (int i = 0; i < row.size(); i++) {
+                System.out.println("inside for loop...");
+                String value = row.get(i);
+                RRPowerInventoryField field = headers.get(i);
+                
+                System.out.println("RRInventoryField: " + field + "; cell value: " + value);
 
-                for(int i = 0; i < lastCell; i++){
-                    Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL); //prevents skipping over blank cells
-                    RRPowerInventoryField field = headers.get(i);
-
-                    try {
-                        setDtoField(cell, rowDTO, field.getDefinition());
-                    } catch(Exception e) {
-                        System.out.println("Cell: " + cell);
-                        if (field != null)
-                            System.out.println("Field: " + field);
-                        e.printStackTrace();
-                    }
-                }
-
-                if(!rowDTO.isBlankRow()){
-                    inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now()));
+                if (field != null) {
+                    setDtoField(value, dto, field.getDefinition());
+                    System.out.println("Saved to DTO!");
+                } else{
+                    System.out.println("The field was null, so we didn't save it to the dto.");
                 }
             }
+            
+            System.out.println("outside for loop");
+
+            if(!dto.isBlankRow()){
+                inventory.add(dto.toAipInventory(dealerId, LocalDate.now()));
+                System.out.println("saved to aip inventory!");
+            } else{
+                System.out.println("it's a blank row, so we didn't bother saving it to an aipInventoryEntity");
+            }
         }
+        return inventory;
+    }
 
-        System.out.println("Row Count: " + inventoryList.size());
+    private List<RRPowerInventoryField> getHeaderList(List<String> headerStrings) {
+        List<RRPowerInventoryField> headers = new ArrayList<>();
 
-        return inventoryList;
+        for(String header : headerStrings) {
+
+            RRPowerInventoryField field = RRPowerInventoryField.of(header);
+
+//            System.out.println(header);
+
+//            if (field != null) {
+//                System.out.println("matches " + field.toString());
+//            }
+
+            headers.add(field);
+        }
+        return headers;
     }
 
 
     /**
      * Sets the value of this cell to the appropriate element in the R&R Power DTO
-     * @param cell If null, means the cell is blank
-     * @param dto
+     * @param cellValue
+     * @param dto our RRPowerDto that will get its field set
      * @param cellDefinition
      * @param <V> The value to be set
      * @param <W> We don't care about this for our purposes here.
      */
-    private <V, W> void setDtoField(Cell cell, RRPowerDto dto, CellDefinition<RRPowerDto, V, W> cellDefinition) {
-        if(cell == null){
-            return; //cell is blank: ok to leave null in dto, too
-        }
+    private <V, W> void setDtoField(String cellValue, RRPowerDto dto, CellDefinition<RRPowerDto, V, W> cellDefinition) {
+        if(cellValue == null || cellValue.equals("")){ return; } //cellValue is blank: ok to leave null in dto, too
 
         Class<?> setterClass = cellDefinition.getSetterClass();
 
         V value = null;
 
         if (setterClass == String.class) {
-            String cellValue = SpreadsheetService.translateCellIntoString(cell);
             value = (V) cellValue;
 
         } else if (setterClass == Long.class) {
-            Double d = SpreadsheetService.translateCellIntoDouble(cell, null);
-            value = (d == null) ? null : (V) Long.valueOf(Math.round(d));
+            Long l = Long.parseLong(cellValue);
+            value = (V) l;
 
         } else if (setterClass == Double.class) {
-            value = (V) SpreadsheetService.translateCellIntoDouble(cell, null);
+            Double d = Double.parseDouble(cellValue);
+            value = (V) d;
 
         } else if (setterClass == LocalDate.class) {
-            LocalDate date;
-            try{
-                date = cell.getDateCellValue()
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate();
-            } catch(IllegalStateException ise){ //the cell isn't formatted as a numeric date
-                //assume format like "04FEB22", "FEB22", or "-12345*19680-"--otherwise, null
-                date = parseUglyDate(cell.getStringCellValue());
-            }
+            LocalDate date = SpreadsheetService.parseUglyDate(cellValue);
             value = (V) date;
 
         } else {
-            System.out.println("Given setter class not accounted for in CdkImportService: " + setterClass);
+            System.out.println("Given setter class not accounted for in RRPowerImportService: " + setterClass);
         }
 
         cellDefinition.getEntitySetter()
                 .accept(dto, value);
 
-    }
-
-
-    /**
-     * Parses a String of one of the given formats into a LocalDate.
-     * Accepted formats:
-     * 		- "04FEB22" (i.e. Feb 4, 2022)
-     * 		- "FEB22" (i.e. February 2022)
-     * 		- "-12345*19680-" (i.e. 19680 days after December 30, 1967)
-     * 		- "1997-08-12" (i.e. August 12, 1997)
-     * If not one of these formats, returns null.
-     * Years above 75 will be read as "1976" instead of "2076". If by some miracle this code is still being used after 2075, sorry for the headache.
-     * @param uglyDate A String with one of the accepted formats, representing a date between Jan 1st, 1976 and Dec 31st, 2075.
-     * @return a LocalDate representing this date, or null if unable to parse. If no day information given (as with "FEB22" format), assume 1st of the month.
-     */
-    private LocalDate parseUglyDate(String uglyDate){
-        if(uglyDate == null || uglyDate.equals("")){
-            return null;
-        }
-
-        uglyDate = uglyDate.trim();
-
-        //keep trying formats until it works
-        try{ //first, try the easy option of "1997-08-12" format
-            return LocalDate.parse(uglyDate);
-
-        } catch (DateTimeParseException dtpe){
-            try{ //format of "04FEB22" or "FEB22"
-                return parseAlphanumericDate(uglyDate);
-
-            } catch (Exception e){
-                try{ //format of "-12345*19680-"
-                    return parse1967DateFormat(uglyDate);
-
-                } catch(Exception f){
-                    System.out.println("Unable to parse \"" + uglyDate + "\" as a date.");
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /**
-     * Parses a date of the format "-12345*19680-" into a LocalDate object.
-     * Here, "19680" represents days since December 30, 1967.
-     * (The "12345" is just an order number that is disregarded).
-     * Throws an exception if date is not of expected format.
-     * @param date
-     * @return
-     */
-    private LocalDate parse1967DateFormat(@NotNull String date){
-        date = date.trim().replace("-", "");
-        String days = date.split("[*]")[1];
-        LocalDate base = LocalDate.of(1967,12,30);
-        return base.plusDays( Integer.parseInt(days) );
-    }
-
-    /**
-     * Parses a cell's contents that may contain many dates of format "-12345*19680-" into a LocalDate object.
-     * The LocalDate object represents the latest date in the series.
-     * Here, "19680" represents days since December 30, 1967.
-     * (The "12345" is just an order number that is disregarded).
-     * Throws an exception if the argument string does not contain a date of the format "-12345*19680-".
-     * @param contents one or more dates of the format "-12345*19680-". Can contain other substrings as well, as long as separated by whitespace.
-     * @return
-     */
-//	private LocalDate parseMany1967DateFormats(@NotNull String contents){
-//
-//	}
-
-    /**
-     * Parses an alphanumeric date of format "04FEB22" or "FEB22" (Feb 2022) into a LocalDate object.
-     * Throws an exception if alphanumDate not of this format (including if null).
-     * @param alphanumDate
-     * @return a LocalDate object represented by the input String.
-     */
-    private LocalDate parseAlphanumericDate(@NotNull String alphanumDate){
-        alphanumDate = alphanumDate.trim();
-        LocalDate date = null;
-
-        String dayString = null;
-        String monthName = null;
-        String shortYear = null;
-
-        if(alphanumDate.length() == 7){ //format of 04FEB22
-            dayString = alphanumDate.substring(0,2);
-            monthName = alphanumDate.substring(2,5);
-            shortYear = alphanumDate.substring(5,7);
-        } else if(alphanumDate.length() == 5){ //format of FEB22
-            dayString = "1"; //assume worst-case scenario of 1st of the month (earliest)
-            monthName = alphanumDate.substring(0,3);
-            shortYear = alphanumDate.substring(3,5);
-        } else{ //other formats not accepted
-            return null;
-        }
-
-        int day = Integer.parseInt(dayString);
-        Month month = null;
-        for(Month m: Month.values()){
-            String monthAbbreviation = m.getDisplayName(TextStyle.SHORT, Locale.ENGLISH).toUpperCase();
-            if(monthName.equals(monthAbbreviation)){
-                month = m;
-                break;
-            }
-        }
-
-        int year = Integer.parseInt(shortYear);
-        if(year > 75){
-            year = year + 1900;
-        } else{
-            year = year + 2000;
-        }
-
-        return LocalDate.of(year, month, day);
     }
 
 
