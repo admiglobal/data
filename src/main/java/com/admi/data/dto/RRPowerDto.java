@@ -59,20 +59,18 @@ public class RRPowerDto {
         inv.setCents((net == null) ? null : Math.toIntExact(net));
         inv.setQoh(quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
-        inv.setStatus(this.getOverallStatus());
+        inv.setStatus(this.overallStatus);
         inv.setAdmiStatus(this.getAdmiStatus());
-        inv.setLastSale(this.getLastSaleDate());
-        inv.setLastReceipt(this.getReceiptDate());
+        inv.setLastSale(this.lastSaleDate);
+        inv.setLastReceipt(this.receiptDate);
         inv.setBin(this.bin);
         inv.setSource(this.source);
 //        //mfgControlled //TODO - Check if rimState column in DTO gives us mfgControlled info for AipInventoryEntity
         inv.setDataDate(date);
-//        //manufacturer //TODO - make sure this info isn't in the RR Power file
+//        //manufacturer
         inv.setQoo(this.backorder == null ? null : Math.toIntExact(backorder));
         inv.setTwelveMonthSales(twelveMonthSalesYr1 == null ? null : Math.toIntExact(twelveMonthSalesYr1));
         inv.setEntryDate(entry);
-
-        System.out.println("Converted to AipInventoryEntity: " + inv);
 
         return inv;
     }

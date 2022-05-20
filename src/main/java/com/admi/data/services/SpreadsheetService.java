@@ -9,13 +9,16 @@ package com.admi.data.services;
 import com.sun.istack.NotNull;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
+import java.util.Date;
 import java.util.Locale;
 
 @Service
@@ -106,15 +109,15 @@ public class SpreadsheetService {
      * 		- "FEB22" (i.e. February 2022)
      * 		- "-12345*19680-" (i.e. 19680 days after December 30, 1967)
      * 		- "1997-08-12" (i.e. August 12, 1997)
+     * 	    - "3/23/2022" (i.e. March 23rd, 2022)
      * If not one of these formats, returns null.
+     * Note that a date of format d/M/yyyy may be misread as M/d/yyyy.
      * Years above 75 will be read as "1976" instead of "2076". If by some miracle this code is still being used after 2075, sorry for the headache.
      * @param uglyDate A String with one of the accepted formats, representing a date between Jan 1st, 1976 and Dec 31st, 2075.
      * @return a LocalDate representing this date, or null if unable to parse. If no day information given (as with "FEB22" format), assume 1st of the month.
      */
     public static LocalDate parseUglyDate(String uglyDate){
-        if(uglyDate == null || uglyDate.equals("")){
-            return null;
-        }
+        if(uglyDate == null || uglyDate.equals("")){ return null; }
 
         uglyDate = uglyDate.trim();
 
@@ -211,5 +214,48 @@ public class SpreadsheetService {
         }
 
         return LocalDate.of(year, month, day);
+    }
+
+    /**
+     * Parses a date of the format "M-d-yyyy" or "M-d-yy", with the given delimiter.
+     * @param date The String that represents a date
+     * @param dateDelimiter The delimiter between date parts, usually either "/" or "-"
+     * @return the LocalDate object that corresponds to this date
+     */
+    public static LocalDate parseAmericanDate(String date, String dateDelimiter){
+        try{ //format "M-d-yyyy"
+            return parseAmericanDateLongYear(date, dateDelimiter);
+        } catch(DateTimeParseException dtpe){
+            try{ //format "M-d-yy"
+                return parseAmericanDateShortYear(date, dateDelimiter);
+            } catch (DateTimeParseException dtpe2){
+                System.out.println("Unable to parse the American date \"" + date + "\" with the delimiter \"" + dateDelimiter + "\".");
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Parses a date of the format "M-d-yy", with the given delimiter.
+     * @param date The String that represents a date
+     * @param dateDelimiter The delimiter between date parts, usually either "/" or "-"
+     * @return the LocalDate object that corresponds to this date
+     */
+    private static LocalDate parseAmericanDateShortYear(String date, String dateDelimiter){
+        String datePattern = "M" + dateDelimiter + "d" + dateDelimiter + "yy";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern).withLocale(Locale.US);
+        return LocalDate.parse(date, formatter);
+    }
+
+    /**
+     * Parses a date of the format "M-d-yyyy", with the given delimiter.
+     * @param date The String that represents a date
+     * @param dateDelimiter The delimiter between date parts, usually either "/" or "-"
+     * @return the LocalDate object that corresponds to this date
+     */
+    private static LocalDate parseAmericanDateLongYear(String date, String dateDelimiter){
+        String datePattern = "M" + dateDelimiter + "d" + dateDelimiter + "yyyy";
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(datePattern).withLocale(Locale.US);
+        return LocalDate.parse(date, formatter);
     }
 }

@@ -84,41 +84,24 @@ public class RRPowerImportService {
         Iterator<CSVRecord> recordIterator = parser.iterator();
 
         List<RRPowerInventoryField> headers = getHeaderList(recordIterator.next().toList());
-        System.out.println(headers);
 
         while (recordIterator.hasNext()) {
             CSVRecord row = recordIterator.next();
             RRPowerDto dto = new RRPowerDto();
 
-            if(row.getRecordNumber() < 15){
-                System.out.println("Record: " + row.toString());
-            }
-            
-            System.out.println("Approaching for loop...");
 
-            for (int i = 0; i < row.size(); i++) {
-                System.out.println("inside for loop...");
-                String value = row.get(i);
-                RRPowerInventoryField field = headers.get(i);
-                
-                System.out.println("RRInventoryField: " + field + "; cell value: " + value);
+                for (int i = 0; i < row.size(); i++) {
+                    String value = row.get(i);
+                    RRPowerInventoryField field = headers.get(i);
 
-                if (field != null) {
-                    setDtoField(value, dto, field.getDefinition());
-                    System.out.println("Saved to DTO!");
-                } else{
-                    System.out.println("The field was null, so we didn't save it to the dto.");
+                    if (field != null) {
+                        setDtoField(value, dto, field.getDefinition());
+                    }
                 }
-            }
-            
-            System.out.println("outside for loop");
 
-            if(!dto.isBlankRow()){
-                inventory.add(dto.toAipInventory(dealerId, LocalDate.now()));
-                System.out.println("saved to aip inventory!");
-            } else{
-                System.out.println("it's a blank row, so we didn't bother saving it to an aipInventoryEntity");
-            }
+                if(!dto.isBlankRow()){
+                    inventory.add(dto.toAipInventory(dealerId, LocalDate.now()));
+                }
         }
         return inventory;
     }
@@ -127,15 +110,7 @@ public class RRPowerImportService {
         List<RRPowerInventoryField> headers = new ArrayList<>();
 
         for(String header : headerStrings) {
-
             RRPowerInventoryField field = RRPowerInventoryField.of(header);
-
-//            System.out.println(header);
-
-//            if (field != null) {
-//                System.out.println("matches " + field.toString());
-//            }
-
             headers.add(field);
         }
         return headers;
@@ -161,15 +136,27 @@ public class RRPowerImportService {
             value = (V) cellValue;
 
         } else if (setterClass == Long.class) {
-            Long l = Long.parseLong(cellValue);
+            Long l;
+            try{
+                l = Long.parseLong(cellValue);
+            } catch (NumberFormatException nfe){
+                System.out.println("Unable to parse \"" + cellValue + "\" as a Long.");
+                l = null;
+            }
             value = (V) l;
 
         } else if (setterClass == Double.class) {
-            Double d = Double.parseDouble(cellValue);
+            Double d;
+            try{
+                d = Double.parseDouble(cellValue);
+            } catch (NumberFormatException nfe){
+                System.out.println("Unable to parse \"" + cellValue + "\" as a Double.");
+                d = null;
+            }
             value = (V) d;
 
         } else if (setterClass == LocalDate.class) {
-            LocalDate date = SpreadsheetService.parseUglyDate(cellValue);
+            LocalDate date = SpreadsheetService.parseAmericanDate(cellValue, "/");
             value = (V) date;
 
         } else {
@@ -181,48 +168,4 @@ public class RRPowerImportService {
 
     }
 
-
-    /**
-     * A sub-class for describing the headers row of the spreadsheet
-     */
-    private class Headers {
-        public List<RRPowerInventoryField> headerList;
-        public int headerRowNum;
-
-        /**
-         * 	Finds the header list for this sheet, even if the header list isn't the first row of the sheet.
-         * 	Theoretically, the header list could be any row in the sheet.
-         * @throws IllegalArgumentException Thrown if the header row is missing or doesn't match our expected RRPowerInventoryFields
-         */
-        public Headers(Sheet sheet) throws IllegalArgumentException{
-            List<RRPowerInventoryField> headerList = new ArrayList<>();
-            for(Row row: sheet){
-                headerList = getHeaderList(row);
-                if(headerList.contains(RRPowerInventoryField.PART_NUMBER) //checking two should suffice
-                        && headerList.contains(RRPowerInventoryField.QOH)){
-                    this.headerRowNum = row.getRowNum();
-                    break;
-                }
-            }
-
-            if(headerList.isEmpty()){
-                throw new IllegalArgumentException("The given sheet does not contain the expected header row.");
-            }
-
-            this.headerList = headerList;
-        }
-
-        private List<RRPowerInventoryField> getHeaderList(Row row) {
-            Iterator<Cell> cellIterator = row.iterator();
-            List<RRPowerInventoryField> headers = new ArrayList<>();
-
-            while(cellIterator.hasNext()) {
-                String cellValue = cellIterator.next().getStringCellValue();
-                RRPowerInventoryField field = RRPowerInventoryField.of(cellValue);
-                headers.add(field);
-            }
-
-            return headers;
-        }
-    }
 }
