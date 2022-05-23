@@ -32,6 +32,13 @@ public enum CdkInventoryField {
                     String.class,
                     CdkDto :: setCostCents,
                     Double.class)),
+    LIST(new String[] {"LIST"},
+            new CellDefinition<>(
+                    CellType.NUMERIC,
+                    Cell :: getNumericCellValue,
+                    String.class,
+                    CdkDto :: setList,
+                    Double.class)),
     BIN(new String[] {"BIN", "BIN1"},
             new CellDefinition<>(
                     CellType.STRING,

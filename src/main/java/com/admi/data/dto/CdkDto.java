@@ -18,6 +18,7 @@ public class CdkDto {
     private String partNo;
     private String description;
     private Long costCents;
+    private Double list;
     private String bin;
     private String source;
     private Long quantityOnHand;
@@ -65,6 +66,7 @@ public class CdkDto {
         inv.setQoo(this.quantityOnOrder == null ? null : Math.toIntExact(this.quantityOnOrder));
         inv.setTwelveMonthSales(this.yrsl == null ? null : Math.toIntExact(this.yrsl));
         inv.setEntryDate(this.getEntry());
+        inv.setYtdMonthsWithSales(this.calculateYtdMonthsWithSales());
 
         return inv;
     }
@@ -77,10 +79,35 @@ public class CdkDto {
         }
     }
 
+    /**
+     * Calculates the number of months in the past year that included sales for this part.
+     * Note that
+     * @return An integer in the range 0-12, inclusive
+     */
+    private Integer calculateYtdMonthsWithSales(){
+        int count = 0;
+
+        if(this.jan != null && this.jan > 0) { count++; }
+        if(this.feb != null && this.feb > 0) { count++; }
+        if(this.mar != null && this.mar > 0) { count++; }
+        if(this.apr != null && this.apr > 0) { count++; }
+        if(this.may != null && this.may > 0) { count++; }
+        if(this.jun != null && this.jun > 0) { count++; }
+        if(this.jul != null && this.jul > 0) { count++; }
+        if(this.aug != null && this.aug > 0) { count++; }
+        if(this.sep != null && this.sep > 0) { count++; }
+        if(this.oct != null && this.oct > 0) { count++; }
+        if(this.nov != null && this.nov > 0) { count++; }
+        if(this.dec != null && this.dec > 0) { count++; }
+
+        return count;
+    }
+
     public boolean isBlankRow(){
         return partNo == null
                 && description == null
                 && costCents == null
+                && list == null
                 && bin == null
                 && source == null
                 && quantityOnHand == null
@@ -138,6 +165,14 @@ public class CdkDto {
         if(cost != null){
             this.costCents = Math.round(cost * 100);
         }
+    }
+
+    public Double getList() {
+        return list;
+    }
+
+    public void setList(Double list) {
+        this.list = list;
     }
 
     public String getBin() {
