@@ -33,7 +33,6 @@ public class TipOrderDetailEntity {
 		this.monthsNoSale = monthsNoSale;
 	}
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	@Column(name = "DEALER_ID", nullable = false, precision = 0)
 	public Long getDealerId() {
@@ -44,7 +43,6 @@ public class TipOrderDetailEntity {
 		this.dealerId = dealerId;
 	}
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	@Column(name = "DATA_DATE", nullable = false)
 	public LocalDateTime getDataDate() {
@@ -55,7 +53,6 @@ public class TipOrderDetailEntity {
 		this.dataDate = dataDate;
 	}
 
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Id
 	@Column(name = "PART_NO", nullable = false, length = 30)
 	public String getPartNo() {
@@ -159,5 +156,20 @@ public class TipOrderDetailEntity {
 		result = 31 * result + (ytdHitsByMonth != null ? ytdHitsByMonth.hashCode() : 0);
 		result = 31 * result + (monthsNoSale != null ? monthsNoSale.hashCode() : 0);
 		return result;
+	}
+
+	@Override
+	public String toString() {
+		return "TipOrderDetailEntity{" +
+				"dealerId=" + dealerId +
+				", dataDate=" + dataDate +
+				", partNo='" + partNo + '\'' +
+				", description='" + description + '\'' +
+				", cents=" + cents +
+				", src='" + src + '\'' +
+				", ytdSales=" + ytdSales +
+				", ytdHitsByMonth=" + ytdHitsByMonth +
+				", monthsNoSale=" + monthsNoSale +
+				'}';
 	}
 }

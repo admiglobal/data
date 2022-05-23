@@ -32,6 +32,7 @@ public class AipInventoryEntity {
 	private Integer qoo;
 	private Integer twelveMonthSales;
 	private LocalDate entryDate;
+	private Byte ytdMonthsWithSales;
 
 	private String paCode;
 
@@ -230,6 +231,12 @@ public class AipInventoryEntity {
 	public void setEntryDate(LocalDate entryDate) {
 		this.entryDate = entryDate;
 	}
+
+	@Basic
+	@Column(name = "YTD_MONTHS_WITH_SALES", nullable = true)
+	public Byte getYtdMonthsWithSales() { return ytdMonthsWithSales; }
+
+	public void setYtdMonthsWithSales(Byte ytdMonthsWithSales) { this.ytdMonthsWithSales = ytdMonthsWithSales; }
 
 	@Transient
 	public String getPaCode() {

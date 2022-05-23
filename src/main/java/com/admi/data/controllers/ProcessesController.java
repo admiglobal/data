@@ -55,6 +55,9 @@ public class ProcessesController {
 	@Autowired
 	OpcKpiService opcKpiService;
 
+	@Autowired
+	TipOrderDetailService tipService;
+
 //	@ResponseBody
 ////	@GetMapping("/processTest")
 //	public String processTest(Model model) {
@@ -229,5 +232,13 @@ public class ProcessesController {
 		return "ok.";
 	}
 
+	@ResponseBody
+	@GetMapping("/tip")
+	public String runTipDealer() {
+
+		tipService.runSingleTipDealer();
+
+		return "TIP process has completed successfully.";
+	}
 
 }

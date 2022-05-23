@@ -14,7 +14,6 @@ public class TipOrderDetailEntityPK implements Serializable {
 
 	@Column(name = "DEALER_ID", nullable = false, precision = 0)
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public Long getDealerId() {
 		return dealerId;
 	}
@@ -25,7 +24,6 @@ public class TipOrderDetailEntityPK implements Serializable {
 
 	@Column(name = "DATA_DATE", nullable = false)
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public LocalDateTime getDataDate() {
 		return dataDate;
 	}
@@ -36,7 +34,6 @@ public class TipOrderDetailEntityPK implements Serializable {
 
 	@Column(name = "PART_NO", nullable = false, length = 30)
 	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	public String getPartNo() {
 		return partNo;
 	}

@@ -9,21 +9,32 @@ import java.time.LocalDateTime;
 @Table(name = "TIP_KPI", schema = "ADMI")
 @IdClass(TipKpiEntityPK.class)
 public class TipKpiEntity {
-    private Integer dealerId;
+    private Long dealerId;
     private LocalDateTime dataDate;
     private Integer lines;
     private Long orderTotal;
     private Integer totalStockParts;
     private Integer totalStockPartsQoh;
 
+    public TipKpiEntity() {}
+
+    public TipKpiEntity(Long dealerId, LocalDateTime dataDate, Integer lines, Long orderTotal, Integer totalStockParts, Integer totalStockPartsQoh) {
+        this.dealerId = dealerId;
+        this.dataDate = dataDate;
+        this.lines = lines;
+        this.orderTotal = orderTotal;
+        this.totalStockParts = totalStockParts;
+        this.totalStockPartsQoh = totalStockPartsQoh;
+    }
+
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "DEALER_ID", nullable = false, precision = 0)
-    public Integer getDealerId() {
+    public Long getDealerId() {
         return dealerId;
     }
 
-    public void setDealerId(Integer dealerId) {
+    public void setDealerId(Long dealerId) {
         this.dealerId = dealerId;
     }
 
