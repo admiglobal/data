@@ -371,6 +371,7 @@ public class AipInventoryEntity {
 				", qoo=" + qoo +
 				", twelveMonthSales=" + twelveMonthSales +
 				", entryDate=" + entryDate +
+				", ytdMonthsWithSales=" + ytdMonthsWithSales +
 				", paCode='" + paCode + '\'' +
 				'}';
 	}
