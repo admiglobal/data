@@ -17,6 +17,7 @@ public interface ZigRepository extends JpaRepository<ZigEntity, Long> {
 	List<ZigEntity> findAllByPaCodeAndDataDateOrderByDmsStatus(String paCode, LocalDateTime dataDate);
 	ZigEntity findFirstByPaCode(String paCode);
 
+	//TODO: Look into deleting this @Async: it could be causing problems elsewhere with thread racing (inserting and deleting at the same time, etc)
 	@Async
 	@Transactional
 	void deleteAllByPaCode(String paCode);

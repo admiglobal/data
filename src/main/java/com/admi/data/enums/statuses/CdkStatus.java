@@ -3,6 +3,7 @@ package com.admi.data.enums.statuses;
 import com.admi.data.enums.statuses.DmsStatus;
 
 import java.util.List;
+import java.util.Objects;
 
 public enum CdkStatus implements DmsStatus {
 
@@ -17,16 +18,20 @@ public enum CdkStatus implements DmsStatus {
 
 	private final String statusName;
 
-	private CdkStatus(String statusName) {
-		if (statusName == null) {
-			this.statusName = "No Status";
-		} else {
-			this.statusName = statusName;
-		}
+	CdkStatus(String statusName) {
+		this.statusName = Objects.requireNonNullElse(statusName, "No Status");
 	}
 
 	public String getStatusName() {
 		return statusName;
+	}
+
+	public DmsStatus getStockStatus() {
+		return STOCK;
+	}
+
+	public DmsStatus getNonStockStatus() {
+		return NS;
 	}
 
 	public List<DmsStatus> getStockStatuses() {
@@ -42,6 +47,6 @@ public enum CdkStatus implements DmsStatus {
 	}
 
 	public List<DmsStatus> getInactiveStatuses() {
-		return List.of(NS, AP, SP, DP);
+		return List.of(NS, AP, SP);
 	}
 }

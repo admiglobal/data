@@ -2,15 +2,9 @@ package com.admi.data.services;
 
 import com.admi.data.dto.*;
 import com.admi.data.entities.*;
-import com.admi.data.enums.RRField;
 import com.admi.data.enums.UdbInventoryField;
-import com.admi.data.services.DateService;
-import com.admi.data.services.EmailService;
-import com.admi.data.services.ProcessService;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.repositories.*;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
@@ -31,7 +25,6 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -86,7 +79,7 @@ public class ImportService {
 			inventory = importXlsxInventoryFile(file, dealerId, dmsId);
 		}
 
-		aipInventoryService.saveAll(inventory, dealerId, paCode);
+		aipInventoryService.saveAll(inventory, dealerId, paCode, DmsProvider.findDms(dmsId));
 
 		System.out.println(DateService.getTimeString() + ": Completed importing Dealer " + dealerId);
 	}
@@ -300,20 +293,20 @@ public class ImportService {
 		return importInventoryFile(new FileInputStream(file), job.getDealerId(), job.getDmsId());
 	}
 
-	public List<AipInventoryEntity> importUdbInventoryFile(MultipartFile file) throws IOException, InvalidFormatException {
-		OPCPackage pkg = OPCPackage.open(file.getInputStream());
-		Workbook workbook = new XSSFWorkbook(pkg);
-		List<AipInventoryEntity> inventory = new ArrayList<>();
-		Iterator<Sheet> sheetIterator = workbook.sheetIterator();
-		DataFormatter cellFormatter = new DataFormatter();
-
-		List<AipInventoryEntity> aipInventory = importUdbInventorySheet(workbook.getSheetAt(0), cellFormatter);
-
-		inventoryRepo.saveAll(aipInventory);
-		processService.calculateAisKpi(aipInventory);
-
-		return aipInventory;
-	}
+//	public List<AipInventoryEntity> importUdbInventoryFile(MultipartFile file) throws IOException, InvalidFormatException {
+//		OPCPackage pkg = OPCPackage.open(file.getInputStream());
+//		Workbook workbook = new XSSFWorkbook(pkg);
+//		List<AipInventoryEntity> inventory = new ArrayList<>();
+//		Iterator<Sheet> sheetIterator = workbook.sheetIterator();
+//		DataFormatter cellFormatter = new DataFormatter();
+//
+//		List<AipInventoryEntity> aipInventory = importUdbInventorySheet(workbook.getSheetAt(0), cellFormatter);
+//
+//		inventoryRepo.saveAll(aipInventory);
+//		processService.calculateAisKpi(aipInventory);
+//
+//		return aipInventory;
+//	}
 
 	private List<AipInventoryEntity> importUdbInventorySheet(Sheet sheet, DataFormatter cellFormatter) {
 		Iterator<Row> rowIterator = sheet.rowIterator();

@@ -555,6 +555,7 @@ public class MixPartsInventoryEntity {
 		List<String> automateStatus = List.of("STOCKED", "AUTO_PHASE_OUT","MANUAL");
 		List<String> autosoftStatus = List.of("Y", "P", "O");
 		List<String> pbsStatus = List.of("S", "STK","Stock", "Manual Order");
+		List<String> dominionStatus = List.of("S", "STK","Stock", "Manual Order");
 
 
 		String status = "N";

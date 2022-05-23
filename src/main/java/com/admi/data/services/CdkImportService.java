@@ -6,6 +6,7 @@ import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.CdkDealersEntity;
 import com.admi.data.entities.CdkPartsInventoryChild;
 import com.admi.data.enums.CdkInventoryField;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.repositories.CdkDealersRepository;
 import com.admi.data.repositories.CdkPartsInventoryRepository;
 import com.sun.istack.NotNull;
@@ -50,7 +51,7 @@ public class CdkImportService {
 				.map(part -> part.toAipInventoryEntity(dealerId))
 				.collect(Collectors.toList());
 
-		aipInventoryService.saveAll(aipInventory, dealerId, paCode);
+		aipInventoryService.saveAll(aipInventory, dealerId, paCode, DmsProvider.CDK);
 
 		System.out.println("Imported and processed CDK " + paCode + " Dealer Id: " + dealerId);
 	}

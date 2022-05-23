@@ -14,15 +14,6 @@ public interface AipInventoryRepository extends JpaRepository<AipInventoryEntity
 
 	List<AipInventoryEntity> findAllByDealerIdAndDataDate(Long dealerId, LocalDate dataDate);
 
-	@Query(value = "SELECT *\n" +
-			"FROM AIP_INVENTORY\n" +
-			"WHERE DEALER_ID = :dealerId\n" +
-			"AND DATA_DATE = (\n" +
-			"SELECT MAX(i2.DATA_DATE)\n" +
-			"FROM AIP_INVENTORY i2\n" +
-			"WHERE i2.DEALER_ID = :dealerId)", nativeQuery = true)
-	List<AipInventoryEntity> findAllAtMaxDataDateByDealerId(@Param("dealerId") Long dealerId);
-
 	@Transactional
 	@Modifying
 	@Query( value = "CALL DELETE_AIP_INVENTORY_P()",
@@ -90,6 +81,18 @@ public interface AipInventoryRepository extends JpaRepository<AipInventoryEntity
 					")\n" +
 					"and ROWNUM = 1", nativeQuery = true)
 	AipInventoryEntity findFirstByMaxDataDate();
+
+	@Query(value =  "select i.DEALER_ID, i.PARTNO, pt.PC_VALUE * 100 CENTS, i.QOH, pt.DESCRIPTION, \n" +
+					"       i.STATUS, i.LAST_SALE, i.LAST_RECEIPT, i.BIN, i.SOURCE, h.STATUS MFG_CONTROLLED, \n" +
+					"       i.DATA_DATE, i.ADMI_STATUS, i.MANUFACTURER, i.QOO, i.TWELVE_MONTH_SALES, i.ENTRY_DATE \n" +
+					"from FORD_DEALER_INVENTORY i \n" +
+					"LEFT OUTER JOIN FORD_DEALER_RIM_HISTORY h \n" +
+					"    on h.PA_CODE = i.PA_CODE \n" +
+					"    and h.PART_NUMBER = i.PARTNO \n" +
+					"INNER JOIN FORD_PT pt \n" +
+					"    on pt.PARTNO = i.PARTNO \n" +
+					"where i.PA_CODE = :pa", nativeQuery = true)
+	List<AipInventoryEntity> findFordInventoryByPaCode(@Param("pa") String pa_code);
 
 	default LocalDate getMaxDateByDealerId(Long dealerId) {
 		AipInventoryEntity entity = findFirstByDealerIdAndMaxDataDate(dealerId);

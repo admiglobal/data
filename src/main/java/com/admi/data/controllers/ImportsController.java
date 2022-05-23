@@ -20,11 +20,32 @@ import javax.mail.MessagingException;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+
+/**
+ * The ImportsController is used as one of the two ways to interface with this server. This is the front door
+ * for any automated import process controlled by this server.
+ *
+ * This {@link org.springframework.stereotype.Controller} pulls in many different services to handle most the
+ * underlying processes. We try to keep logic outy of this controller and put it in the hands of the relevant
+ * service.
+ *
+ * Some of these methods are accessed directly from a web page, and others are accessed by the AIP Server, or
+ * the DDD AIP server as HTTP calls.
+ *
+ * Programs/Imports handled through here:
+ * <ul>
+ *     <li>"Plan B" Inventory Import - Dealer uploads inventory file through the AIP</li>
+ *     <li>Motorcraft Battery Order Import, Order Generation</li>
+ *     <li>Calculation of all AIP data using various sources: DDD API, FTP Files, Dealer Upload</li>
+ *     <li>Upload of FCSD Credits for DPOC program</li>
+ * </ul>
+ *
+ *
+ * @author kmowers, jbetzig, igrisham
+ */
 
 @Controller
 @CrossOrigin
@@ -86,7 +107,8 @@ public class ImportsController {
 	@PostMapping("/inventory/{dealerId}")
 	@ResponseBody
 	public String submitInventoryFile(@PathVariable("dealerId") Long dealerId,
-	                                  @RequestParam("file") MultipartFile file, Model model)
+	                                  @RequestParam("file") MultipartFile file,
+	                                  Model model)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
 		DealerMasterEntity dealer = dealerMasterRepo.findByDealerId(dealerId);
 		String paCode = dealer.getPaCode();
@@ -100,19 +122,19 @@ public class ImportsController {
 		return paCode + " - Dealer ID: " + dealerId + "Complete";
 	}
 
-	@GetMapping("/UDBInventory")
-	public String selectUdbInventoryFile(Model model) {
-		model.addAttribute("action", "/imports/UDBInventory");
-		return getPage("upload", "Inventory", model);
-	}
-
-	@PostMapping("/UDBInventory")
-	@ResponseBody
-	public String submitUdbInventoryFile(@RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
-		List<AipInventoryEntity> inventory = importService.importUdbInventoryFile(file);
-
-		return "UDB File imported.\n \n Lines: " + inventory.size() + "\n \n " + inventory.subList(0,100);
-	}
+//	@GetMapping("/UDBInventory")
+//	public String selectUdbInventoryFile(Model model) {
+//		model.addAttribute("action", "/imports/UDBInventory");
+//		return getPage("upload", "Inventory", model);
+//	}
+//
+//	@PostMapping("/UDBInventory")
+//	@ResponseBody
+//	public String submitUdbInventoryFile(@RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
+//		List<AipInventoryEntity> inventory = importService.importUdbInventoryFile(file);
+//
+//		return "UDB File imported.\n \n Lines: " + inventory.size() + "\n \n " + inventory.subList(0,100);
+//	}
 
 	@GetMapping("/DTInventory/{dealerId}")
 	public String selectDtInventoryFile(@PathVariable("dealerId") Long dealerId, Model model) {
@@ -122,7 +144,10 @@ public class ImportsController {
 
 	@PostMapping("/DTInventory/{dealerId}")
 	@ResponseBody
-	public String submitDtInventoryFile(@PathVariable("dealerId") Long dealerId, @RequestParam("file") MultipartFile file, Model model) throws IOException, InvalidFormatException {
+	public String submitDtInventoryFile(@PathVariable("dealerId") Long dealerId,
+	                                    @RequestParam("file") MultipartFile file,
+	                                    Model model)
+			throws IOException, InvalidFormatException {
 		String paCode = file.getOriginalFilename().substring(0, file.getOriginalFilename().indexOf('.'));
 
 		dtService.runDtInventoryFile(dealerId, file.getInputStream(), paCode);
@@ -158,15 +183,8 @@ public class ImportsController {
 			default:
 				throw new ApiNotSupportedException("This API is not currently supported by this import process.");
 		}
+
 		return apiName.toUpperCase() + " Dealer " + dealerMasterEntity.getPaCode() + " Processing";
-
-
-//		try {
-//		} catch (Exception e) {
-//			System.out.println(e.getMessage());
-//			System.out.println(Arrays.toString(e.getStackTrace()));
-//			return "There was an issue importing " + dealerId;
-//		}
 	}
 
 	@GetMapping("/rimDashUpload")

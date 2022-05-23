@@ -758,4 +758,77 @@ public class DealerMasterEntity {
 	public int hashCode() {
 		return Objects.hash(dealerId, locationCode, dmsId, paCode, dealershipName, dealershipAddress1, dealershipAddress2, dealershipCity, dealershipState, dealershipZip, dealershipZipplus4, dealershipCountry, useShippingAddressForMaili, mailingAddress1, mailingAddress2, mailingCity, mailingState, mailingZip, mailingZipplus4, mailingCountry, heavyTruckFlag, fordRegionNumber, primaryEmailAddress, primaryManufacturerId, fordSegment, admiDealerType, responsibleConsultantId, graphMonths, graphStartDate, referenceDealer, fordHvcRegionCode, doNotSolicitFlag, solicitationComments, fordDominantMarketArea, fordMajorMarketArea, fordFcsdMarketArea, fordFcsdZone, lastUpdatedBy, lastUpdatedDate, reactDate, testDealerFlag, imaBlock, electronicReporting, hyperion, hyperionDist, dspServiceId, dealerSalesCode, effectiveDate, terminationDate, primaryOrSecondary, nissRegionCode, salesCode, golddId, billToPerson, lm, minorityCode, regionMarket, selectDealer, mon, tue, wed, thu, fri, previousDealership, returnWeek, utc, localDlrName);
 	}
+
+	@Override
+	public String toString() {
+		return "DealerMasterEntity{" +
+				"dealerId=" + dealerId +
+				", locationCode='" + locationCode + '\'' +
+				", dmsId=" + dmsId +
+				", paCode='" + paCode + '\'' +
+				", dealershipName='" + dealershipName + '\'' +
+				", dealershipAddress1='" + dealershipAddress1 + '\'' +
+				", dealershipAddress2='" + dealershipAddress2 + '\'' +
+				", dealershipCity='" + dealershipCity + '\'' +
+				", dealershipState='" + dealershipState + '\'' +
+				", dealershipZip='" + dealershipZip + '\'' +
+				", dealershipZipplus4='" + dealershipZipplus4 + '\'' +
+				", dealershipCountry='" + dealershipCountry + '\'' +
+				", useShippingAddressForMaili='" + useShippingAddressForMaili + '\'' +
+				", mailingAddress1='" + mailingAddress1 + '\'' +
+				", mailingAddress2='" + mailingAddress2 + '\'' +
+				", mailingCity='" + mailingCity + '\'' +
+				", mailingState='" + mailingState + '\'' +
+				", mailingZip='" + mailingZip + '\'' +
+				", mailingZipplus4='" + mailingZipplus4 + '\'' +
+				", mailingCountry='" + mailingCountry + '\'' +
+				", heavyTruckFlag='" + heavyTruckFlag + '\'' +
+				", fordRegionNumber=" + fordRegionNumber +
+				", primaryEmailAddress='" + primaryEmailAddress + '\'' +
+				", primaryManufacturerId=" + primaryManufacturerId +
+				", fordSegment=" + fordSegment +
+				", admiDealerType=" + admiDealerType +
+				", responsibleConsultantId=" + responsibleConsultantId +
+				", graphMonths=" + graphMonths +
+				", graphStartDate=" + graphStartDate +
+				", referenceDealer='" + referenceDealer + '\'' +
+				", fordHvcRegionCode='" + fordHvcRegionCode + '\'' +
+				", doNotSolicitFlag='" + doNotSolicitFlag + '\'' +
+				", solicitationComments='" + solicitationComments + '\'' +
+				", fordDominantMarketArea='" + fordDominantMarketArea + '\'' +
+				", fordMajorMarketArea='" + fordMajorMarketArea + '\'' +
+				", fordFcsdMarketArea='" + fordFcsdMarketArea + '\'' +
+				", fordFcsdZone='" + fordFcsdZone + '\'' +
+				", lastUpdatedBy=" + lastUpdatedBy +
+				", lastUpdatedDate=" + lastUpdatedDate +
+				", reactDate=" + reactDate +
+				", testDealerFlag='" + testDealerFlag + '\'' +
+				", imaBlock=" + imaBlock +
+				", electronicReporting='" + electronicReporting + '\'' +
+				", hyperion='" + hyperion + '\'' +
+				", hyperionDist=" + hyperionDist +
+				", dspServiceId='" + dspServiceId + '\'' +
+				", dealerSalesCode='" + dealerSalesCode + '\'' +
+				", effectiveDate=" + effectiveDate +
+				", terminationDate=" + terminationDate +
+				", primaryOrSecondary='" + primaryOrSecondary + '\'' +
+				", nissRegionCode='" + nissRegionCode + '\'' +
+				", salesCode='" + salesCode + '\'' +
+				", golddId='" + golddId + '\'' +
+				", billToPerson='" + billToPerson + '\'' +
+				", lm='" + lm + '\'' +
+				", minorityCode='" + minorityCode + '\'' +
+				", regionMarket='" + regionMarket + '\'' +
+				", selectDealer='" + selectDealer + '\'' +
+				", mon='" + mon + '\'' +
+				", tue='" + tue + '\'' +
+				", wed='" + wed + '\'' +
+				", thu='" + thu + '\'' +
+				", fri='" + fri + '\'' +
+				", previousDealership='" + previousDealership + '\'' +
+				", returnWeek=" + returnWeek +
+				", utc=" + utc +
+				", localDlrName='" + localDlrName + '\'' +
+				'}';
+	}
 }

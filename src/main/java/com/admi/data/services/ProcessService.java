@@ -2,6 +2,7 @@ package com.admi.data.services;
 
 import com.admi.data.dto.MotorcraftOrderSet;
 import com.admi.data.entities.*;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.repositories.McOrdersContentRepository;
 import com.admi.data.repositories.McOrdersRepository;
 import org.apache.poi.ss.usermodel.*;
@@ -28,8 +29,9 @@ public class ProcessService {
 	@Autowired
 	McOrdersContentRepository ordersContentRepo;
 
-	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory) {
+	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory, DmsProvider dms) {
 		return aisKpiService.calculateAisKpi(inventory);
+//		return aisKpiService.calculateAisKpi(inventory, dms);
 	}
 
 	public void generateDowOrders(List<MotorcraftOrderSet> orders) throws IOException {
@@ -79,7 +81,7 @@ public class ProcessService {
 
 		try {
 			String filePath = File.separator + File.separator +
-					"192.168.254.1" + File.separator +
+					"192.168.250.90" + File.separator +
 					"Public" + File.separator +
 					"Development" + File.separator +
 					"Motorcraft_Orders" + File.separator +
@@ -115,7 +117,7 @@ public class ProcessService {
 		McOrdersEntity order = ordersRepo.findByOrderNumber(orderNumber);
 
 		String filePathRoot = File.separator + File.separator +
-				"192.168.254.1" + File.separator +
+				"192.168.250.90" + File.separator +
 				"Public" + File.separator +
 				"Development" + File.separator +
 				"Motorcraft_Orders" + File.separator +

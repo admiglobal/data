@@ -3,6 +3,7 @@ package com.admi.data.enums.statuses;
 import com.admi.data.enums.statuses.DmsStatus;
 
 import java.util.List;
+import java.util.Objects;
 
 public enum DealerTrackStatus implements DmsStatus {
 
@@ -16,16 +17,20 @@ public enum DealerTrackStatus implements DmsStatus {
 
 	private final String statusName;
 
-	private DealerTrackStatus(String statusName) {
-		if (statusName == null) {
-			this.statusName = "No Status";
-		} else {
-			this.statusName = statusName;
-		}
+	DealerTrackStatus(String statusName) {
+		this.statusName = Objects.requireNonNullElse(statusName, "No Status");
 	}
 
 	public String getStatusName() {
 		return statusName;
+	}
+
+	public DmsStatus getStockStatus() {
+		return A;
+	}
+
+	public DmsStatus getNonStockStatus() {
+		return N;
 	}
 
 	public List<DmsStatus> getStockStatuses() {
@@ -41,6 +46,6 @@ public enum DealerTrackStatus implements DmsStatus {
 	}
 
 	public List<DmsStatus> getInactiveStatuses() {
-		return List.of(N, P, R);
+		return List.of(N, P);
 	}
 }

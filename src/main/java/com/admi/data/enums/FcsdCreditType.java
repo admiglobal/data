@@ -16,7 +16,9 @@ public enum FcsdCreditType {
 	WINS_DEALER_TO_DEALER("WINS-DEALER TO DEALER", FcsdProgramCreditsEntity :: setWdd),
 	WINS_FLEET("WINS-FLEET", FcsdProgramCreditsEntity :: setWf),
 	SIXTY_DAY("30 DAY RETURNS", FcsdProgramCreditsEntity :: setSixtyDay),
-	NORMAL_RETURN("NORMAL RETURNS", FcsdProgramCreditsEntity :: setNr);
+	NORMAL_RETURN("NORMAL RETURNS", FcsdProgramCreditsEntity :: setNr),
+	WINS_JOBBER("WINS-JOBBER", FcsdProgramCreditsEntity :: setWj),
+	WINS_ECOMMERCE("WINS-ECOMMERCE-CR", FcsdProgramCreditsEntity :: setWec);
 
 	private final String creditType;
 	private final BiConsumer<FcsdProgramCreditsEntity, BigDecimal> setter;

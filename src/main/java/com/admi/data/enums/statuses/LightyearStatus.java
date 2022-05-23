@@ -3,6 +3,7 @@ package com.admi.data.enums.statuses;
 import com.admi.data.enums.statuses.DmsStatus;
 
 import java.util.List;
+import java.util.Objects;
 
 public enum LightyearStatus implements DmsStatus {
 
@@ -16,16 +17,20 @@ public enum LightyearStatus implements DmsStatus {
 
 	private final String statusName;
 
-	private LightyearStatus(String statusName) {
-		if (statusName == null) {
-			this.statusName = "No Status";
-		} else {
-			this.statusName = statusName;
-		}
+	LightyearStatus(String statusName) {
+		this.statusName = Objects.requireNonNullElse(statusName, "No Status");
 	}
 
 	public String getStatusName() {
 		return statusName;
+	}
+
+	public DmsStatus getStockStatus() {
+		return S;
+	}
+
+	public DmsStatus getNonStockStatus() {
+		return N;
 	}
 
 	public List<DmsStatus> getStockStatuses() {

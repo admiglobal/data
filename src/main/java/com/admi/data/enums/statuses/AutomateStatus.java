@@ -3,6 +3,7 @@ package com.admi.data.enums.statuses;
 import com.admi.data.enums.statuses.DmsStatus;
 
 import java.util.List;
+import java.util.Objects;
 
 public enum AutomateStatus implements DmsStatus {
 
@@ -15,16 +16,20 @@ public enum AutomateStatus implements DmsStatus {
 
 	private final String statusName;
 
-	private AutomateStatus(String statusName) {
-		if (statusName == null) {
-			this.statusName = "No Status";
-		} else {
-			this.statusName = statusName;
-		}
+	AutomateStatus(String statusName) {
+		this.statusName = Objects.requireNonNullElse(statusName, "No Status");
 	}
 
 	public String getStatusName() {
 		return statusName;
+	}
+
+	public DmsStatus getStockStatus() {
+		return STOCKED;
+	}
+
+	public DmsStatus getNonStockStatus() {
+		return NOT_STOCKED;
 	}
 
 	public List<DmsStatus> getStockStatuses() {

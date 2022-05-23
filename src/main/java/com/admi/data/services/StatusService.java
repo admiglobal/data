@@ -1,6 +1,7 @@
 package com.admi.data.services;
 
 import com.admi.data.entities.*;
+import com.admi.data.enums.KpiTitle;
 import com.admi.data.enums.statuses.*;
 import com.admi.data.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,9 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +32,6 @@ public class StatusService {
     public void runStatusValuesForToday(Long dealerId) {
         DealerMasterEntity dealer = dealerMasterRepo.findByDealerId(dealerId);
 
-        DateTimeFormatter dataDateFormatter = DateTimeFormatter.ofPattern("yyyyMM");
-        Long dataDate = Long.parseLong(dataDateFormatter.format(LocalDate.now()));
-
         ZigEntity zigEntityForDate = zigRepo.findFirstByPaCode(dealer.getPaCode());
 
         LocalDateTime todayDate;
@@ -45,6 +41,8 @@ public class StatusService {
         } else {
             todayDate = zigEntityForDate.getDataDate();
         }
+
+        Long dataDate = new DateService().getLongDate(todayDate.toLocalDate().minusDays(1));
 
         List<ZigEntity> nonnegativeQohParts = zigRepo.findAllNonnegativeQohByPaCodeAndDataDateOrderByDmsStatus(dealer.getPaCode(), todayDate);
         List<ZigEntity> rimActiveParts = zigRepo.findAllRimActivePartsByPaCode(dealer.getPaCode(), todayDate);
