@@ -30,4 +30,13 @@ public interface DealerMasterRepository extends JpaRepository<DealerMasterEntity
 			nativeQuery = true)
 	List<DealerMasterEntity> findAllQuickLaneDealers(String[] nonQlPrimariesPaCodes);
 
+	@Query(value = "select * \n" +
+			"from DEALER_MASTER \n" +
+			"where SALES_CODE = ( \n" +
+			"    select SALES_CODE from DEALER_MASTER \n" +
+			"    where PA_CODE = :paCode \n" +
+			"    ) \n" +
+			"and PA_CODE <> :paCode",
+			nativeQuery = true)
+	List<DealerMasterEntity> findSameSalesCodeDealers(String paCode);
 }

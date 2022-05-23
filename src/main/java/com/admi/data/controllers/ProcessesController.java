@@ -124,14 +124,11 @@ public class ProcessesController {
 	@GetMapping("/opc/{paCode}")
 	public String processSingleOpcDealer(@PathVariable("paCode") String paCode) {
 		long startTime = System.currentTimeMillis();
-		opcKpiService.updateOpc200Data(paCode);
-		opcKpiService.takePerformanceSnapshot(paCode); //take snapshot AFTER updating
-		opcTsp200DataRepo.flush();
+		opcKpiService.processSingleOpcDealer(paCode);
 		long endTime = System.currentTimeMillis();
 		Long l = endTime-startTime;
-		double completionTime = (l.doubleValue())/1000;
-
-		return "Ran single OPC dealer (P&A Code " + paCode + "): transferred OPC 200 data and took KPI performance snapshot. This took " + completionTime + "s.";
+		double completionTime = l.doubleValue();
+		return "Ran single OPC dealer (P&A Code " + paCode + "): transferred OPC 200 data and took KPI performance snapshot. This took " + completionTime/1000 + "s.";
 	}
 
 	@ResponseBody
