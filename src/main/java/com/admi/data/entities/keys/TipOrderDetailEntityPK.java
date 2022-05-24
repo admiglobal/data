@@ -1,15 +1,13 @@
 package com.admi.data.entities.keys;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class TipOrderDetailEntityPK implements Serializable {
 	private Long dealerId;
-	private LocalDateTime dataDate;
+	private LocalDate dataDate;
 	private String partNo;
 
 	@Column(name = "DEALER_ID", nullable = false, precision = 0)
@@ -24,11 +22,11 @@ public class TipOrderDetailEntityPK implements Serializable {
 
 	@Column(name = "DATA_DATE", nullable = false)
 	@Id
-	public LocalDateTime getDataDate() {
+	public LocalDate getDataDate() {
 		return dataDate;
 	}
 
-	public void setDataDate(LocalDateTime dataDate) {
+	public void setDataDate(LocalDate dataDate) {
 		this.dataDate = dataDate;
 	}
 

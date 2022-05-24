@@ -3,25 +3,25 @@ package com.admi.data.entities;
 import com.admi.data.entities.keys.TipOrderDetailEntityPK;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "TIP_ORDER_DETAIL", schema = "ADMI")
 @IdClass(TipOrderDetailEntityPK.class)
 public class TipOrderDetailEntity {
 	private Long dealerId;
-	private LocalDateTime dataDate;
+	private LocalDate dataDate;
 	private String partNo;
 	private String description;
 	private Integer cents;
 	private String src;
 	private Integer ytdSales;
-	private Byte ytdHitsByMonth;
-	private Byte monthsNoSale;
+	private Integer ytdHitsByMonth;
+	private Integer monthsNoSale;
 
 	public TipOrderDetailEntity() {}
 
-	public TipOrderDetailEntity(Long dealerId, LocalDateTime dataDate, String partNo, String description, Integer cents, String src, Integer ytdSales, Byte ytdHitsByMonth, Byte monthsNoSale) {
+	public TipOrderDetailEntity(Long dealerId, LocalDate dataDate, String partNo, String description, Integer cents, String src, Integer ytdSales, Integer ytdHitsByMonth, Integer monthsNoSale) {
 		this.dealerId = dealerId;
 		this.dataDate = dataDate;
 		this.partNo = partNo;
@@ -45,11 +45,11 @@ public class TipOrderDetailEntity {
 
 	@Id
 	@Column(name = "DATA_DATE", nullable = false)
-	public LocalDateTime getDataDate() {
+	public LocalDate getDataDate() {
 		return dataDate;
 	}
 
-	public void setDataDate(LocalDateTime dataDate) {
+	public void setDataDate(LocalDate dataDate) {
 		this.dataDate = dataDate;
 	}
 
@@ -105,21 +105,21 @@ public class TipOrderDetailEntity {
 
 	@Basic
 	@Column(name = "YTD_HITS_BY_MONTH", nullable = true, precision = 0)
-	public Byte getYtdHitsByMonth() {
+	public Integer getYtdHitsByMonth() {
 		return ytdHitsByMonth;
 	}
 
-	public void setYtdHitsByMonth(Byte ytdHitsByMonth) {
+	public void setYtdHitsByMonth(Integer ytdHitsByMonth) {
 		this.ytdHitsByMonth = ytdHitsByMonth;
 	}
 
 	@Basic
 	@Column(name = "MONTHS_NO_SALE", nullable = true, precision = 0)
-	public Byte getMonthsNoSale() {
+	public Integer getMonthsNoSale() {
 		return monthsNoSale;
 	}
 
-	public void setMonthsNoSale(Byte monthsNoSale) {
+	public void setMonthsNoSale(Integer monthsNoSale) {
 		this.monthsNoSale = monthsNoSale;
 	}
 

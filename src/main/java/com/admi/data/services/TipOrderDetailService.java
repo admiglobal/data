@@ -10,9 +10,8 @@ import com.admi.data.repositories.TipOrderDetailRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.sql.BatchUpdateException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -29,24 +28,26 @@ public class TipOrderDetailService {
     TipOrderDetailRepository tipOrderRepo;
 
     public void runSingleTipDealer() {
-        List<AipInventoryEntity> inventory = fetchInventory(55780L);
-        calculateTipKpi(inventory, DmsProvider.CDK);
+        Long dealerId = 55780L;
+        List<AipInventoryEntity> inventory = fetchInventory(dealerId);
+        calculateTipKpi(dealerId, inventory, DmsProvider.CDK);
     }
 
     public List<AipInventoryEntity> fetchInventory(Long dealerId) {
-        LocalDate dataDate = inventoryRepo.getMaxDateByDealerId(dealerId);
+//        LocalDate dataDate = inventoryRepo.getMaxDateByDealerId(dealerId);
+        LocalDate dataDate = LocalDate.of(2022,5,23);
         return inventoryRepo.findAllByDealerIdAndDataDate(dealerId, dataDate);
     }
 
-    public void calculateTipKpi(List<AipInventoryEntity> inventory, DmsProvider dms) {
+    public void calculateTipKpi(Long dealerId, List<AipInventoryEntity> inventory, DmsProvider dms) {
+        List<TipOrderDetailEntity> orderList = new ArrayList<>();
 
         int lines = 0;
         int orderTotal = 0;
         int stockParts = 0;
         int onHandStockParts = 0;
 
-        AipInventoryEntity entity = inventory.get(0);
-        LocalDateTime creationTime = LocalDateTime.now();
+        LocalDate creationTime = LocalDate.now();
 
         for (AipInventoryEntity part : inventory) {
 
@@ -56,7 +57,7 @@ public class TipOrderDetailService {
             int lastSaleYear = part.getLastSale().getYear();
             int monthsNoSale = (currentMonth - lastSaleMonth) + ((currentYear - lastSaleYear) * 12);
 
-            if (part.getQoh() == 0 || monthsNoSale <= 6) {
+            if (part.getQoh() == 0 && monthsNoSale <= 6 && part.getYtdMonthsWithSales() >= 2) {
                 lines++;
                 orderTotal += part.getCents();
 
@@ -76,27 +77,35 @@ public class TipOrderDetailService {
                         part.getSource(),
                         part.getTwelveMonthSales(),
                         part.getYtdMonthsWithSales(),
-                        (byte) monthsNoSale);
+                        monthsNoSale);
 
-                System.out.println(order.toString());
+                orderList.add(order);
+            }
+        }
 
+        try {
+            tipOrderRepo.saveAll(orderList);
+        } catch (Exception e) {
+            e.printStackTrace();
+            for (TipOrderDetailEntity order : orderList) {
                 try {
                     tipOrderRepo.save(order);
                 }
-                catch (Exception e) {
+                catch (Exception f) {
                     System.out.println("Doesn't pass, pal.");
+                    f.printStackTrace();
+                    System.out.println(order.toString());
                 }
             }
         }
 
         TipKpiEntity kpi = new TipKpiEntity(
-                entity.getDealerId(),
+                dealerId,
                 creationTime,
                 lines,
                 (long) orderTotal,
                 stockParts,
                 onHandStockParts);
-
 
         tipKpiRepo.save(kpi);
     }

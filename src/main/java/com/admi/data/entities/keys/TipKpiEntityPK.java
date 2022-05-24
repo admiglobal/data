@@ -1,35 +1,31 @@
 package com.admi.data.entities.keys;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 public class TipKpiEntityPK implements Serializable {
-    private Integer dealerId;
-    private LocalDateTime dataDate;
+    private Long dealerId;
+    private LocalDate dataDate;
 
     @Column(name = "DEALER_ID", nullable = false, precision = 0)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public Integer getDealerId() {
+    public Long getDealerId() {
         return dealerId;
     }
 
-    public void setDealerId(Integer dealerId) {
+    public void setDealerId(Long dealerId) {
         this.dealerId = dealerId;
     }
 
     @Column(name = "DATA_DATE", nullable = false)
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    public LocalDateTime getDataDate() {
+    public LocalDate getDataDate() {
         return dataDate;
     }
 
-    public void setDataDate(LocalDateTime dataDate) {
+    public void setDataDate(LocalDate dataDate) {
         this.dataDate = dataDate;
     }
 

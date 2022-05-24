@@ -3,14 +3,14 @@ package com.admi.data.entities;
 import com.admi.data.entities.keys.TipKpiEntityPK;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 
 @Entity
 @Table(name = "TIP_KPI", schema = "ADMI")
 @IdClass(TipKpiEntityPK.class)
 public class TipKpiEntity {
     private Long dealerId;
-    private LocalDateTime dataDate;
+    private LocalDate dataDate;
     private Integer lines;
     private Long orderTotal;
     private Integer totalStockParts;
@@ -18,7 +18,7 @@ public class TipKpiEntity {
 
     public TipKpiEntity() {}
 
-    public TipKpiEntity(Long dealerId, LocalDateTime dataDate, Integer lines, Long orderTotal, Integer totalStockParts, Integer totalStockPartsQoh) {
+    public TipKpiEntity(Long dealerId, LocalDate dataDate, Integer lines, Long orderTotal, Integer totalStockParts, Integer totalStockPartsQoh) {
         this.dealerId = dealerId;
         this.dataDate = dataDate;
         this.lines = lines;
@@ -27,7 +27,6 @@ public class TipKpiEntity {
         this.totalStockPartsQoh = totalStockPartsQoh;
     }
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "DEALER_ID", nullable = false, precision = 0)
     public Long getDealerId() {
@@ -38,14 +37,13 @@ public class TipKpiEntity {
         this.dealerId = dealerId;
     }
 
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     @Column(name = "DATA_DATE", nullable = false)
-    public LocalDateTime getDataDate() {
+    public LocalDate getDataDate() {
         return dataDate;
     }
 
-    public void setDataDate(LocalDateTime dataDate) {
+    public void setDataDate(LocalDate dataDate) {
         this.dataDate = dataDate;
     }
 
