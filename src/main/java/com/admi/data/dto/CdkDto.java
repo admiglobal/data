@@ -50,7 +50,7 @@ public class CdkDto {
 
         inv.setDealerId(dealerId);
         inv.setPartNo(CdkImportService.getModifiedPartNumber(partNo, this.hashCode()));
-        inv.setCents(this.costCents == null ? null : Math.toIntExact(this.costCents));
+        inv.setCents(this.costCents == null ? 0 : Math.toIntExact(this.costCents));
         inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
         inv.setStatus(this.getStatus());
