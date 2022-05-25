@@ -38,12 +38,24 @@ public class SpreadsheetService {
         } else if(cell.getCellType().equals(CellType.NUMERIC)){
             //round to prevent decimal of .0 appended to numeric value
             // TODO: This rounding was probably leftover from the CDK process...but we won't want it everywhere! Make sure the CDK process rounds where it needs, then remove this here
+            //This is from CDK "BIN" values that are numeric: they should remain a whole number, instead of gaining the trailing .0
+            //However, this might not always be the case that we want to trim
+            //Solution: truncate decimals if it's just a trailing zero (.0), but not if it's other digits (e.g. X.12)
             Long wholeNum = Math.round(cell.getNumericCellValue());
             return wholeNum.toString();
         } else{
             System.out.println("Unable to translate cell value into String. Cell: " + cell);
         }
         return null;
+    }
+
+    /**
+     * If the given string is a number of the format
+     * @param numberString
+     * @return
+     */
+    public static String removeTrailingZeros(String numberString){
+
     }
 
     /**
