@@ -30,13 +30,18 @@ public interface DealerMasterRepository extends JpaRepository<DealerMasterEntity
 			nativeQuery = true)
 	List<DealerMasterEntity> findAllQuickLaneDealers(String[] nonQlPrimariesPaCodes);
 
+	/**
+	 * Ordered to put the primary dealer first, if applicable, since it is most likely to find data under the primary PA code
+	 * @return A list of all dealers that share this dealer's sales code. This list does not include the argument dealer.
+	 */
 	@Query(value = "select * \n" +
 			"from DEALER_MASTER \n" +
 			"where SALES_CODE = ( \n" +
 			"    select SALES_CODE from DEALER_MASTER \n" +
 			"    where PA_CODE = :paCode \n" +
 			"    ) \n" +
-			"and PA_CODE <> :paCode",
+			"and PA_CODE <> :paCode \n" +
+			"order by PRIMARY_OR_SECONDARY",
 			nativeQuery = true)
 	List<DealerMasterEntity> findSameSalesCodeDealers(String paCode);
 }

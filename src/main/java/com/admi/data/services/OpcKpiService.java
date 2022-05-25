@@ -59,6 +59,7 @@ public class OpcKpiService {
         //if there's no data for this paCode, check other dealers with this PA code (sometimes, the primary dealership with the inventory data is marked as non-QuickLane, so isn't in dealer list initially)
         if(fordDealerInventoryRepo.findFirstByPaCode(paCode) == null){
             List<DealerMasterEntity> sameSalesCodeDealers = dealerMasterRepo.findSameSalesCodeDealers(paCode);
+
             for(DealerMasterEntity dealer : sameSalesCodeDealers){
                 if(fordDealerInventoryRepo.findFirstByPaCode(dealer.getPaCode()) != null){
                     processSingleOpcDealer(dealer.getPaCode());
