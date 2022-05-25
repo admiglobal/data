@@ -61,7 +61,7 @@ public class ImportService {
 	DealerMasterRepository dealerRepo;
 
 	@Async("asyncExecutor")
-	public void runAipInventory(InputStream file, Long dealerId, String paCode, int dmsId, String fileType)
+	public void runAipInventory(InputStream file, Long dealerId, String paCode, int dmsId, String fileType, String userEmail)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
 		System.out.println(DateService.getTimeString() + ": Importing Dealer " + dealerId);
 
@@ -82,6 +82,16 @@ public class ImportService {
 		aipInventoryService.saveAll(inventory, dealerId, paCode, DmsProvider.findDms(dmsId));
 
 		System.out.println(DateService.getTimeString() + ": Completed importing Dealer " + dealerId);
+
+		if(userEmail != null && !userEmail.equals("")){
+			try {
+				emailService.sendAipUploadVerificationEmail(userEmail, paCode);
+				System.out.println("Upload verification message sent to " + userEmail + ".");
+			} catch (MessagingException e) {
+				System.out.println(e.getMessage());
+				e.printStackTrace();
+			}
+		}
 	}
 
 	@Async("asyncMotorcraftExecutor")

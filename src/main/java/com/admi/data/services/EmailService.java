@@ -68,4 +68,36 @@ public class EmailService {
 		}
 	}
 
+	public void sendAipUploadVerificationEmail(String userEmail, String paCode) throws MessagingException {
+		String errorEmail = "errors@admiglobal.com";
+
+		String to = userEmail;
+		String from = "no-reply@admiglobal.com";
+		String cc = null;
+		String[] bcc = {};
+		String subject = "File finished processing for " + paCode;
+
+		String message = "Thank you for uploading your inventory file to the ADMI Insights Platform. " +
+				"You are receiving this email to notify you that the file has finished processing for P&A code " + paCode + ", and " +
+				"the ADMI Insights Platform site will now reflect your updated inventory information. " +
+				"If you have any questions, please contact your ADMI representative. ";
+
+		Context context = new Context();
+
+		context.setVariable("message", message);
+//		context.setVariable("issuesMessage", issuesMessage);
+//		context.setVariable("issues", issues);
+//		context.setVariable("orders", orders);
+
+		String html = templateEngine.process("email/uploadVerificationMessage", context);
+
+		try {
+			emailUtility.sendMimeMessage(to, from, cc, bcc, subject, html);
+		} catch (MailSendException e) {
+
+			emailUtility.sendMimeMessage(errorEmail, from, bcc,"AIP Upload Verification Failed to Send - " + subject, html);
+			throw e;
+		}
+	}
+
 }

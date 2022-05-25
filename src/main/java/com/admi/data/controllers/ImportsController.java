@@ -115,7 +115,7 @@ public class ImportsController {
 
 		System.out.println(file.getContentType());
 
-		importService.runAipInventory(file.getInputStream(), dealerId, dealer.getPaCode(), dealer.getDmsId(), file.getContentType());
+		importService.runAipInventory(file.getInputStream(), dealerId, dealer.getPaCode(), dealer.getDmsId(), file.getContentType(), null);
 
 		System.out.println(DateService.getTimeString() + ": Completed Dealer " + dealerId);
 
@@ -278,9 +278,9 @@ public class ImportsController {
 			return "All fields required. There can be no null values";
 		} else {
 			File file = new File(call.getFilePath());
-			importService.runAipInventory(new FileInputStream(file), call.getDealerId(), call.getPaCode(), call.getDmsId(), call.getFileType());
+			importService.runAipInventory(new FileInputStream(file), call.getDealerId(), call.getPaCode(), call.getDmsId(), call.getFileType(), call.getEmail());
 
-			return "Import queued successfully. Please wait a few minutes to allow us to process this file.";
+			return "Import queued successfully. Please wait a few minutes to allow us to process this file. You will receive an email notification once your file has finished processing.";
 		}
 
 	}
