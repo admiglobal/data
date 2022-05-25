@@ -72,7 +72,7 @@ public class EmailService {
 		String errorEmail = "errors@admiglobal.com";
 
 		String to = userEmail;
-		String from = "aip-no-reply@admiglobal.com";
+		String from = "aisSupport@admiglobal.com";
 //		String cc = "";
 		String[] bcc = {};
 		String subject = "File finished processing for P&A code " + paCode;
