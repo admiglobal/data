@@ -4,6 +4,7 @@ import com.admi.data.entities.keys.TipOrderDetailEntityPK;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "TIP_ORDER_DETAIL", schema = "ADMI")
@@ -18,10 +19,20 @@ public class TipOrderDetailEntity {
 	private Integer ytdSales;
 	private Integer ytdHitsByMonth;
 	private Integer monthsNoSale;
+	private Integer qoh;
+	private String status;
+	private LocalDate lastSale;
+	private LocalDate lastReceipt;
+	private String bin;
+	private Boolean mfgControlled;
+	private String manufacturer;
+	private Integer qoo;
+	private LocalDate entryDate;
+	private Integer orderQty;
 
 	public TipOrderDetailEntity() {}
 
-	public TipOrderDetailEntity(Long dealerId, LocalDate dataDate, String partNo, String description, Integer cents, String src, Integer ytdSales, Integer ytdHitsByMonth, Integer monthsNoSale) {
+	public TipOrderDetailEntity(Long dealerId, LocalDate dataDate, String partNo, String description, Integer cents, String src, Integer ytdSales, Integer ytdHitsByMonth, Integer monthsNoSale, Integer qoh, String status, LocalDate lastSale, LocalDate lastReceipt, String bin, Boolean mfgControlled, String manufacturer, Integer qoo, LocalDate entryDate, Integer orderQty) {
 		this.dealerId = dealerId;
 		this.dataDate = dataDate;
 		this.partNo = partNo;
@@ -31,6 +42,16 @@ public class TipOrderDetailEntity {
 		this.ytdSales = ytdSales;
 		this.ytdHitsByMonth = ytdHitsByMonth;
 		this.monthsNoSale = monthsNoSale;
+		this.qoh = qoh;
+		this.status = status;
+		this.lastSale = lastSale;
+		this.lastReceipt = lastReceipt;
+		this.bin = bin;
+		this.mfgControlled = mfgControlled;
+		this.manufacturer = manufacturer;
+		this.qoo = qoo;
+		this.entryDate = entryDate;
+		this.orderQty = orderQty;
 	}
 
 	@Id
@@ -84,7 +105,7 @@ public class TipOrderDetailEntity {
 	}
 
 	@Basic
-	@Column(name = "SRC", nullable = true, precision = 0)
+	@Column(name = "SRC", nullable = true, precision = 0, length = 15)
 	public String getSrc() {
 		return src;
 	}
@@ -123,39 +144,146 @@ public class TipOrderDetailEntity {
 		this.monthsNoSale = monthsNoSale;
 	}
 
+	@Basic
+	@Column(name = "QOH", nullable = true, precision = 0)
+	public Integer getQoh() {
+		return qoh;
+	}
+
+	public void setQoh(Integer qoh) {
+		this.qoh = qoh;
+	}
+
+	@Basic
+	@Column(name = "STATUS", nullable = true, length = 20)
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	@Basic
+	@Column(name = "LAST_SALE", nullable = true)
+	public LocalDate getLastSale() {
+		return lastSale;
+	}
+
+	public void setLastSale(LocalDate lastSale) {
+		this.lastSale = lastSale;
+	}
+
+	@Basic
+	@Column(name = "LAST_RECEIPT", nullable = true)
+	public LocalDate getLastReceipt() {
+		return lastReceipt;
+	}
+
+	public void setLastReceipt(LocalDate lastReceipt) {
+		this.lastReceipt = lastReceipt;
+	}
+
+	@Basic
+	@Column(name = "BIN", nullable = true, length = 200)
+	public String getBin() {
+		return bin;
+	}
+
+	public void setBin(String bin) {
+		this.bin = bin;
+	}
+
+	@Basic
+	@Column(name = "MFG_CONTROLLED", nullable = true, precision = 0)
+	public Boolean getMfgControlled() {
+		return mfgControlled;
+	}
+
+	public void setMfgControlled(Boolean mfgControlled) {
+		this.mfgControlled = mfgControlled;
+	}
+
+	@Basic
+	@Column(name = "MANUFACTURER", nullable = true, length = 20)
+	public String getManufacturer() {
+		return manufacturer;
+	}
+
+	public void setManufacturer(String manufacturer) {
+		this.manufacturer = manufacturer;
+	}
+
+	@Basic
+	@Column(name = "QOO", nullable = true, precision = 0)
+	public Integer getQoo() {
+		return qoo;
+	}
+
+	public void setQoo(Integer qoo) {
+		this.qoo = qoo;
+	}
+
+	@Basic
+	@Column(name = "ENTRY_DATE", nullable = true)
+	public LocalDate getEntryDate() {
+		return entryDate;
+	}
+
+	public void setEntryDate(LocalDate entryDate) {
+		this.entryDate = entryDate;
+	}
+
+	public Integer getOrderQty() { return orderQty; }
+
+	public void setOrderQty(Integer orderQty) { this.orderQty = orderQty; }
+
 	@Override
 	public boolean equals(Object o) {
 		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-
+		if (!(o instanceof TipOrderDetailEntity)) return false;
 		TipOrderDetailEntity that = (TipOrderDetailEntity) o;
-
-		if (dealerId != null ? !dealerId.equals(that.dealerId) : that.dealerId != null) return false;
-		if (dataDate != null ? !dataDate.equals(that.dataDate) : that.dataDate != null) return false;
-		if (partNo != null ? !partNo.equals(that.partNo) : that.partNo != null) return false;
-		if (description != null ? !description.equals(that.description) : that.description != null) return false;
-		if (cents != null ? !cents.equals(that.cents) : that.cents != null) return false;
-		if (src != null ? !src.equals(that.src) : that.src != null) return false;
-		if (ytdSales != null ? !ytdSales.equals(that.ytdSales) : that.ytdSales != null) return false;
-		if (ytdHitsByMonth != null ? !ytdHitsByMonth.equals(that.ytdHitsByMonth) : that.ytdHitsByMonth != null)
-			return false;
-		if (monthsNoSale != null ? !monthsNoSale.equals(that.monthsNoSale) : that.monthsNoSale != null) return false;
-
-		return true;
+		return dealerId.equals(that.dealerId) &&
+				dataDate.equals(that.dataDate) &&
+				partNo.equals(that.partNo) &&
+				Objects.equals(description, that.description) &&
+				Objects.equals(cents, that.cents) && Objects.equals(src, that.src) &&
+				Objects.equals(ytdSales, that.ytdSales) &&
+				Objects.equals(ytdHitsByMonth, that.ytdHitsByMonth) &&
+				Objects.equals(monthsNoSale, that.monthsNoSale) &&
+				Objects.equals(qoh, that.qoh) &&
+				Objects.equals(status, that.status) &&
+				Objects.equals(lastSale, that.lastSale) &&
+				Objects.equals(lastReceipt, that.lastReceipt) &&
+				Objects.equals(bin, that.bin) &&
+				Objects.equals(mfgControlled, that.mfgControlled) &&
+				Objects.equals(manufacturer, that.manufacturer) &&
+				Objects.equals(qoo, that.qoo) &&
+				Objects.equals(entryDate, that.entryDate) &&
+				Objects.equals(orderQty, that.orderQty);
 	}
 
 	@Override
 	public int hashCode() {
-		int result = dealerId != null ? dealerId.hashCode() : 0;
-		result = 31 * result + (dataDate != null ? dataDate.hashCode() : 0);
-		result = 31 * result + (partNo != null ? partNo.hashCode() : 0);
-		result = 31 * result + (description != null ? description.hashCode() : 0);
-		result = 31 * result + (cents != null ? cents.hashCode() : 0);
-		result = 31 * result + (src != null ? src.hashCode() : 0);
-		result = 31 * result + (ytdSales != null ? ytdSales.hashCode() : 0);
-		result = 31 * result + (ytdHitsByMonth != null ? ytdHitsByMonth.hashCode() : 0);
-		result = 31 * result + (monthsNoSale != null ? monthsNoSale.hashCode() : 0);
-		return result;
+		return Objects.hash(dealerId,
+				dataDate,
+				partNo,
+				description,
+				cents,
+				src,
+				ytdSales,
+				ytdHitsByMonth,
+				monthsNoSale,
+				qoh,
+				status,
+				lastSale,
+				lastReceipt,
+				bin,
+				mfgControlled,
+				manufacturer,
+				qoo,
+				entryDate,
+				orderQty);
 	}
 
 	@Override
@@ -170,6 +298,16 @@ public class TipOrderDetailEntity {
 				", ytdSales=" + ytdSales +
 				", ytdHitsByMonth=" + ytdHitsByMonth +
 				", monthsNoSale=" + monthsNoSale +
+				", qoh=" + qoh +
+				", status='" + status + '\'' +
+				", lastSale=" + lastSale +
+				", lastReceipt=" + lastReceipt +
+				", bin='" + bin + '\'' +
+				", mfgControlled=" + mfgControlled +
+				", manufacturer='" + manufacturer + '\'' +
+				", qoo=" + qoo +
+				", entryDate=" + entryDate +
+				", orderQty=" + orderQty +
 				'}';
 	}
 }

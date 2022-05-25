@@ -29,11 +29,11 @@ public class TipOrderDetailService {
 
     public void runSingleTipDealer() {
         Long dealerId = 55780L;
-        List<AipInventoryEntity> inventory = fetchInventory(dealerId);
+        List<AipInventoryEntity> inventory = getInventory(dealerId);
         calculateTipKpi(dealerId, inventory, DmsProvider.CDK);
     }
 
-    public List<AipInventoryEntity> fetchInventory(Long dealerId) {
+    public List<AipInventoryEntity> getInventory(Long dealerId) {
 //        LocalDate dataDate = inventoryRepo.getMaxDateByDealerId(dealerId);
         LocalDate dataDate = LocalDate.of(2022,5,23);
         return inventoryRepo.findAllByDealerIdAndDataDate(dealerId, dataDate);
@@ -50,36 +50,47 @@ public class TipOrderDetailService {
         LocalDate creationTime = LocalDate.now();
 
         for (AipInventoryEntity part : inventory) {
-
             int currentMonth = part.getDataDate().getMonthValue();
             int lastSaleMonth = part.getLastSale().getMonthValue();
             int currentYear = part.getDataDate().getYear();
             int lastSaleYear = part.getLastSale().getYear();
             int monthsNoSale = (currentMonth - lastSaleMonth) + ((currentYear - lastSaleYear) * 12);
 
-            if (part.getQoh() == 0 && monthsNoSale <= 6 && part.getYtdMonthsWithSales() >= 2) {
-                lines++;
-                orderTotal += part.getCents();
+            if (Objects.equals(dms.getStatusType().getStockStatus().toString(), part.getStatus())) {
+                stockParts++;
 
-                if (Objects.equals(dms.getStatusType().getStockStatus().toString(), part.getStatus())) {
-                    stockParts++;
+                if (part.getQoh() > 0)
+                    onHandStockParts++;
+            }
 
-                    if (part.getQoh() > 0)
-                        onHandStockParts++;
+            if (part.getQoo() == null && !part.getPartNo().startsWith("DT")) {
+                if (part.getQoh() == 0 && monthsNoSale <= 6 && part.getYtdMonthsWithSales() >= 2 && part.getTwelveMonthSales() > 0) {
+                    lines++;
+                    orderTotal += part.getCents();
+
+                    TipOrderDetailEntity order = new TipOrderDetailEntity(
+                            part.getDealerId(),
+                            creationTime,
+                            part.getPartNo(),
+                            part.getDescription(),
+                            part.getCents(),
+                            part.getSource(),
+                            part.getTwelveMonthSales(),
+                            part.getYtdMonthsWithSales(),
+                            monthsNoSale,
+                            part.getQoh(),
+                            part.getStatus(),
+                            part.getLastSale(),
+                            part.getLastReceipt(),
+                            part.getBin(),
+                            part.getMfgControlled(),
+                            part.getManufacturer(),
+                            part.getQoo(),
+                            part.getEntryDate(),
+                            1);
+
+                    orderList.add(order);
                 }
-
-                TipOrderDetailEntity order = new TipOrderDetailEntity(
-                        part.getDealerId(),
-                        creationTime,
-                        part.getPartNo(),
-                        part.getDescription(),
-                        part.getCents(),
-                        part.getSource(),
-                        part.getTwelveMonthSales(),
-                        part.getYtdMonthsWithSales(),
-                        monthsNoSale);
-
-                orderList.add(order);
             }
         }
 
