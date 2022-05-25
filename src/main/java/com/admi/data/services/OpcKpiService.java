@@ -39,8 +39,7 @@ public class OpcKpiService {
     public void runOpcProcess(){
         long startTime = System.currentTimeMillis();
 
-        String[] nonQlPrimariesPaCodes = {"08972"}; //non-QL dealers we want to include because they have a secondary that's a QL
-        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers(nonQlPrimariesPaCodes);
+        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
 
         for(DealerMasterEntity dealer : quickLaneDealers){
             processSingleOpcDealer(dealer.getPaCode());
@@ -101,8 +100,7 @@ public class OpcKpiService {
      * For testing purposes only
      */
     public void tester(){
-        String[] nonQlPrimariesPaCodes = {"08972","000002"}; //non-QL dealers we want to include because they have a secondary that's a QL
-        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers(nonQlPrimariesPaCodes);
+        List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers();
         System.out.println("Size of this list: " + quickLaneDealers.size());
     }
 

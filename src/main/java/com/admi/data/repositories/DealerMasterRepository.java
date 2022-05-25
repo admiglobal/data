@@ -23,12 +23,10 @@ public interface DealerMasterRepository extends JpaRepository<DealerMasterEntity
 			"  and dm.PRIMARY_MANUFACTURER_ID = 1 \n" +
 			"  and dm.TERMINATION_DATE is null \n" +
 			"  and (dm.DEALERSHIP_COUNTRY = 'USA' or dm.DEALERSHIP_COUNTRY is null) \n" +
-			"  and (g.QUICK_LANE = 'Y' \n" +
-			"  or dm.PA_CODE in (:nonQlPrimariesPaCodes) \n" +
-			"  ) \n" +
+			"  and g.QUICK_LANE = 'Y' \n" +
 			"order by dm.PA_CODE",
 			nativeQuery = true)
-	List<DealerMasterEntity> findAllQuickLaneDealers(String[] nonQlPrimariesPaCodes);
+	List<DealerMasterEntity> findAllQuickLaneDealers();
 
 	/**
 	 * Ordered to put the primary dealer first, if applicable, since it is most likely to find data under the primary PA code
