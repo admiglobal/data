@@ -64,7 +64,7 @@ public class RRPowerDto {
         inv.setLastReceipt(this.receiptDate);
         inv.setBin(this.bin);
         inv.setSource(this.source);
-//        //mfgControlled //TODO - Check if rimState column in DTO gives us mfgControlled info for AipInventoryEntity
+        inv.setMfgControlled(this.getMfgControlled());
         inv.setDataDate(date);
 //        //manufacturer
         inv.setQoo(this.backorder == null ? null : Math.toIntExact(backorder));
@@ -74,6 +74,13 @@ public class RRPowerDto {
         System.out.println("AIP Inventory Entity: " + inv);
 
         return inv;
+    }
+
+    //TODO - once we have RR Power files that have populated RIM STATE columns, make sure this mapping is correct. Adjust as needed.
+    public Boolean getMfgControlled(){
+        if(rimState.equals("1")) { return Boolean.TRUE; }
+        if(rimState.equals("0")) { return Boolean.FALSE; }
+        return null;
     }
 
     public boolean isBlankRow(){
