@@ -2,7 +2,9 @@ package com.admi.data.controllers;
 
 import com.admi.data.dto.ImportJob;
 import com.admi.data.entities.*;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.exceptions.ApiNotSupportedException;
+import com.admi.data.repositories.TipEnrollmentsRepository;
 import com.admi.data.services.ImportService;
 import com.admi.data.services.MixImportService;
 import com.admi.data.services.*;
@@ -278,9 +280,16 @@ public class ImportsController {
 			return "All fields required. There can be no null values";
 		} else {
 			File file = new File(call.getFilePath());
-			importService.runAipInventory(new FileInputStream(file), call.getDealerId(), call.getPaCode(), call.getDmsId(), call.getFileType(), call.getEmail());
+			importService.runAipInventory(
+					new FileInputStream(file),
+					call.getDealerId(),
+					call.getPaCode(),
+					call.getDmsId(),
+					call.getFileType(),
+					call.getEmail());
 
-			return "Import queued successfully. Please wait a few minutes to allow us to process this file. You will receive an email notification once your file has finished processing.";
+			return "Import queued successfully. Please wait a few minutes to allow us to process this file. " +
+					"You will receive an email notification once your file has finished processing.";
 		}
 
 	}

@@ -37,6 +37,8 @@ public class RRImportService {
 
 		List<AipInventoryEntity> inventoryList = new ArrayList<>();
 
+		Exception e = null;
+
 		Iterator<Row> rowIterator = sheet.iterator();
 		while (rowIterator.hasNext()) {
 			Row row = rowIterator.next();
@@ -51,17 +53,24 @@ public class RRImportService {
 
 					try {
 						setDtoField(cell, rowDTO, rrFields.get(field));
-					} catch(Exception e) {
-						System.out.println("Cell: " + cell);
-						if (field != null)
-							System.out.println("Field: " + field);
-						e.printStackTrace();
+					} catch(Exception f) {
+						e = f;
+//						System.out.println("Cell: " + cell);
+//						if (field != null)
+//							System.out.println("Field: " + field);
+//						e.printStackTrace();
 					}
 				}
 
 				inventoryList.add(rowDTO.toAipInventory(dealerId, LocalDate.now(), true));
 			}
 		}
+
+		if (e != null) {
+			System.out.println("Check error log for " + e.getMessage());
+			e.printStackTrace();
+		}
+
 		System.out.println("Row Count: " + inventoryList.size());
 
 		return inventoryList;

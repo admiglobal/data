@@ -54,7 +54,7 @@ public class CdkDto {
         inv.setCents(this.costCents == null ? 0 : Math.toIntExact(this.costCents));
         inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
-        inv.setStatus(this.getStatusNotNull());
+        inv.setStatus(getModifiedSpecialStatus());
         inv.setLastSale(this.getLastSaleDate());
         inv.setLastReceipt(this.getLastReceiptDate());
         inv.setBin(this.bin);
@@ -258,8 +258,11 @@ public class CdkDto {
         this.status = status;
     }
 
-    public String getStatusNotNull() {
-        return Objects.requireNonNullElse(this.status, "STOCK");
+    private String getModifiedSpecialStatus() {
+        if (this.status == null || this.status.equals(""))
+            return "STOCK";
+        else
+            return this.status;
     }
 
     public Long getMns() {

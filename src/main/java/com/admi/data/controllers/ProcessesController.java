@@ -232,9 +232,7 @@ public class ProcessesController {
 	@ResponseBody
 	@GetMapping("/tip")
 	public String runTipDealer() {
-
-		tipService.runSingleTipDealer();
-
+		tipService.runSingleTipDealerTest();
 		return "TIP process has completed successfully.";
 	}
 

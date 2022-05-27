@@ -27,10 +27,19 @@ public class TipOrderDetailService {
     @Autowired
     TipOrderDetailRepository tipOrderRepo;
 
-    public void runSingleTipDealer() {
+    public void runSingleTipDealerTest() {
         Long dealerId = 55780L;
         List<AipInventoryEntity> inventory = getInventory(dealerId);
         calculateTipKpi(dealerId, inventory, DmsProvider.CDK);
+    }
+
+    public void runSingleTipDealer(Long dealerId, LocalDate dataDate, DmsProvider dms) {
+       List<AipInventoryEntity> inventory = inventoryRepo.findAllByDealerIdAndDataDate(dealerId, dataDate);
+       calculateTipKpi(dealerId, inventory, dms);
+    }
+
+    public void runSingleTipDealer(Long dealerId, List<AipInventoryEntity> inventory, DmsProvider dms) {
+       calculateTipKpi(dealerId, inventory, dms);
     }
 
     public List<AipInventoryEntity> getInventory(Long dealerId) {
@@ -56,7 +65,7 @@ public class TipOrderDetailService {
             int lastSaleYear = part.getLastSale().getYear();
             int monthsNoSale = (currentMonth - lastSaleMonth) + ((currentYear - lastSaleYear) * 12);
 
-            if (Objects.equals(dms.getStatusType().getStockStatus().toString(), part.getStatus())) {
+            if (Objects.equals(dms.getStatusType().getStockStatus().toString(), part.getStatus()) || part.getStatus() == null) {
                 stockParts++;
 
                 if (part.getQoh() > 0)

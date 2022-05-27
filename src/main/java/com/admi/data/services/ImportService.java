@@ -46,6 +46,9 @@ public class ImportService {
 	CdkImportService cdkImportService;
 
 	@Autowired
+	TipOrderDetailService tipService;
+
+	@Autowired
 	AipInventoryRepository inventoryRepo;
 
 	@Autowired
@@ -59,6 +62,9 @@ public class ImportService {
 
 	@Autowired
 	DealerMasterRepository dealerRepo;
+
+	@Autowired
+	TipEnrollmentsRepository tipEnrollmentsRepo;
 
 	@Async("asyncExecutor")
 	public void runAipInventory(InputStream file, Long dealerId, String paCode, int dmsId, String fileType, String userEmail)
@@ -80,6 +86,12 @@ public class ImportService {
 		}
 
 		aipInventoryService.saveAll(inventory, dealerId, paCode, DmsProvider.findDms(dmsId));
+
+		TipEnrollmentsEntity tipDealer = tipEnrollmentsRepo.findByDealerId(dealerId);
+
+		if (tipDealer != null) {
+			tipService.runSingleTipDealer(dealerId, inventory, DmsProvider.findDms(dmsId));
+		}
 
 		System.out.println(DateService.getTimeString() + ": Completed importing Dealer " + dealerId);
 
