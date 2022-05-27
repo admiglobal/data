@@ -77,7 +77,14 @@ public class RRPowerImportService {
         List<RRPowerInventoryField> headers = new ArrayList<>();
 
         for(String header : headerStrings) {
-            RRPowerInventoryField field = RRPowerInventoryField.of(header);
+            RRPowerInventoryField field = null;
+
+            try{
+                field = RRPowerInventoryField.of(header);
+            } catch(IllegalArgumentException iae){
+                System.out.println("Could not map header name \"" + header + "\" to an RRPowerInventoryField. This column will not be read.");
+            }
+
             headers.add(field);
         }
         return headers;
