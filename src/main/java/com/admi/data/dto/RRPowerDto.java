@@ -56,7 +56,7 @@ public class RRPowerDto {
         inv.setDealerId(dealerId);
         inv.setPartNo(SpreadsheetService.getModifiedPartNumber(partNumber, this.hashCode()));
         inv.setCents((net == null) ? null : Math.toIntExact(net));
-        inv.setQoh(quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
+        inv.setQoh(quantityOnHand == null ? 0 : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
         inv.setStatus(this.overallStatus);
         inv.setAdmiStatus(RRPowerImportService.getAdmiStatus(this.overallStatus));
