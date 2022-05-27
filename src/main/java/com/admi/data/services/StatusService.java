@@ -239,12 +239,19 @@ public class StatusService {
                 }
                 break;
             case 1:
-            case 48:
             case 50:
                 try {
                     status = RREraStatus.valueOf(statusString);
                 } catch (NullPointerException | IllegalArgumentException e) {
                     status = RREraStatus.NS;
+                }
+                break;
+            case 48:
+                try{
+                    status = RRPowerStatus.valueOf(statusString);
+                    System.out.println("The value we found for " + statusString + " was " + status);
+                } catch (NullPointerException | IllegalArgumentException e) {
+                    status = RRPowerStatus.N_STK;
                 }
                 break;
             default:

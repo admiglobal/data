@@ -68,6 +68,7 @@ public class RRPowerImportService {
 
                 if(!dto.isBlankRow()){
                     inventory.add(dto.toAipInventory(dealerId, LocalDate.now()));
+                    System.out.println("DTO: " + dto);
                 }
         }
         return inventory;
