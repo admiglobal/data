@@ -69,10 +69,9 @@ public class ImportService {
 
 		List<AipInventoryEntity> inventory;
 
-		System.out.println(fileType);
+		System.out.println("File type: " + fileType);
 
 		if (Objects.equals(fileType, "text/csv")	) {
-			System.out.println("CSV file selected");
 			inventory = importCsvInventoryFile(file, dealerId, dmsId);
 		} else if (Objects.equals(fileType, "application/vnd.ms-excel")) {
 			inventory = importXlsInventoryFile(file, dealerId, dmsId);

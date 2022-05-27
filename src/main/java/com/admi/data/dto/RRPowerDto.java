@@ -76,6 +76,7 @@ public class RRPowerDto {
 
     //TODO - once we have RR Power files that have populated RIM STATE columns, make sure this mapping is correct. Adjust as needed.
     public Boolean getMfgControlled(){
+        if(rimState == null) { return null; }
         if(rimState.equals("1")) { return Boolean.TRUE; }
         if(rimState.equals("0")) { return Boolean.FALSE; }
         return null;
