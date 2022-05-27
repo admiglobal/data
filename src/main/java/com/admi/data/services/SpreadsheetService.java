@@ -9,16 +9,13 @@ package com.admi.data.services;
 import com.sun.istack.NotNull;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
-import org.apache.tomcat.jni.Local;
 import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.time.LocalDate;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
-import java.util.Date;
 import java.util.Locale;
 
 @Service
@@ -36,26 +33,13 @@ public class SpreadsheetService {
         } else if(cell.getCellType().equals(CellType.STRING)){
             return cell.getStringCellValue();
         } else if(cell.getCellType().equals(CellType.NUMERIC)){
-            //round to prevent decimal of .0 appended to numeric value
-            // TODO: This rounding was probably leftover from the CDK process...but we won't want it everywhere! Make sure the CDK process rounds where it needs, then remove this here
-            //This is from CDK "BIN" values that are numeric: they should remain a whole number, instead of gaining the trailing .0
-            //However, this might not always be the case that we want to trim
-            //Solution: truncate decimals if it's just a trailing zero (.0), but not if it's other digits (e.g. X.12)
-            Long wholeNum = Math.round(cell.getNumericCellValue());
-            return wholeNum.toString();
+            Double numericCellValue = cell.getNumericCellValue();
+            //Translating a cell made of digits into a Double will automatically append a ".0" to the end. Remove this.
+            return removeDecimalZero(numericCellValue.toString());
         } else{
             System.out.println("Unable to translate cell value into String. Cell: " + cell);
         }
         return null;
-    }
-
-    /**
-     * If the given string is a number of the format
-     * @param numberString
-     * @return
-     */
-    public static String removeTrailingZeros(String numberString){
-
     }
 
     /**
@@ -81,6 +65,21 @@ public class SpreadsheetService {
             System.out.println("Unable to translate cell value into a Double. Cell: " + cell);
         }
         return fallbackValue;
+    }
+
+    /**
+     * If the given string is a number ending in ".0", then the ".0" is removed.
+     * Otherwise, just returns the argument string.
+     * Helpful if your parsed String is a number format that was auto-corrected to gain a trailing zero.
+     * @param numberString Any string
+     * @return The whole number part of the String, if it is a string of number format with a single trailing zero. Otherwise, returns the argument.
+     */
+    public static String removeDecimalZero(String numberString){
+        if(numberString.matches("[0-9]+.0")){ //A number with trailing decimal zeros
+            return numberString.split("\\.")[0];
+        }
+
+        return numberString;
     }
 
     /**
