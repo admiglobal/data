@@ -68,6 +68,7 @@ public class RRPowerImportService {
 
                 if(!dto.isBlankRow()){
                     inventory.add(dto.toAipInventory(dealerId, LocalDate.now()));
+                    System.out.println("DTO: " + dto);
                 }
         }
         return inventory;
@@ -79,10 +80,14 @@ public class RRPowerImportService {
         for(String header : headerStrings) {
             RRPowerInventoryField field = null;
 
-            try{
-                field = RRPowerInventoryField.of(header);
-            } catch(IllegalArgumentException iae){
-                System.out.println("Could not map header name \"" + header + "\" to an RRPowerInventoryField. This column will not be read.");
+            if(header.matches("... YR2")){
+                System.out.println("Ignored junk field \"" + header + "\" in R&R Power import file. This column will not be read.");
+            } else{
+                try{
+                    field = RRPowerInventoryField.of(header);
+                } catch(IllegalArgumentException iae){
+                    System.out.println("Could not map header name \"" + header + "\" to an RRPowerInventoryField. This column will not be read.");
+                }
             }
 
             headers.add(field);
@@ -140,6 +145,24 @@ public class RRPowerImportService {
         cellDefinition.getEntitySetter()
                 .accept(dto, value);
 
+    }
+
+    /**
+     * Given the R&R Power status string, returns the corresponding ADMI status string
+     * @param rrPowerStatus The R&R Power status. One of: "STOCK", "N-STK", or "ZEROG"
+     * @return The corresponding ADMI status, either "S" or "N"
+     */
+    public static String getAdmiStatus(String rrPowerStatus) {
+        if(rrPowerStatus == null){ return "N"; }
+
+        switch(rrPowerStatus){
+            case "STOCK":
+            case "ZEROG":
+                return "S";
+            case "N-STK":
+            default:
+                return "N";
+        }
     }
 
 }

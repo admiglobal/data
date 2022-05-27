@@ -185,13 +185,14 @@ public enum RRPowerInventoryField{
                     Long.class,
                     RRPowerDto :: setApr,
                     Long.class)),
-    MAR_YR2(new String[] {"MAR YR2"},
-            new CellDefinition<>(
-                    CellType.NUMERIC,
-                    Cell :: getStringCellValue,
-                    Long.class,
-                    RRPowerDto :: setMarYr2,
-                    Long.class)),
+    //Jay says this is a junk field--ignore it
+//    MAR_YR2(new String[] {"MAR YR2"},
+//            new CellDefinition<>(
+//                    CellType.NUMERIC,
+//                    Cell :: getStringCellValue,
+//                    Long.class,
+//                    RRPowerDto :: setMarYr2,
+//                    Long.class)),
     SEP(new String[] {"SEP"},
             new CellDefinition<>(
                     CellType.NUMERIC,
@@ -246,6 +247,12 @@ public enum RRPowerInventoryField{
         }
     }
 
+    /**
+     * Returns the RRPowerInventoryField enum that corresponds to this field name.
+     * Will ignore fields of the format "MMM YR2" (e.g. MAY YR2), as Jay says these are junk fields (data from 2 years ago)
+     * @param fieldName A String corresponding to a field name. This class accounts for multiple possible names for a column
+     * @return The corresponding RRPowerInventoryField enum constant
+     */
     public static RRPowerInventoryField of(String fieldName) {
         RRPowerInventoryField result = map.get(fieldName);
         if (result == null)

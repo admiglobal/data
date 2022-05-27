@@ -6,6 +6,7 @@
 package com.admi.data.dto;
 
 import com.admi.data.entities.AipInventoryEntity;
+import com.admi.data.services.RRPowerImportService;
 import com.admi.data.services.SpreadsheetService;
 import com.sun.istack.NotNull;
 
@@ -39,7 +40,6 @@ public class RRPowerDto {
     private String rimState;
     private Long apr;
     private Long may;
-    private Long marYr2;
     private Long sep;
     private String description;
     private Long aug;
@@ -59,7 +59,7 @@ public class RRPowerDto {
         inv.setQoh(quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
         inv.setStatus(this.overallStatus);
-        inv.setAdmiStatus(this.getAdmiStatus());
+        inv.setAdmiStatus(RRPowerImportService.getAdmiStatus(this.overallStatus));
         inv.setLastSale(this.lastSaleDate);
         inv.setLastReceipt(this.receiptDate);
         inv.setBin(this.bin);
@@ -71,29 +71,9 @@ public class RRPowerDto {
         inv.setTwelveMonthSales(twelveMonthSalesYr1 == null ? null : Math.toIntExact(twelveMonthSalesYr1));
         inv.setEntryDate(entry);
 
+        System.out.println("AIP Inventory Entity: " + inv);
+
         return inv;
-    }
-
-    //TODO - double check what the ZEROG status and blanks should translate to in ADMI terms
-    private String getAdmiStatus() {
-        if(overallStatus == null){ return "N"; }
-
-        switch(overallStatus){
-            case "STOCK":
-                return "S";
-            case "N-STK":
-            case "ZEROG":
-            default:
-                return "N";
-        }
-    }
-
-    private LocalDate getDefaultDateIfNull(LocalDate date) {
-        if (date == null) {
-            return LocalDate.of(2000,1,1);
-        } else {
-            return date;
-        }
     }
 
     public boolean isBlankRow(){
@@ -121,7 +101,6 @@ public class RRPowerDto {
                 && rimState == null
                 && apr == null
                 && may == null
-                && marYr2 == null
                 && sep == null
                 && description == null
                 && aug == null
@@ -329,14 +308,6 @@ public class RRPowerDto {
         this.may = may;
     }
 
-    public Long getMarYr2() {
-        return marYr2;
-    }
-
-    public void setMarYr2(Long marYr2) {
-        this.marYr2 = marYr2;
-    }
-
     public Long getSep() {
         return sep;
     }
@@ -382,12 +353,12 @@ public class RRPowerDto {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         RRPowerDto that = (RRPowerDto) o;
-        return Objects.equals(oct, that.oct) && Objects.equals(nov, that.nov) && Objects.equals(dec, that.dec) && Objects.equals(jan, that.jan) && Objects.equals(feb, that.feb) && Objects.equals(mar, that.mar) && Objects.equals(twelveMonthSalesYr1, that.twelveMonthSalesYr1) && Objects.equals(net, that.net) && Objects.equals(quantityOnHand, that.quantityOnHand) && Objects.equals(onHandValue, that.onHandValue) && Objects.equals(backorder, that.backorder) && Objects.equals(outstanding, that.outstanding) && Objects.equals(minimum, that.minimum) && Objects.equals(maximum, that.maximum) && Objects.equals(source, that.source) && Objects.equals(partNumber, that.partNumber) && Objects.equals(group, that.group) && Objects.equals(bin, that.bin) && Objects.equals(entry, that.entry) && Objects.equals(lastSaleDate, that.lastSaleDate) && Objects.equals(overallStatus, that.overallStatus) && Objects.equals(receiptDate, that.receiptDate) && Objects.equals(rimState, that.rimState) && Objects.equals(apr, that.apr) && Objects.equals(may, that.may) && Objects.equals(marYr2, that.marYr2) && Objects.equals(sep, that.sep) && Objects.equals(description, that.description) && Objects.equals(aug, that.aug) && Objects.equals(jul, that.jul) && Objects.equals(jun, that.jun);
+        return Objects.equals(oct, that.oct) && Objects.equals(nov, that.nov) && Objects.equals(dec, that.dec) && Objects.equals(jan, that.jan) && Objects.equals(feb, that.feb) && Objects.equals(mar, that.mar) && Objects.equals(twelveMonthSalesYr1, that.twelveMonthSalesYr1) && Objects.equals(net, that.net) && Objects.equals(quantityOnHand, that.quantityOnHand) && Objects.equals(onHandValue, that.onHandValue) && Objects.equals(backorder, that.backorder) && Objects.equals(outstanding, that.outstanding) && Objects.equals(minimum, that.minimum) && Objects.equals(maximum, that.maximum) && Objects.equals(source, that.source) && Objects.equals(partNumber, that.partNumber) && Objects.equals(group, that.group) && Objects.equals(bin, that.bin) && Objects.equals(entry, that.entry) && Objects.equals(lastSaleDate, that.lastSaleDate) && Objects.equals(overallStatus, that.overallStatus) && Objects.equals(receiptDate, that.receiptDate) && Objects.equals(rimState, that.rimState) && Objects.equals(apr, that.apr) && Objects.equals(may, that.may) && Objects.equals(sep, that.sep) && Objects.equals(description, that.description) && Objects.equals(aug, that.aug) && Objects.equals(jul, that.jul) && Objects.equals(jun, that.jun);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(oct, nov, dec, jan, feb, mar, twelveMonthSalesYr1, net, quantityOnHand, onHandValue, backorder, outstanding, minimum, maximum, source, partNumber, group, bin, entry, lastSaleDate, overallStatus, receiptDate, rimState, apr, may, marYr2, sep, description, aug, jul, jun);
+        return Objects.hash(oct, nov, dec, jan, feb, mar, twelveMonthSalesYr1, net, quantityOnHand, onHandValue, backorder, outstanding, minimum, maximum, source, partNumber, group, bin, entry, lastSaleDate, overallStatus, receiptDate, rimState, apr, may, sep, description, aug, jul, jun);
     }
 
     @Override
@@ -418,7 +389,6 @@ public class RRPowerDto {
                 ", rimState='" + rimState + '\'' +
                 ", apr=" + apr +
                 ", may=" + may +
-                ", marYr2=" + marYr2 +
                 ", sep=" + sep +
                 ", description='" + description + '\'' +
                 ", aug=" + aug +
