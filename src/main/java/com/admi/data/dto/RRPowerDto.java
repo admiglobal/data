@@ -71,8 +71,6 @@ public class RRPowerDto {
         inv.setTwelveMonthSales(twelveMonthSalesYr1 == null ? null : Math.toIntExact(twelveMonthSalesYr1));
         inv.setEntryDate(entry);
 
-        System.out.println("AIP Inventory Entity: " + inv);
-
         return inv;
     }
 
