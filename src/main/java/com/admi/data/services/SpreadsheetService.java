@@ -1,5 +1,5 @@
 /**
- * This class contains helpful methods for reading in spreadsheets using the Apache POI library.
+ * This class contains helpful methods for reading in spreadsheets, especially using the Apache POI library.
  * Contains methods for reading cells, parsing data of different formats, etc.
  * @author Julia Betzig +JMJ+
  */
@@ -105,11 +105,9 @@ public class SpreadsheetService {
      * @return A string containing only a-z, A-Z, and 0-9
      */
     public static String makeAlphanumeric(String string){
-        if (string != null) {
-            return string.replaceAll("[^a-zA-Z0-9]", "");
-        } else {
-            return null;
-        }
+        if(string == null){ return null; }
+
+        return string.replaceAll("[^a-zA-Z0-9]", "");
     }
 
     /**
