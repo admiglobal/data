@@ -91,7 +91,7 @@ public class SpreadsheetService {
      * @param rowHashCode The hash code of the row where this part number originally appeared.
      * @return If part number is not null or blank, will return the original part number made alphanumeric (removing spaces, punctuation, etc). Otherwise, returns a dummy part number of format XXXX-rowHashCode.
      */
-    public static String getModifiedPartNumber(String partNumber, int rowHashCode) {
+    public static String getPartNumberDbFormat(String partNumber, int rowHashCode) {
         if(partNumber == null || partNumber.trim().equals("")){
             return "XXXX-" + rowHashCode;
         }

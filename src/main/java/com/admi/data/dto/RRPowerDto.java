@@ -54,7 +54,7 @@ public class RRPowerDto {
         AipInventoryEntity inv = new AipInventoryEntity();
 
         inv.setDealerId(dealerId);
-        inv.setPartNo(SpreadsheetService.getModifiedPartNumber(partNumber, this.hashCode()));
+        inv.setPartNo(SpreadsheetService.getPartNumberDbFormat(partNumber, this.hashCode()));
         inv.setCents((net == null) ? null : Math.toIntExact(net));
         inv.setQoh(quantityOnHand == null ? 0 : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);

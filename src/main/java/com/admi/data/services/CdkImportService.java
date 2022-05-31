@@ -172,15 +172,6 @@ public class CdkImportService {
 		return status;
 	}
 
-	public static String getModifiedPartNumber(String partNumber, int hashCode) {
-		if(partNumber == null || partNumber.trim().equals("")){
-			return "XXXX-" + hashCode;
-		} else {
-			return makeAlphanumeric(partNumber);
-		}
-
-	}
-
 	/**
 	 * Returns the argument string, having removed any non-alphanumeric characters.
 	 * @param string An arbitrary string

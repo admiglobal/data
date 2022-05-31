@@ -2,6 +2,7 @@ package com.admi.data.entities;
 
 import com.admi.data.entities.keys.CdkInventoryPK;
 import com.admi.data.services.CdkImportService;
+import com.admi.data.services.SpreadsheetService;
 import com.fasterxml.jackson.dataformat.xml.annotation.JacksonXmlProperty;
 
 import javax.persistence.*;
@@ -1605,7 +1606,7 @@ public class CdkPartsInventoryChild implements Serializable {
 		AipInventoryEntity aip = new AipInventoryEntity();
 
 		aip.setDealerId(dealerId);
-		aip.setPartNo(getModifiedPartNumber());
+		aip.setPartNo(getPartNumberDbFormat());
 		aip.setCents(getPricing());
 		aip.setQoh(Objects.nonNull(this.onHand) ? Math.toIntExact(this.onHand) : 0);
 		aip.setDescription(this.description);
@@ -1677,8 +1678,8 @@ public class CdkPartsInventoryChild implements Serializable {
 	}
 
 	@Transient
-	private String getModifiedPartNumber() {
-		return CdkImportService.getModifiedPartNumber(this.partNumber, this.hashCode());
+	private String getPartNumberDbFormat() {
+		return SpreadsheetService.getPartNumberDbFormat(this.partNumber, this.hashCode());
 	}
 
 	@Override

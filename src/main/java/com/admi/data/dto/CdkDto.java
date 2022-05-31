@@ -7,8 +7,8 @@ package com.admi.data.dto;
 
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.services.CdkImportService;
+import com.admi.data.services.SpreadsheetService;
 import com.sun.istack.NotNull;
-import org.apache.tomcat.jni.Local;
 
 import java.time.LocalDate;
 import java.util.Objects;
@@ -49,7 +49,7 @@ public class CdkDto {
         AipInventoryEntity inv = new AipInventoryEntity();
 
         inv.setDealerId(dealerId);
-        inv.setPartNo(CdkImportService.getModifiedPartNumber(partNo, this.hashCode()));
+        inv.setPartNo(SpreadsheetService.getPartNumberDbFormat(partNo, this.hashCode()));
         inv.setCents(this.costCents == null ? null : Math.toIntExact(this.costCents));
         inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
