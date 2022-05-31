@@ -173,19 +173,6 @@ public class CdkImportService {
 	}
 
 	/**
-	 * Returns the argument string, having removed any non-alphanumeric characters.
-	 * @param string An arbitrary string
-	 * @return A string containing only a-z, A-Z, and 0-9
-	 */
-	public static String makeAlphanumeric(String string){
-		if (string != null) {
-			return string.replaceAll("[^a-zA-Z0-9]", "");
-		} else {
-			return null;
-		}
-	}
-
-	/**
 	 * A sub-class for describing the headers row of the spreadsheet
 	 */
 	private class Headers {

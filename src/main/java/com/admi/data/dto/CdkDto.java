@@ -111,7 +111,7 @@ public class CdkDto {
      * @param partNo
      */
     public void setPartNo(String partNo) {
-        this.partNo = CdkImportService.makeAlphanumeric(partNo);
+        this.partNo = SpreadsheetService.makeAlphanumeric(partNo);
     }
 
     public String getPartNo() {
