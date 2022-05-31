@@ -46,7 +46,7 @@ public class DealerTrackImportService {
 	@Scheduled(cron="0 0 6 * * ?")
 	public void runAllDtInventoryFiles() throws IOException {
 		String filePath = File.separator + File.separator +
-				"192.168.250.90" + File.separator +
+				"192.168.10.90" + File.separator +
 				"ftp_server" + File.separator +
 				"dtrack" + File.separator;
 		Set<String> files = getFilesInDirectory(filePath);
