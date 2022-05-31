@@ -28,17 +28,17 @@ public class SpreadsheetService {
      * @return the cell's value as a String
      */
     public static String translateCellIntoString(Cell cell){
-        if(cell == null || cell.getCellType().equals(CellType.BLANK)){
-            return null;
-        } else if(cell.getCellType().equals(CellType.STRING)){
-            return cell.getStringCellValue();
-        } else if(cell.getCellType().equals(CellType.NUMERIC)){
+        if(cell == null || cell.getCellType().equals(CellType.BLANK)){ return null; }
+
+        if(cell.getCellType().equals(CellType.STRING)){ return cell.getStringCellValue(); }
+
+        if(cell.getCellType().equals(CellType.NUMERIC)){
             Double numericCellValue = cell.getNumericCellValue();
             //Translating a cell made of digits into a Double will automatically append a ".0" to the end. Remove this.
             return removeDecimalZero(numericCellValue.toString());
-        } else{
-            System.out.println("Unable to translate cell value into String. Cell: " + cell);
         }
+
+        System.out.println("Unable to translate cell value into String. Cell: " + cell);
         return null;
     }
 
@@ -47,30 +47,30 @@ public class SpreadsheetService {
      * If the cell is blank or null, returns a null Double.
      * If the value of the cell is a String that can't be parsed into a Double, returns the fallback value.
      * @param cell the Cell we're reading from
-     * @param fallbackValue This value is returned if the cell can't be parsed into a Double. Usually something like null or 0.
+     * @param fallbackValue This value is returned if the cell can't be parsed into a Double; usually something like null or 0.
      * @return
      */
     public static Double translateCellIntoDouble(Cell cell, Double fallbackValue){
-        if(cell == null || cell.getCellType().equals(CellType.BLANK)){
-            return null;
-        } else if(cell.getCellType().equals(CellType.NUMERIC)){
-            return cell.getNumericCellValue();
-        } else if(cell.getCellType().equals(CellType.STRING)){
+        if(cell == null || cell.getCellType().equals(CellType.BLANK)){ return null; }
+
+        if(cell.getCellType().equals(CellType.NUMERIC)){ return cell.getNumericCellValue(); }
+
+        if(cell.getCellType().equals(CellType.STRING)){
             try{
                 return Double.parseDouble(cell.getStringCellValue());
             } catch (NumberFormatException nfe){
-                return fallbackValue;
+                //return fallbackValue;
             }
-        } else{
-            System.out.println("Unable to translate cell value into a Double. Cell: " + cell);
         }
+
+        System.out.println("Unable to translate cell value into a Double. Cell: " + cell);
         return fallbackValue;
     }
 
     /**
      * If the given string is a number ending in ".0", then the ".0" is removed.
      * Otherwise, just returns the argument string.
-     * Helpful if your parsed String is a number format that was auto-corrected to gain a trailing zero.
+     * Helpful if your parsed String is a number format that was autocorrected to gain a trailing zero; e.g. "BIN" column in CDK with a value of "17934" will unhappily become "17934.0"
      * @param numberString Any string
      * @return The whole number part of the String, if it is a string of number format with a single trailing zero. Otherwise, returns the argument.
      */
