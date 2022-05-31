@@ -94,10 +94,9 @@ public class SpreadsheetService {
     public static String getModifiedPartNumber(String partNumber, int rowHashCode) {
         if(partNumber == null || partNumber.trim().equals("")){
             return "XXXX-" + rowHashCode;
-        } else {
-            return makeAlphanumeric(partNumber);
         }
 
+        return makeAlphanumeric(partNumber);
     }
 
     /**

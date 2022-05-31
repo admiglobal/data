@@ -249,7 +249,6 @@ public class StatusService {
             case 48:
                 try{
                     status = RRPowerStatus.valueOf(statusString);
-                    System.out.println("The value we found for " + statusString + " was " + status);
                 } catch (NullPointerException | IllegalArgumentException e) {
                     status = RRPowerStatus.N_STK;
                 }

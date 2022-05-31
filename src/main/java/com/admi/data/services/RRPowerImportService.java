@@ -68,7 +68,7 @@ public class RRPowerImportService {
 
                 if(!dto.isBlankRow()){
                     inventory.add(dto.toAipInventory(dealerId, LocalDate.now()));
-                    System.out.println("DTO: " + dto);
+//                    System.out.println("DTO: " + dto);
                 }
         }
         return inventory;
@@ -100,7 +100,7 @@ public class RRPowerImportService {
      * Sets the value of this cell to the appropriate element in the R&R Power DTO
      * @param cellValue
      * @param dto our RRPowerDto that will get its field set
-     * @param cellDefinition
+     * @param cellDefinition Defines this cell, which here allows us to access the setter class for this attribute of the DTO
      * @param <V> The value to be set
      * @param <W> We don't care about this for our purposes here.
      */
