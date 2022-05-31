@@ -13,6 +13,7 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -45,11 +46,14 @@ public class DealerTrackImportService {
 	@Autowired
 	DealerMasterRepository dealerMasterRepo;
 
+	@Value("${pDrive.address}")
+	String pDriveAddress;
+
 	@Async("asyncExecutor")
 	@Scheduled(cron="0 0 6 * * ?")
 	public void runAllDtInventoryFiles() throws IOException {
 		String filePath = File.separator + File.separator +
-				"192.168.250.90" + File.separator +
+				pDriveAddress + File.separator +
 				"ftp_server" + File.separator +
 				"dtrack" + File.separator;
 		Set<String> files = getFilesInDirectory(filePath);
