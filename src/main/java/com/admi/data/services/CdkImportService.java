@@ -6,6 +6,7 @@ import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.CdkDealersEntity;
 import com.admi.data.entities.CdkPartsInventoryChild;
 import com.admi.data.enums.CdkInventoryField;
+import com.admi.data.pojos.SpreadsheetHeaders;
 import com.admi.data.repositories.CdkDealersRepository;
 import com.admi.data.repositories.CdkPartsInventoryRepository;
 import com.sun.istack.NotNull;
@@ -59,10 +60,11 @@ public class CdkImportService {
 	 * Parses a sheet into a list of AipInventoryEntity's for the given dealer
 	 */
 	public List<AipInventoryEntity> importInventory(Sheet sheet, Long dealerId) throws NoSuchFieldException, IllegalAccessException {
-		Headers headersObject = new Headers(sheet);
-		List<CdkInventoryField> headers = headersObject.headerList;
-		int headerRowNum = headersObject.headerRowNum;
-
+		SpreadsheetHeaders<CdkInventoryField> spreadsheetHeadersObject = new SpreadsheetHeaders<>(sheet,
+																								  CdkInventoryField :: findByColumnName,
+																								  CdkInventoryField.values());
+		List<CdkInventoryField> headers = spreadsheetHeadersObject.getHeaderList();
+		int headerRowNum = spreadsheetHeadersObject.getHeaderRowNum();
 
 		List<AipInventoryEntity> inventoryList = new ArrayList<>();
 

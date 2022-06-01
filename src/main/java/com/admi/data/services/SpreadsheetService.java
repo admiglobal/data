@@ -9,6 +9,7 @@ package com.admi.data.services;
 import com.sun.istack.NotNull;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
+import org.apache.poi.ss.usermodel.Sheet;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,6 +17,7 @@ import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
+import java.util.List;
 import java.util.Locale;
 
 @Service
@@ -56,6 +58,8 @@ public class SpreadsheetService {
         if(cell.getCellType().equals(CellType.NUMERIC)){ return cell.getNumericCellValue(); }
 
         if(cell.getCellType().equals(CellType.STRING)){
+            String value = cell.getStringCellValue();
+            if(value == null || value.equals("")){ return null; }
             try{
                 return Double.parseDouble(cell.getStringCellValue());
             } catch (NumberFormatException nfe){
