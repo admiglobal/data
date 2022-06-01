@@ -1,8 +1,3 @@
-/**
- * A class for describing the headers row of an imported spreadsheet.
- * Especially useful when the header row is not the first row of the spreadsheet
- * @author Julia Betzig +JMJ+
- */
 
 package com.admi.data.pojos;
 
@@ -17,6 +12,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.function.Function;
 
+/**
+ * A class for describing the headers row of an imported spreadsheet.
+ * Especially useful when the header row is not the first row of the spreadsheet
+ * @param <F> An InventoryField enum, such as CdkInventoryField
+ * @author Julia Betzig +JMJ+
+ */
 public class SpreadsheetHeaders<F extends Enum<?>> {
     /**
      * A header that we don't recognize for this InventoryField will be null
@@ -30,10 +31,10 @@ public class SpreadsheetHeaders<F extends Enum<?>> {
      * Since not every inventory file will have all potential InventoryFields,
      * and since some files may contain unknown fields (which we'll return as null),
      * we consider to have found the header row once three known fields have been found in that row.
-     * @param sheet The Apache POI Sheet that we want to find the headers of
+     * @param sheet The Sheet that we want to find the headers of
      * @param findByColumnNameFunction The Function that accepts a String and returns an enum instance for this InventoryField, usually named findByColumnName() or of(). This method should return null if this field isn't recognized.
      * @param inventoryFieldValues The list of all enum values for this InventoryField class
-     * @throws IllegalArgumentException Thrown if the header row is missing or doesn't match our expected (F)ields
+     * @throws IllegalArgumentException Thrown if the header row is missing or doesn't match our expected inventoryFieldValues
      */
     public SpreadsheetHeaders(Sheet sheet,
                               Function<String, F> findByColumnNameFunction,
