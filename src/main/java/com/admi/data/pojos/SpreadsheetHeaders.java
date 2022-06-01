@@ -83,8 +83,6 @@ public class SpreadsheetHeaders<F extends Enum<?>> {
         return headers;
     }
 
-    //Static getters
-
     public List<F> getHeaderList() {
         return headerList;
     }
