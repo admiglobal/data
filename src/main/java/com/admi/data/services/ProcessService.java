@@ -8,6 +8,7 @@ import com.admi.data.repositories.McOrdersRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -28,6 +29,10 @@ public class ProcessService {
 
 	@Autowired
 	McOrdersContentRepository ordersContentRepo;
+
+	@Value("${pDrive.address}")
+	String pDriveAddress;
+
 
 	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory, DmsProvider dms) {
 		return aisKpiService.calculateAisKpi(inventory);
@@ -81,7 +86,7 @@ public class ProcessService {
 
 		try {
 			String filePath = File.separator + File.separator +
-					"192.168.10.90" + File.separator +
+					pDriveAddress + File.separator +
 					"Public" + File.separator +
 					"Development" + File.separator +
 					"Motorcraft_Orders" + File.separator +
@@ -117,7 +122,7 @@ public class ProcessService {
 		McOrdersEntity order = ordersRepo.findByOrderNumber(orderNumber);
 
 		String filePathRoot = File.separator + File.separator +
-				"192.168.10.90" + File.separator +
+				pDriveAddress + File.separator +
 				"Public" + File.separator +
 				"Development" + File.separator +
 				"Motorcraft_Orders" + File.separator +

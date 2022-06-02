@@ -58,6 +58,9 @@ public class ProcessesController {
 	@Autowired
 	TipOrderDetailService tipService;
 
+	@Autowired
+	EmailService emailService;
+
 //	@ResponseBody
 ////	@GetMapping("/processTest")
 //	public String processTest(Model model) {
@@ -75,8 +78,12 @@ public class ProcessesController {
 	@ResponseBody
 	public String motorcraftCancellation(@PathVariable("orderNumber") String orderNumber, Model model)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
-		System.out.println("Order Number: " + orderNumber);
+		System.out.println("Deleting MotorCraft Order Number: " + orderNumber);
 		Boolean deleteSuccessful = processService.deleteMotorcraftOrderFile(orderNumber);
+//		if(deleteSuccessful){
+//			emailService.sendMotorcraftCancellationEmail(orderNumber);
+//		}
+
 		return deleteSuccessful.toString();
 	}
 
