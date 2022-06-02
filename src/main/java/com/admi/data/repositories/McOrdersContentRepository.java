@@ -8,5 +8,6 @@ import java.util.List;
 public interface McOrdersContentRepository extends JpaRepository<McOrdersContentEntity, Long> {
 
 	List<McOrdersContentEntity> findAllByPaCodeAndOrderNumber(String paCode, String orderNumber);
+	List<McOrdersContentEntity> findAllByOrderNumber(String orderNumber);
 
 }

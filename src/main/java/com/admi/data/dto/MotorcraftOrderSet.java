@@ -7,6 +7,9 @@ package com.admi.data.dto;
 import com.admi.data.entities.DowOrderRow;
 import com.admi.data.entities.McOrdersContentEntity;
 import com.admi.data.entities.McOrdersEntity;
+import com.admi.data.repositories.McOrdersContentRepository;
+import com.admi.data.repositories.McOrdersRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
 import java.util.List;
