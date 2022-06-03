@@ -3,6 +3,7 @@ package com.admi.data.repositories;
 import com.admi.data.entities.DealerMasterEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -28,6 +29,21 @@ public interface DealerMasterRepository extends JpaRepository<DealerMasterEntity
 			"and DEALERSHIP_COUNTRY = 'USA'\n" +
 			"order by dm.PA_CODE", nativeQuery = true)
 	List<DealerMasterEntity> findAllInInventory();
+
+	@Query(value = "select *\n" +
+			"from DEALER_MASTER dm\n" +
+			"inner join (\n" +
+			"    select unique pa_code\n" +
+			"    from FORD_DEALER_INVENTORY\n" +
+			") i\n" +
+			"    on i.PA_CODE = dm.PA_CODE\n" +
+			"where PRIMARY_MANUFACTURER_ID = 1\n" +
+			"and TERMINATION_DATE is null\n" +
+			"and DEALERSHIP_COUNTRY = 'USA'\n" +
+			"and i.PA_CODE = :pa\n" +
+			"and dm.PA_CODE = :pa\n" +
+			"order by dm.PA_CODE", nativeQuery = true)
+	DealerMasterEntity findInInventory(@Param("pa") String paCode);
 
 	@Query(value = "select dm.* \n" +
 			"from DEALER_MASTER dm \n" +

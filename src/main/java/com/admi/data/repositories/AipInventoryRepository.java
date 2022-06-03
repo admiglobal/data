@@ -82,16 +82,14 @@ public interface AipInventoryRepository extends JpaRepository<AipInventoryEntity
 					"and ROWNUM = 1", nativeQuery = true)
 	AipInventoryEntity findFirstByMaxDataDate();
 
-	@Query(value =  "select i.DEALER_ID, i.PARTNO, pt.PC_VALUE * 100 CENTS, i.QOH, pt.DESCRIPTION, \n" +
-					"       i.STATUS, i.LAST_SALE, i.LAST_RECEIPT, i.BIN, i.SOURCE, h.STATUS MFG_CONTROLLED, \n" +
-					"       i.DATA_DATE, i.ADMI_STATUS, i.MANUFACTURER, i.QOO, i.TWELVE_MONTH_SALES, i.ENTRY_DATE \n" +
+	@Query(value =  "select i.DEALER_ID, i.PARTNO, pt.PC_VALUE * 100 CENTS, i.QOH, pt.DESCRIPTION, i.STATUS, i.LAST_SALE, i.LAST_RECEIPT, i.BIN, i.SOURCE, h.STATUS MFG_CONTROLLED, i.DATA_DATE, i.ADMI_STATUS, i.MANUFACTURER, i.QOO, i.TWELVE_MONTH_SALES, i.ENTRY_DATE, 0 YTD_MONTHS_WITH_SALES " +
 					"from FORD_DEALER_INVENTORY i \n" +
 					"LEFT OUTER JOIN FORD_DEALER_RIM_HISTORY h \n" +
 					"    on h.PA_CODE = i.PA_CODE \n" +
 					"    and h.PART_NUMBER = i.PARTNO \n" +
 					"INNER JOIN FORD_PT pt \n" +
 					"    on pt.PARTNO = i.PARTNO \n" +
-					"where i.PA_CODE = :pa", nativeQuery = true)
+					"where i.PA_CODE = ':pa'", nativeQuery = true)
 	List<AipInventoryEntity> findFordInventoryByPaCode(@Param("pa") String pa_code);
 
 	default LocalDate getMaxDateByDealerId(Long dealerId) {

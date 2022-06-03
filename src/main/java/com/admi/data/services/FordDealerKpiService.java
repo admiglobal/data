@@ -35,6 +35,13 @@ public class FordDealerKpiService {
 		}
 	}
 
+	public void runDealerByPaCode(String paCode) {
+		DealerMasterEntity dealer = dealerRepo.findInInventory(paCode);
+
+		System.out.println("Running dealer " + dealer.getPaCode() + " - " + dealer.getDealershipName());
+		runSingleDealer(dealer);
+	}
+
 	public void runSingleDealer(DealerMasterEntity dealer) {
 		List<AipInventoryEntity> inventory = inventoryRepo.findFordInventoryByPaCode(dealer.getPaCode());
 		FordDealerKpiEntity kpi;

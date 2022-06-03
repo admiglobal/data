@@ -158,6 +158,15 @@ public class ProcessesController {
 	}
 
 	@ResponseBody
+	@GetMapping("/dpoc/{paCode}")
+	public String processInventoryForDpocSite(@PathVariable("paCode") String paCode) {
+
+		fordDealerKpiService.runDealerByPaCode(paCode);
+
+		return "DPOC dealers ran.";
+	}
+
+	@ResponseBody
 	@GetMapping("/ford/{dateString}")
 	public String processUDBForAllFordPrograms(@PathVariable("dateString") String dateString) {
 		long startTime = System.currentTimeMillis();
