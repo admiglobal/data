@@ -48,4 +48,8 @@ public enum RRPowerStatus implements DmsStatus {
 		return List.of(N_STK, ZEROG);
 	}
 
+//	public String toString(){
+//		return statusName;
+//	}
+
 }

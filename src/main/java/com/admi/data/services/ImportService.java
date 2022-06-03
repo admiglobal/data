@@ -43,6 +43,9 @@ public class ImportService {
 	RRImportService rrImportService;
 
 	@Autowired
+	RRPowerImportService rrPowerImportService;
+
+	@Autowired
 	CdkImportService cdkImportService;
 
 	@Autowired
@@ -73,15 +76,13 @@ public class ImportService {
 
 		List<AipInventoryEntity> inventory;
 
-		System.out.println(fileType);
+		System.out.println("File type: " + fileType);
 
-		if (Objects.equals(fileType, ".csv")) {
-			System.out.println("CSV file selected");
-			inventory = rrImportService.importCsvInventoryFile(file, dealerId, dmsId);
+		if (Objects.equals(fileType, "text/csv")	) {
+			inventory = importCsvInventoryFile(file, dealerId, dmsId);
 		} else if (Objects.equals(fileType, "application/vnd.ms-excel")) {
 			inventory = importXlsInventoryFile(file, dealerId, dmsId);
 		} else {
-//			System.out.println("Inside runAipInventory (line 85 of ImportService.java)");
 			inventory = importXlsxInventoryFile(file, dealerId, dmsId);
 		}
 
@@ -299,7 +300,6 @@ public class ImportService {
 	public List<AipInventoryEntity> importInventoryFile(InputStream file, Long dealerId, int dmsId)
 			throws InvalidFormatException, IllegalAccessException, NoSuchFieldException, IOException {
 		List<AipInventoryEntity> inventory;
-//		System.out.println("Inside importInventoryFile, line 290 of ImportService.java");
 		inventory = importXlsxInventoryFile(file, dealerId, dmsId);
 
 		return inventory;
@@ -418,6 +418,25 @@ public class ImportService {
 		return createImportJob(filePath, dealerId, null, paCode, file.getContentType());
 	}
 
+	public List<AipInventoryEntity> importCsvInventoryFile(InputStream file, Long dealerId, int dmsId){
+		List<AipInventoryEntity> inventory = new ArrayList<>();
+
+		switch(dmsId) {
+			case 1: 	//R&R ERA
+			case 50:	//R&R Ignite
+//				inventory = rrImportService.importCsvInventoryFile(file, dealerId);
+				break;
+			case 48: 	//R&R Power
+				inventory = rrPowerImportService.importCsvInventoryFile(file, dealerId);
+				break;
+			default:
+				System.out.println("Tried to import CSV for DMS ID " + dmsId + ", but there's no CSV import process for this DMS.");
+				break;
+		}
+
+		return inventory;
+	}
+
 	public List<AipInventoryEntity> importXlsxInventoryFile(InputStream file, Long dealerId, int dmsId)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
 		OPCPackage pkg = OPCPackage.open(file);
@@ -441,11 +460,10 @@ public class ImportService {
 
 		switch(dmsId) {
 			case 0:
-			case 1: 	//R&R
-			case 48: 	//R&R
-			case 50:	//R&R
+			case 1: 	//R&R ERA
+			case 50:	//R&R Ignite
 				inventory = rrImportService.importInventory(sheet, dealerId);
-				break;
+				break; //note that RR Power runs under the importCsvInventoryFile process
 			case 8:		//CDK
 			case 35:	//CDK
 			case 37:	//CDK

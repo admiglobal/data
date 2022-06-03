@@ -50,8 +50,8 @@ public class CdkDto {
         AipInventoryEntity inv = new AipInventoryEntity();
 
         inv.setDealerId(dealerId);
-        inv.setPartNo(CdkImportService.getModifiedPartNumber(partNo, this.hashCode()));
-        inv.setCents(this.costCents == null ? 0 : Math.toIntExact(this.costCents));
+        inv.setPartNo(SpreadsheetService.getPartNumberDbFormat(partNo, this.hashCode()));
+        inv.setCents(this.costCents == null ? null : Math.toIntExact(this.costCents));
         inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
         inv.setStatus(getModifiedSpecialStatus());
