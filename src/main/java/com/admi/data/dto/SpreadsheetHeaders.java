@@ -1,5 +1,5 @@
 
-package com.admi.data.pojos;
+package com.admi.data.dto;
 
 import com.admi.data.services.SpreadsheetService;
 import org.apache.poi.ss.usermodel.Cell;
