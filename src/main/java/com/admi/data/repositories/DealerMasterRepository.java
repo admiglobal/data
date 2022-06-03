@@ -49,6 +49,8 @@ public interface DealerMasterRepository extends JpaRepository<DealerMasterEntity
 			"where SALES_CODE = ( \n" +
 			"    select SALES_CODE from DEALER_MASTER \n" +
 			"    where PA_CODE = :paCode \n" +
+			"    and termination_date is null \n" +
+			"    and PRIMARY_MANUFACTURER_ID = 1 \n" +
 			"    ) \n" +
 			"and PA_CODE <> :paCode",
 			nativeQuery = true)
