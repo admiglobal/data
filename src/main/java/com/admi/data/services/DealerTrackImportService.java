@@ -55,7 +55,7 @@ public class DealerTrackImportService {
 		for (String fileName : files) {
 			String paCode = fileName.substring(0, fileName.indexOf('.'));
 
-			if (!paCode.equals("00489")) {
+			if (!paCode.equals("00489") && !paCode.equals("05547")) {
 				System.out.println("Running DT Dealer: " + paCode);
 
 				DealerMasterEntity dealer = dealerMasterRepo.findFirstByPaCode(paCode);

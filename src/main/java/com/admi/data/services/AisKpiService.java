@@ -164,7 +164,7 @@ public class AisKpiService {
 			kpi.convertAllCentsToDollars();
 		}
 
-//		kpiRepo.saveAndFlush(kpi);
+		kpiRepo.saveAndFlush(kpi);
 		System.out.println(kpi);
 
 		return kpi;
@@ -189,7 +189,7 @@ public class AisKpiService {
 	private Long getPartTotalByStatus(AipInventoryEntity part, List<DmsStatus> statusList, Function<AipInventoryEntity, String> fieldGetter) {
 		String status = fieldGetter.apply(part);
 
-		System.out.println("Status: " + status);
+//		System.out.println("Status: " + status);
 
 		if (statusList.stream().anyMatch(s -> Objects.equals(s.toString(), status))) {
 			return (long) part.getQoh() * part.getCents();

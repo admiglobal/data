@@ -30,8 +30,8 @@ public class ProcessService {
 	McOrdersContentRepository ordersContentRepo;
 
 	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory, DmsProvider dms) {
-		return aisKpiService.calculateAisKpi(inventory);
-//		return aisKpiService.calculateAisKpi(inventory, dms);
+//		return aisKpiService.calculateAisKpi(inventory);
+		return aisKpiService.calculateAisKpi(inventory, dms);
 	}
 
 	public void generateDowOrders(List<MotorcraftOrderSet> orders) throws IOException {

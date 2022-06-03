@@ -82,9 +82,9 @@ public class CdkImportService {
 					try {
 						setDtoField(cell, rowDTO, field.getDefinition());
 					} catch(Exception e) {
-						System.out.println("Cell: " + cell);
+						System.out.print("Cell: " + cell + " | ");
 						if (field != null)
-							System.out.println("Field: " + field);
+							System.out.print("Field: " + field + " | ");
 						e.printStackTrace();
 					}
 				}
@@ -95,6 +95,7 @@ public class CdkImportService {
 			}
 		}
 
+		System.out.println("");
 		System.out.println("Row Count: " + inventoryList.size());
 
 		return inventoryList;
