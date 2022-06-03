@@ -79,8 +79,8 @@ public class EmailService {
 
 
 	public void sendMotorcraftCancellationEmail(String orderNumber) throws MessagingException {
-		boolean test = true;
-		String devEmail = (test)? "jbetzig@admiglobal.com":"kmowers@admiglobal.com";
+		String devEmail = "jbetzig@admiglobal.com";
+//		String devEmail = "kmowers@admiglobal.com";
 
 		MotorcraftOrderSet order = new MotorcraftOrderSet(mcOrdersRepo.findByOrderNumber(orderNumber),
 														  mcOrdersContentRepo.findAllByOrderNumber(orderNumber),
@@ -95,16 +95,18 @@ public class EmailService {
 		String[] bcc = {devEmail};
 		String subject = "Motorcraft Order Cancellation - " + order.getOrder().getPaCode();
 
-		String message = "The following Motorcraft order has been canceled. For assistance, contact your ADMI representative.";
+		String message = "The following Motorcraft order has been canceled. For assistance, contact the support center at Motorcraft@admigobal.com.";
 
 		Context context = new Context();
 
 		context.setVariable("message", message);
 		context.setVariable("order", order.getOrder());
 
-		String html = templateEngine.process("email/importMessage", context);
+		String html = templateEngine.process("email/motorcraftCancellation", context);
 
 		try {
+			System.out.println("Sending email to: " + to);
+
 			emailUtility.sendMimeMessage(to, from, bcc, subject, html);
 		} catch (MailSendException e) {
 

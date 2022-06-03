@@ -80,18 +80,16 @@ public class ProcessesController {
 	public String motorcraftCancellation(@PathVariable("orderNumber") String orderNumber, Model model)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
 		System.out.println("Deleting MotorCraft Order Number: " + orderNumber);
-		Boolean deleteSuccessful = processService.deleteMotorcraftOrderFile(orderNumber);
-		if(deleteSuccessful){
-			try{
-				emailService.sendMotorcraftCancellationEmail(orderNumber);
-			} catch (MessagingException me){
-				System.out.println("Failed to send Motorcraft cancellation email for ADMI order number " + orderNumber);
-				System.out.println(me.getMessage());
-				me.printStackTrace();
-			}
 
+		try{
+			emailService.sendMotorcraftCancellationEmail(orderNumber);
+		} catch (MessagingException me){
+			System.out.println("Failed to send Motorcraft cancellation email for ADMI order number " + orderNumber);
+			System.out.println(me.getMessage());
+			me.printStackTrace();
 		}
 
+		Boolean deleteSuccessful = processService.deleteMotorcraftOrderFile(orderNumber);
 		return deleteSuccessful.toString();
 	}
 
