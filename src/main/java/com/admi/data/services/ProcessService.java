@@ -135,10 +135,15 @@ public class ProcessService {
 				filePathRoot + order.getPoNumber() + "_" + order.getOrderNumber() + ".xlsx"
 		};
 
+		boolean fileNotFound = true;
+
 		//try each filename format
 		for(String orderFileFormat : orderFileFormats){
+			File file = new File(orderFileFormat);
+
+			if(file.exists()) { fileNotFound = false; }
+
 			try {
-				File file = new File(orderFileFormat);
 				if(file.delete()){
 					System.out.println("Successfully deleted file from P: drive for Motorcraft order #" + orderNumber + ": " + orderFileFormat);
 					return true;
@@ -146,7 +151,16 @@ public class ProcessService {
 
 			} catch (SecurityException se) {
 				se.printStackTrace();
+				if(file.exists()){
+					System.out.println("Unable to delete file from P: drive for Motorcraft order #" + orderNumber);
+					return false;
+				}
 			}
+		}
+
+		if(fileNotFound){
+			System.out.println("Motorcraft file for order #" + orderNumber + " was not found; assumed already deleted.");
+			return true;
 		}
 
 		System.out.println("Unable to delete file from P: drive for Motorcraft order #" + orderNumber);
