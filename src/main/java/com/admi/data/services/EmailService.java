@@ -84,7 +84,7 @@ public class EmailService {
 
 		MotorcraftOrderSet order = new MotorcraftOrderSet(mcOrdersRepo.findByOrderNumber(orderNumber),
 														  mcOrdersContentRepo.findAllByOrderNumber(orderNumber),
-														  null);
+														  null); //issues always null because these are associated with upload isues, not cancellation issues
 
 		if (order.getOrder().getEmail() == null || order.getOrder().getEmail().equals("")) {
 			throw new MessagingException("Unable to deliver cancellation confirmation email for Motorcraft order: the email field for order number " + orderNumber + " is empty in database table MC_ORDERS.");
@@ -95,12 +95,12 @@ public class EmailService {
 		String[] bcc = {devEmail};
 		String subject = "Motorcraft Order Cancellation - " + order.getOrder().getPaCode();
 
-		String message = "The following Motorcraft order has been canceled. For assistance, contact the support center at Motorcraft@admigobal.com.";
+		String message = "The following Motorcraft order has been canceled by an ADMI employee. If you have any questions, please contact the support center at Motorcraft@admigobal.com.";
 
 		Context context = new Context();
 
 		context.setVariable("message", message);
-		context.setVariable("order", order.getOrder());
+		context.setVariable("order", order);
 
 		String html = templateEngine.process("email/motorcraftCancellation", context);
 
