@@ -79,8 +79,8 @@ public class EmailService {
 
 
 	public void sendMotorcraftCancellationEmail(String orderNumber) throws MessagingException {
-		String devEmail = "jbetzig@admiglobal.com";
-//		String devEmail = "kmowers@admiglobal.com";
+//		String devEmail = "jbetzig@admiglobal.com";
+		String devEmail = "kmowers@admiglobal.com";
 
 		MotorcraftOrderSet order = new MotorcraftOrderSet(mcOrdersRepo.findByOrderNumber(orderNumber),
 														  mcOrdersContentRepo.findAllByOrderNumber(orderNumber),
