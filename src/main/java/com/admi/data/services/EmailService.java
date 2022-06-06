@@ -1,7 +1,10 @@
 package com.admi.data.services;
 
 import com.admi.data.dto.ImportIssue;
+import com.admi.data.dto.MotorcraftOrder;
 import com.admi.data.dto.MotorcraftOrderSet;
+import com.admi.data.repositories.McOrdersContentRepository;
+import com.admi.data.repositories.McOrdersRepository;
 import com.admi.data.utilities.EmailUtility;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.MailSendException;
@@ -16,6 +19,12 @@ import java.util.List;
 
 @Service
 public class EmailService {
+
+	@Autowired
+	McOrdersRepository mcOrdersRepo;
+
+	@Autowired
+	McOrdersContentRepository mcOrdersContentRepo;
 
 	@Autowired
 	private EmailUtility emailUtility;
@@ -67,6 +76,45 @@ public class EmailService {
 			throw e;
 		}
 	}
+
+
+	public void sendMotorcraftCancellationEmail(String orderNumber) throws MessagingException {
+//		String devEmail = "jbetzig@admiglobal.com";
+		String devEmail = "kmowers@admiglobal.com";
+
+		MotorcraftOrderSet order = new MotorcraftOrderSet(mcOrdersRepo.findByOrderNumber(orderNumber),
+														  mcOrdersContentRepo.findAllByOrderNumber(orderNumber),
+														  null); //issues always null because these are associated with upload isues, not cancellation issues
+
+		if (order.getOrder().getEmail() == null || order.getOrder().getEmail().equals("")) {
+			throw new MessagingException("Unable to deliver cancellation confirmation email for Motorcraft order: the email field for order number " + orderNumber + " is empty in database table MC_ORDERS.");
+		}
+
+		String to = order.getOrder().getEmail();
+		String from = "Motorcraft@admiglobal.com";
+		String[] bcc = {devEmail};
+		String subject = "Motorcraft Order Cancellation - " + order.getOrder().getPaCode();
+
+		String message = "The following Motorcraft order has been canceled by an ADMI employee. If you have any questions, please contact the support center at Motorcraft@admigobal.com.";
+
+		Context context = new Context();
+
+		context.setVariable("message", message);
+		context.setVariable("order", order);
+
+		String html = templateEngine.process("email/motorcraftCancellation", context);
+
+		try {
+			System.out.println("Sending email to: " + to);
+
+			emailUtility.sendMimeMessage(to, from, bcc, subject, html);
+		} catch (MailSendException e) {
+
+			emailUtility.sendMimeMessage(devEmail, from, bcc,"Order Failed to Send - " + subject, html);
+			throw e;
+		}
+	}
+
 
 	public void sendAipUploadVerificationEmail(String userEmail, String paCode) throws MessagingException {
 		String errorEmail = "errors@admiglobal.com";

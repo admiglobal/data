@@ -8,6 +8,7 @@ import com.admi.data.repositories.McOrdersRepository;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -28,6 +29,10 @@ public class ProcessService {
 
 	@Autowired
 	McOrdersContentRepository ordersContentRepo;
+
+	@Value("${pDrive.address}")
+	String pDriveAddress;
+
 
 	public KpiEntity calculateAisKpi(List<AipInventoryEntity> inventory, DmsProvider dms) {
 //		return aisKpiService.calculateAisKpi(inventory);
@@ -81,7 +86,7 @@ public class ProcessService {
 
 		try {
 			String filePath = File.separator + File.separator +
-					"192.168.10.90" + File.separator +
+					pDriveAddress + File.separator +
 					"Public" + File.separator +
 					"Development" + File.separator +
 					"Motorcraft_Orders" + File.separator +
@@ -117,7 +122,7 @@ public class ProcessService {
 		McOrdersEntity order = ordersRepo.findByOrderNumber(orderNumber);
 
 		String filePathRoot = File.separator + File.separator +
-				"192.168.10.90" + File.separator +
+				pDriveAddress + File.separator +
 				"Public" + File.separator +
 				"Development" + File.separator +
 				"Motorcraft_Orders" + File.separator +
@@ -130,10 +135,15 @@ public class ProcessService {
 				filePathRoot + order.getPoNumber() + "_" + order.getOrderNumber() + ".xlsx"
 		};
 
+		boolean fileNotFound = true;
+
 		//try each filename format
 		for(String orderFileFormat : orderFileFormats){
+			File file = new File(orderFileFormat);
+
+			if(file.exists()) { fileNotFound = false; }
+
 			try {
-				File file = new File(orderFileFormat);
 				if(file.delete()){
 					System.out.println("Successfully deleted file from P: drive for Motorcraft order #" + orderNumber + ": " + orderFileFormat);
 					return true;
@@ -141,7 +151,16 @@ public class ProcessService {
 
 			} catch (SecurityException se) {
 				se.printStackTrace();
+				if(file.exists()){
+					System.out.println("Unable to delete file from P: drive for Motorcraft order #" + orderNumber);
+					return false;
+				}
 			}
+		}
+
+		if(fileNotFound){
+			System.out.println("Motorcraft file for order #" + orderNumber + " was not found; assumed already deleted.");
+			return true;
 		}
 
 		System.out.println("Unable to delete file from P: drive for Motorcraft order #" + orderNumber);

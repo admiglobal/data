@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.MessagingException;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -58,6 +59,9 @@ public class ProcessesController {
 	@Autowired
 	TipOrderDetailService tipService;
 
+	@Autowired
+	EmailService emailService;
+
 //	@ResponseBody
 ////	@GetMapping("/processTest")
 //	public String processTest(Model model) {
@@ -69,13 +73,22 @@ public class ProcessesController {
 //	}
 
 	/**
-	 * Called to delete a Motorcraft order file from the P: drive
+	 * Called to delete a Motorcraft order file from the P: drive and send an email notification of the cancellation.
 	 */
 	@PostMapping(value = "/motorcraftCancellation/{orderNumber}")
 	@ResponseBody
 	public String motorcraftCancellation(@PathVariable("orderNumber") String orderNumber, Model model)
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
-		System.out.println("Order Number: " + orderNumber);
+		System.out.println("Deleting MotorCraft Order Number: " + orderNumber);
+
+		try{
+			emailService.sendMotorcraftCancellationEmail(orderNumber);
+		} catch (MessagingException me){
+			System.out.println("Failed to send Motorcraft cancellation email for ADMI order number " + orderNumber);
+			System.out.println(me.getMessage());
+			me.printStackTrace();
+		}
+
 		Boolean deleteSuccessful = processService.deleteMotorcraftOrderFile(orderNumber);
 		return deleteSuccessful.toString();
 	}
