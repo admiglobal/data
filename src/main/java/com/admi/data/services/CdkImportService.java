@@ -76,13 +76,14 @@ public class CdkImportService {
 					Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL); //prevents skipping over blank cells
 					CdkInventoryField field = headers.get(i);
 
-					try {
-						setDtoField(cell, rowDTO, field.getDefinition());
-					} catch(Exception e) {
-						System.out.print("Cell: " + cell + " | ");
-						if (field != null)
+					if (field != null) {
+						try {
+							setDtoField(cell, rowDTO, field.getDefinition());
+						} catch(Exception e) {
+							System.out.print("Cell: " + cell + " | ");
 							System.out.print("Field: " + field + " | ");
-						e.printStackTrace();
+							e.printStackTrace();
+						}
 					}
 				}
 

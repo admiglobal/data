@@ -7,6 +7,7 @@ package com.admi.data.dto;
 
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.services.CdkImportService;
+import com.admi.data.services.SpreadsheetService;
 import com.sun.istack.NotNull;
 import org.apache.tomcat.jni.Local;
 
@@ -138,7 +139,7 @@ public class CdkDto {
      * @param partNo
      */
     public void setPartNo(String partNo) {
-        this.partNo = CdkImportService.makeAlphanumeric(partNo);
+        this.partNo = SpreadsheetService.makeAlphanumeric(partNo);
     }
 
     public String getPartNo() {
