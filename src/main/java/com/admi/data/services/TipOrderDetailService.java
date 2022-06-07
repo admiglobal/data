@@ -73,7 +73,10 @@ public class TipOrderDetailService {
             }
 
             if (part.getQoo() == null && !part.getPartNo().startsWith("DT")) {
-                if (part.getQoh() == 0 && monthsNoSale <= 6 && part.getYtdMonthsWithSales() >= 2 && part.getTwelveMonthSales() > 0) {
+                if (part.getQoh() == 0
+                        && monthsNoSale <= 6
+                        && part.getYtdMonthsWithSales() != null && part.getYtdMonthsWithSales() >= 2
+                        && part.getTwelveMonthSales() != null && part.getTwelveMonthSales() > 0) {
                     lines++;
                     orderTotal += part.getCents();
 
