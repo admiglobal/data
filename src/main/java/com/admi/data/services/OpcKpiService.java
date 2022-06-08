@@ -52,17 +52,28 @@ public class OpcKpiService {
     /**
      * Runs process for a single OPC dealer.
      * Updates OPC_TSP_200_DATA and takes a performance snapshot.
-     * If we didn't receive new inventory data, doesn't delete old data but still takes a new snapshot.
+     * If there's no inventory data for this P&A code, we check if this dealer has a non-QL primary the data may be listed under.
+     * If we didn't receive new inventory data for this dealer or any dealer that shares its sales code,
+     * doesn't delete old data but still takes a new snapshot.
      */
     public void processSingleOpcDealer(String paCode){
         //if there's no data for this paCode, check other dealers with this PA code (sometimes, the primary dealership with the inventory data is marked as non-QuickLane, so isn't in dealer list initially)
-        if(fordDealerInventoryRepo.findFirstByPaCode(paCode) == null){
+        if(fordDealerInventoryRepo.findFirstByPaCode(paCode) == null){ //no data for this PA code
+            System.out.println("No FDI data found for pa:" + paCode);
             List<DealerMasterEntity> sameSalesCodeDealers = dealerMasterRepo.findSameSalesCodeDealers(paCode);
+
+            System.out.println("Same sales code dealers:");
+            for(DealerMasterEntity dealer: sameSalesCodeDealers){
+                System.out.println("\t" + dealer.getPaCode() + ": " + dealer.getDealershipName());
+            }
 
             for(DealerMasterEntity dealer : sameSalesCodeDealers){
                 if(fordDealerInventoryRepo.findFirstByPaCode(dealer.getPaCode()) != null){
-                    processSingleOpcDealer(dealer.getPaCode());
+                    System.out.println("Found inventory data for " + dealer.getPaCode() + ". Running processSingleOpcDealer.");
+                    processSingleOpcDealer(dealer.getPaCode()); //run process for the parent dealer
                     return;
+                } else{
+                    System.out.println("No inventory data for " + dealer.getPaCode());
                 }
             }
             //if we couldn't find data for this sales code:
@@ -70,15 +81,17 @@ public class OpcKpiService {
 
         } else{ //this PA codes does have inventory data in ford_dealer_inventory
             try{
-                updateOpc200Data(paCode);
+                System.out.println("Would be updating OPC 200 data for pa:" + paCode);
+//                updateOpc200Data(paCode);
             } catch (Exception e){
                 e.printStackTrace();
-                System.out.println("Failed to run OPC process for P&A Code " + paCode + ".");
+                System.out.println("Failed to update OPC 200 data for P&A Code " + paCode + ".");
             }
 
         }
 
-        takePerformanceSnapshot(paCode); //take snapshot AFTER updating
+        System.out.println("Would be taking a performance snapshot for pa:" + paCode);
+//        takePerformanceSnapshot(paCode); //take snapshot AFTER updating
         opcTsp200DataRepo.flush();
     }
 
