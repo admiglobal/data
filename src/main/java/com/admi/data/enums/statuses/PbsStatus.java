@@ -15,7 +15,7 @@ public enum PbsStatus implements DmsStatus {
 //	STK("Stock/Active", new String[]{"STK"}),
 	STOCK("Stock/Active",  new String[]{"STOCK", "STK", "S"}),
 	D("Delete", new String[]{"D"}),
-	C("Cores", new String[]{"C"}),
+	C("Cores", new String[]{"C", "CORE"}),
 	R("Replaced", new String[]{"R"}),
 	MANUAL_ORDER("Manual Order", new String[]{"MANUAL ORDER", "MANUAL_ORDER"}),
 	MEMO("Memo", new String[]{"MEMO"}),

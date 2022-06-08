@@ -232,6 +232,8 @@ public class StatusService {
             case 30:
                 try {
                     status = PbsStatus.findStatus(statusString); //case-insensitive
+                    if(status == null)
+                        status = PbsStatus.TEST;
                 } catch (NullPointerException | IllegalArgumentException e) {
                     status = PbsStatus.TEST;
                 }
