@@ -129,11 +129,13 @@ public class ProcessesController {
 	}
 
 	@ResponseBody
-	@GetMapping("/opc")
-	public String processOpcKpi() {
+	@GetMapping("/opc/{snapshotDate}")
+	public String processOpcKpi(@PathVariable("snapshotDate") String dateString) {
+		LocalDate snapshotDate = LocalDate.parse(dateString);
+
 		long startTime = System.currentTimeMillis();
 
-		opcKpiService.runOpcProcess();
+		opcKpiService.runOpcProcess(snapshotDate);
 
 		long endTime = System.currentTimeMillis();
 		Long l = endTime-startTime;
@@ -143,11 +145,16 @@ public class ProcessesController {
 				"Time to complete: " + completionTime + " seconds.";
 	}
 
+	/**
+	 * @param dateString Of the format YYYY-MM-DD
+	 */
 	@ResponseBody
-	@GetMapping("/opc/{paCode}")
-	public String processSingleOpcDealer(@PathVariable("paCode") String paCode) {
+	@GetMapping("/opc/{paCode}/{snapshotDate}")
+	public String processSingleOpcDealer(@PathVariable("paCode") String paCode, @PathVariable("snapshotDate") String dateString) {
+		LocalDate snapshotDate = LocalDate.parse(dateString);
+
 		long startTime = System.currentTimeMillis();
-		opcKpiService.processSingleOpcDealer(paCode);
+		opcKpiService.processSingleOpcDealer(paCode, snapshotDate);
 		long endTime = System.currentTimeMillis();
 		Long l = endTime-startTime;
 		double completionTime = l.doubleValue();
@@ -188,7 +195,7 @@ public class ProcessesController {
 
 		cpcService.runCpcDealers(date);
 		fordDealerKpiService.runAllFordDealers();
-		opcKpiService.runOpcProcess();
+		opcKpiService.runOpcProcess(date);
 
 		long endTime = System.currentTimeMillis();
 		Long l = endTime-startTime;

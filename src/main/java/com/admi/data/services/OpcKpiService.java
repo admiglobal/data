@@ -4,6 +4,7 @@ import com.admi.data.dto.Opc200PartDto;
 import com.admi.data.dto.OpcKpiDto;
 import com.admi.data.entities.*;
 import com.admi.data.repositories.*;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -36,14 +37,14 @@ public class OpcKpiService {
     /**
      * Runs the OPC process for all QL dealers.
      */
-    public void runOpcProcess(){
+    public void runOpcProcess(LocalDate snapshotDate){
         long startTime = System.currentTimeMillis();
 
         String[] nonQlPrimariesPaCodes = {"08972"}; //non-QL dealers we want to include because they have a secondary that's a QL
         List<DealerMasterEntity> quickLaneDealers = dealerMasterRepo.findAllQuickLaneDealers(nonQlPrimariesPaCodes);
 
         for(DealerMasterEntity dealer : quickLaneDealers){
-            processSingleOpcDealer(dealer.getPaCode());
+            processSingleOpcDealer(dealer.getPaCode(), snapshotDate);
         }
 
         long endTime = System.currentTimeMillis();
@@ -55,13 +56,13 @@ public class OpcKpiService {
      * Updates OPC_TSP_200_DATA and takes a performance snapshot.
      * If we didn't receive new inventory data, doesn't delete old data but still takes a new snapshot.
      */
-    public void processSingleOpcDealer(String paCode){
+    public void processSingleOpcDealer(String paCode, LocalDate snapshotDate){
         //if there's no data for this paCode, check other dealers with this PA code (sometimes, the primary dealership with the inventory data is marked as non-QuickLane, so isn't in dealer list initially)
         if(fordDealerInventoryRepo.findFirstByPaCode(paCode) == null){
             List<DealerMasterEntity> sameSalesCodeDealers = dealerMasterRepo.findSameSalesCodeDealers(paCode);
             for(DealerMasterEntity dealer : sameSalesCodeDealers){
                 if(fordDealerInventoryRepo.findFirstByPaCode(dealer.getPaCode()) != null){
-                    processSingleOpcDealer(dealer.getPaCode());
+                    processSingleOpcDealer(dealer.getPaCode(), snapshotDate);
                     return;
                 }
             }
@@ -78,7 +79,7 @@ public class OpcKpiService {
 
         }
 
-        takePerformanceSnapshot(paCode); //take snapshot AFTER updating
+        takePerformanceSnapshot(paCode, snapshotDate); //take snapshot AFTER updating
         opcTsp200DataRepo.flush();
     }
 
@@ -91,7 +92,7 @@ public class OpcKpiService {
         int counter = 0;
         for(String paCode : top90Dealers){
 //            double completionTime =
-                    processSingleOpcDealer(paCode);
+                    processSingleOpcDealer(paCode, LocalDate.now());
 //            System.out.println("(" + ++counter + "/90) Ran process for " + paCode + " in " + completionTime + " seconds.");
         }
     }
@@ -175,11 +176,11 @@ public class OpcKpiService {
      * Takes an inventory breakdown performance snapshot for a particular dealer.
      * If we haven't received new data from this dealer from Ford, we just copy our last snapshot.
      */
-    public void takePerformanceSnapshot(String paCode){
+    public void takePerformanceSnapshot(String paCode, LocalDate snapshotDate){
         if(fordDealerInventoryRepo.findFirstByPaCode(paCode) != null){
-            takePerformanceSnapshotFromInventory(paCode);
+            takePerformanceSnapshotFromInventory(paCode, snapshotDate);
         } else{
-            copyLastSnapshotForToday(paCode);
+            copyLastSnapshotForToday(paCode, snapshotDate);
         }
     }
 
@@ -187,7 +188,7 @@ public class OpcKpiService {
      * Saves a performance snapshot for a particular dealer's inventory breakdown by brand.
      * The "snapshot date" is LocalDate.now().
      */
-    public void takePerformanceSnapshotFromInventory(String paCode){
+    public void takePerformanceSnapshotFromInventory(String paCode, LocalDate snapshotDate){
         Integer opcQoh = zeroIfNull(opcTsp200DataRepo.countAllByPaCode(paCode));
         Integer opcValue = zeroIfNull(opcTsp200DataRepo.sumPartCostCentsByPaCode(paCode));
 
@@ -195,7 +196,7 @@ public class OpcKpiService {
 
         OpcWeeklyPerformanceEntity snapshot = new OpcWeeklyPerformanceEntity();
         snapshot.setPaCode(paCode);
-        snapshot.setSnapshotDate(LocalDate.now());
+        snapshot.setSnapshotDate(snapshotDate);
         snapshot.setQoh(opcQoh);
         snapshot.setOpcValueCents(opcValue);
         snapshot.setTotalSku(0); //default these to zeros: may not be data for all of them
@@ -278,10 +279,10 @@ public class OpcKpiService {
      * Copies the most recent performance snapshot to today for a certain dealer.
      * (Useful for when we don't receive new data from Ford, but still want a snapshot).
      */
-    public void copyLastSnapshotForToday(String paCode){
+    public void copyLastSnapshotForToday(String paCode, LocalDate snapshotDate){
         OpcWeeklyPerformanceEntity latestSnapshot = opcWeeklyPerformanceRepo.findFirstByPaCodeOrderBySnapshotDateDesc(paCode);
         if(latestSnapshot != null){
-            latestSnapshot.setSnapshotDate(LocalDate.now());
+            latestSnapshot.setSnapshotDate(snapshotDate);
             opcWeeklyPerformanceRepo.save(latestSnapshot);
         } else{ //if we don't have any prior snapshot data, return all nulls
             latestSnapshot = new OpcWeeklyPerformanceEntity();
