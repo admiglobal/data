@@ -80,6 +80,12 @@ public class CdkDto {
                 twelveMonthSales += Math.toIntExact(monthSales);
         }
 
+        //Could indicate monthly sales columns are missing: in that case, use yrsl (if we have it)
+        if(twelveMonthSales == 0){
+            twelveMonthSales = Math.toIntExact(
+                    (this.yrsl == null) ? 0 : yrsl);
+        }
+
         return twelveMonthSales;
     }
 
