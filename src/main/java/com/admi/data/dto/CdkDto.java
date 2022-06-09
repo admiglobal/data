@@ -63,19 +63,24 @@ public class CdkDto {
         inv.setAdmiStatus(CdkImportService.getAdmiStatus(this.getStatus()));
         //manufacturer
         inv.setQoo(this.quantityOnOrder == null ? null : Math.toIntExact(this.quantityOnOrder));
-        inv.setTwelveMonthSales(this.yrsl == null ? null : Math.toIntExact(this.yrsl));
+        inv.setTwelveMonthSales(this.getTwelveMonthSales());
         inv.setEntryDate(this.getEntry());
         inv.setYtdMonthsWithSales(this.calculateYtdMonthsWithSales());
 
         return inv;
     }
 
-    private LocalDate getDefaultDateIfNull(LocalDate date) {
-        if (date == null) {
-            return LocalDate.of(2000,1,1);
-        } else {
-            return date;
+    public int getTwelveMonthSales(){
+        Long[] monthsSales = {jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec};
+
+        int twelveMonthSales = 0;
+
+        for(Long monthSales: monthsSales){
+            if(monthSales != null)
+                twelveMonthSales += Math.toIntExact(monthSales);
         }
+
+        return twelveMonthSales;
     }
 
     /**
