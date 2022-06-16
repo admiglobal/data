@@ -30,11 +30,11 @@ public interface PriceTapeRepository extends JpaRepository<PriceTapeEntity, Long
             "ON FDI.PA_CODE = DM.PA_CODE\n" +
             "WHERE FPT.TAPE = 'FORD_US'\n" +
             "AND DM.DEALER_ID = :dealerId\n" +
-            "AND FDI.DATA_DATE = :dataDate\n" +
+//            "AND FDI.DATA_DATE = :dataDate\n" +
             "AND DM.PRIMARY_MANUFACTURER_ID = 1\n" +
             "AND DM.TERMINATION_DATE IS NULL\n" +
             "AND DM.DEALERSHIP_COUNTRY = 'USA'\n" +
             "AND FDI.QOH > 0", nativeQuery = true)
-    List<PriceTapeEntity> findAllOnHandDealerPartsInPriceTape(@Param("dealerId") Long dealerId,
-                                                              @Param("dataDate") LocalDate dataDate);
+    List<PriceTapeEntity> findAllOnHandDealerPartsInPriceTape(@Param("dealerId") Long dealerId);
+//                                                              @Param("dataDate") LocalDate dataDate);
 }
