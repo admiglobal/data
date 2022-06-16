@@ -73,7 +73,7 @@ public class CpcKpiService {
         return totalInvestment.setScale(0, RoundingMode.HALF_EVEN);
     }
 
-    private List<AipInventoryEntity> getOnHandCpcParts(List<AipInventoryEntity> inventory, List<CpcPartsListsEntity> cpcParts) {
+    private List<AipInventoryEntity> getOnHandCpcParts(List<AipInventoryEntity> inventory, List<CpcPartsListsEntity> cpcParts, LocalDate dataDate) {
 
         Map<String, String> cpcPartsSku = cpcParts.stream()
                 .collect(Collectors.toMap(CpcPartsListsEntity::getPrimarySku,
@@ -94,7 +94,7 @@ public class CpcKpiService {
                 onHandCpcParts.add(part);
                 onHandEntities.add(new CpcPartsOnHandEntity(
                         part.getDealerId(),
-                        part.getDataDate(),
+                        dataDate,
                         part.getPartNo(),
                         part.getQoh()));
                 formattedCpcPartsSku.remove(part.getPartNo());
@@ -108,7 +108,7 @@ public class CpcKpiService {
                         onHandCpcParts.add(part);
                         onHandEntities.add(new CpcPartsOnHandEntity(
                                 part.getDealerId(),
-                                part.getDataDate(),
+                                dataDate,
                                 altPart.getKey(),
                                 part.getQoh()));
                         iterator.remove();
@@ -123,12 +123,12 @@ public class CpcKpiService {
 
     public void calculateCpcKpi(Long dealerId, LocalDate dataDate, String partsList, Short tierList) {
 
-        List<AipInventoryEntity> collisionParts = inventoryRepo.findAllCollisionPartsInInventory(dealerId, dataDate);
-        List<AipInventoryEntity> nonCollisionParts = inventoryRepo.findAllNonCollisionPartsInInventory(dealerId, dataDate);
+        List<AipInventoryEntity> collisionParts = inventoryRepo.findAllCollisionPartsInInventory(dealerId);
+        List<AipInventoryEntity> nonCollisionParts = inventoryRepo.findAllNonCollisionPartsInInventory(dealerId);
         List<CpcPartsListsEntity> cpcParts = cpcPartsListsRepo.findByPartsListAndRankIsLessThanEqual(partsList, tierList);
-        List<PriceTapeEntity> allOnHandDealerPartsInPriceTape = priceTapeRepo.findAllOnHandDealerPartsInPriceTape(dealerId, dataDate);
+        List<PriceTapeEntity> allOnHandDealerPartsInPriceTape = priceTapeRepo.findAllOnHandDealerPartsInPriceTape(dealerId);
         List<PriceTapeEntity> allCpcListPartsInPriceTape = priceTapeRepo.findAllCpcListPartsInPriceTape(partsList, tierList);
-        List<AipInventoryEntity> onHandCpcParts = getOnHandCpcParts(collisionParts, cpcParts);
+        List<AipInventoryEntity> onHandCpcParts = getOnHandCpcParts(collisionParts, cpcParts, dataDate);
         CpcObjectivesEntity objectiveMonth = cpcObjectivesRepo.findByObjectiveMonth(dataDate.withDayOfMonth(1));
 
         long totalCollisionSku = collisionParts.size();

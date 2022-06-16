@@ -29,15 +29,15 @@ public interface AipInventoryRepository extends JpaRepository<AipInventoryEntity
 			"ON FDI.PA_CODE = DM.PA_CODE\n" +
 			"WHERE FDI.QOH > 0\n" +
 			"AND DM.DEALER_ID = :dealerId\n" +
-			"AND FDI.DATA_DATE = :dataDate\n" +
+//			"AND FDI.DATA_DATE = :dataDate\n" +
 			"AND FPT.TAPE = 'FORD_US'\n" +
 			"AND FPT.COLLISION = 'Y'\n" +
 			"AND DM.PRIMARY_MANUFACTURER_ID = 1\n" +
 			"AND DM.TERMINATION_DATE IS NULL\n" +
 			"AND DM.DEALERSHIP_COUNTRY = 'USA'", nativeQuery = true)
 	List<AipInventoryEntity> findAllCollisionPartsInInventory(
-			@Param("dealerId") Long dealerId,
-			@Param("dataDate") LocalDate dataDate);
+			@Param("dealerId") Long dealerId);
+//			@Param("dataDate") LocalDate dataDate);
 
 	@Query( value = "SELECT DM.DEALER_ID, FDI.PARTNO, FDI.CENTS, FDI.QOH, FDI.DESCRIPTION, FDI.STATUS, FDI.LAST_SALE, FDI.LAST_RECEIPT, FDI.BIN, FDI.SOURCE, FDI.MFG_CONTROLLED, FDI.DATA_DATE, FDI.ADMI_STATUS, FDI.MANUFACTURER, FDI.QOO, FDI.TWELVE_MONTH_SALES, FDI.ENTRY_DATE\n" +
 			"FROM FORD_DEALER_INVENTORY FDI\n" +
@@ -47,15 +47,15 @@ public interface AipInventoryRepository extends JpaRepository<AipInventoryEntity
 			"ON FDI.PA_CODE = DM.PA_CODE\n" +
 			"WHERE FDI.QOH > 0\n" +
 			"AND DM.DEALER_ID = :dealerId\n" +
-			"AND FDI.DATA_DATE = :dataDate\n" +
+//			"AND FDI.DATA_DATE = :dataDate\n" +
 			"AND FPT.TAPE = 'FORD_US'\n" +
 			"AND FPT.COLLISION != 'Y'\n" +
 			"AND DM.PRIMARY_MANUFACTURER_ID = 1\n" +
 			"AND DM.TERMINATION_DATE IS NULL\n" +
 			"AND DM.DEALERSHIP_COUNTRY = 'USA'", nativeQuery = true)
 	List<AipInventoryEntity> findAllNonCollisionPartsInInventory(
-			@Param("dealerId") Long dealerId,
-			@Param("dataDate") LocalDate dataDate);
+			@Param("dealerId") Long dealerId);
+//			@Param("dataDate") LocalDate dataDate);
 
 	@Query(value = " select *\n" +
 					"from FORD_DEALER_INVENTORY i\n" +
