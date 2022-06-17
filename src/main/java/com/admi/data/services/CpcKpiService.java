@@ -14,8 +14,8 @@ import java.util.stream.Collectors;
 @Service
 public class CpcKpiService {
 
-    @Autowired
-    AipInventoryRepository inventoryRepo;
+//    @Autowired
+//    AipInventoryRepository inventoryRepo;
 
     @Autowired
     CpcKpiRepository kpiRepo;
@@ -35,6 +35,9 @@ public class CpcKpiService {
     @Autowired
     PriceTapeRepository priceTapeRepo;
 
+    @Autowired
+    FordDealerInventoryRepository inventoryRepo;
+
     public void runCpcDealers(LocalDate inventoryDate) {
 
         List<CpcDealerProfileEntity> profiles = cpcDealerProfileRepo.findAll();
@@ -51,10 +54,10 @@ public class CpcKpiService {
         calculateCpcKpi(dealerId, inventoryDate, partsList, tierList);
     }
 
-    private BigDecimal getTotalInvestment(List<AipInventoryEntity> inventory, List<PriceTapeEntity> priceTapeParts) {
+    private BigDecimal getTotalInvestment(List<FordDealerInventoryEntity> inventory, List<PriceTapeEntity> priceTapeParts) {
 
-        Map<String, AipInventoryEntity> mappedDealerParts = inventory.stream()
-                .collect(Collectors.toMap(AipInventoryEntity::getPartNo, entity -> entity));
+        Map<String, FordDealerInventoryEntity> mappedDealerParts = inventory.stream()
+                .collect(Collectors.toMap(FordDealerInventoryEntity::getPartno, entity -> entity));
         Map<String, PriceTapeEntity> mappedPriceTapeParts = priceTapeParts.stream()
                 .collect(Collectors.toMap(PriceTapeEntity::getPartNo, entity -> entity));
         List<BigDecimal> investments = new ArrayList<>();
@@ -73,13 +76,13 @@ public class CpcKpiService {
         return totalInvestment.setScale(0, RoundingMode.HALF_EVEN);
     }
 
-    private List<AipInventoryEntity> getOnHandCpcParts(List<AipInventoryEntity> inventory, List<CpcPartsListsEntity> cpcParts, LocalDate dataDate) {
+    private List<FordDealerInventoryEntity> getOnHandCpcParts(Long dealerId, List<FordDealerInventoryEntity> inventory, List<CpcPartsListsEntity> cpcParts, LocalDate dataDate) {
 
         Map<String, String> cpcPartsSku = cpcParts.stream()
                 .collect(Collectors.toMap(CpcPartsListsEntity::getPrimarySku,
                         part -> Optional.ofNullable(part.getAlternateSku()).orElse("")));
         Map<String, List<String>> formattedCpcPartsSku = new HashMap<>();
-        List<AipInventoryEntity> onHandCpcParts = new ArrayList<>();
+        List<FordDealerInventoryEntity> onHandCpcParts = new ArrayList<>();
         List<CpcPartsOnHandEntity> onHandEntities = new ArrayList<>();
 
         //Reformat alternateSku Strings into List<String> for use in comparisons
@@ -89,25 +92,25 @@ public class CpcKpiService {
                 formattedCpcPartsSku.put(key, formattedAlternates);
         });
 
-        for (AipInventoryEntity part : inventory) {
-            if (formattedCpcPartsSku.containsKey(part.getPartNo())) {
+        for (FordDealerInventoryEntity part : inventory) {
+            if (formattedCpcPartsSku.containsKey(part.getPartno())) {
                 onHandCpcParts.add(part);
                 onHandEntities.add(new CpcPartsOnHandEntity(
-                        part.getDealerId(),
+                        dealerId,
                         dataDate,
-                        part.getPartNo(),
+                        part.getPartno(),
                         part.getQoh()));
-                formattedCpcPartsSku.remove(part.getPartNo());
+                formattedCpcPartsSku.remove(part.getPartno());
             }
             else {
                 Iterator<Map.Entry<String, List<String>>> iterator = formattedCpcPartsSku.entrySet().iterator();
 
                 while (iterator.hasNext()) {
                     Map.Entry<String, List<String>> altPart = iterator.next();
-                    if (altPart.getValue().contains(part.getPartNo())) {
+                    if (altPart.getValue().contains(part.getPartno())) {
                         onHandCpcParts.add(part);
                         onHandEntities.add(new CpcPartsOnHandEntity(
-                                part.getDealerId(),
+                                dealerId,
                                 dataDate,
                                 altPart.getKey(),
                                 part.getQoh()));
@@ -123,12 +126,12 @@ public class CpcKpiService {
 
     public void calculateCpcKpi(Long dealerId, LocalDate dataDate, String partsList, Short tierList) {
 
-        List<AipInventoryEntity> collisionParts = inventoryRepo.findAllCollisionPartsInInventory(dealerId);
-        List<AipInventoryEntity> nonCollisionParts = inventoryRepo.findAllNonCollisionPartsInInventory(dealerId);
+        List<FordDealerInventoryEntity> collisionParts = inventoryRepo.findAllCollisionPartsInInventory(dealerId);
+        List<FordDealerInventoryEntity> nonCollisionParts = inventoryRepo.findAllNonCollisionPartsInInventory(dealerId);
         List<CpcPartsListsEntity> cpcParts = cpcPartsListsRepo.findByPartsListAndRankIsLessThanEqual(partsList, tierList);
         List<PriceTapeEntity> allOnHandDealerPartsInPriceTape = priceTapeRepo.findAllOnHandDealerPartsInPriceTape(dealerId);
         List<PriceTapeEntity> allCpcListPartsInPriceTape = priceTapeRepo.findAllCpcListPartsInPriceTape(partsList, tierList);
-        List<AipInventoryEntity> onHandCpcParts = getOnHandCpcParts(collisionParts, cpcParts, dataDate);
+        List<FordDealerInventoryEntity> onHandCpcParts = getOnHandCpcParts(dealerId, collisionParts, cpcParts, dataDate);
         CpcObjectivesEntity objectiveMonth = cpcObjectivesRepo.findByObjectiveMonth(dataDate.withDayOfMonth(1));
 
         long totalCollisionSku = collisionParts.size();

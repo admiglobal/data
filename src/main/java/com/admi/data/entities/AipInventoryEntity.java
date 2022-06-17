@@ -374,4 +374,13 @@ public class AipInventoryEntity {
 				", paCode='" + paCode + '\'' +
 				'}';
 	}
+
+	@Transient
+	public boolean checkIfNotNullForFordUdbProcess() {
+		return  this.paCode != null &&
+				this.partNo != null &&
+				this.qoh != null &&
+				this.admiStatus != null &&
+				this.cents != null;
+	}
 }

@@ -16,10 +16,10 @@ public class Opc200PartDto {
     Integer rank;
     String ocPartNumber;
     String servicePartNumber;
-    Long qoh;
+    Integer qoh;
     boolean matchedByServicePartNumber; //when we find an OPC part in FordDealerInventory, this indicates if the part was found under the OC_PART_NUMBER or the SERVICE_PART_NUMBER
 
-    public Opc200PartDto(OpcTsp200Entity opcTsp200Entity, Long qoh, boolean matchedByServicePartNumber){
+    public Opc200PartDto(OpcTsp200Entity opcTsp200Entity, Integer qoh, boolean matchedByServicePartNumber){
         this.rank = opcTsp200Entity.getRank();
         this.ocPartNumber = opcTsp200Entity.getOcPartNumber();
         this.servicePartNumber = opcTsp200Entity.getServicePartNumber();
@@ -77,11 +77,11 @@ public class Opc200PartDto {
         this.servicePartNumber = servicePartNumber;
     }
 
-    public Long getQoh() {
+    public Integer getQoh() {
         return qoh;
     }
 
-    public void setQoh(Long qoh) {
+    public void setQoh(Integer qoh) {
         this.qoh = qoh;
     }
 

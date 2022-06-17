@@ -22,10 +22,11 @@ public class FordDealerKpiEntity {
 	private Integer sOver9M;
 	private Integer nsOver60;
 	private Integer nsUnder60;
+	private Integer nsOver270;
 
 	public FordDealerKpiEntity() {}
 
-	public FordDealerKpiEntity(Long dealerId, LocalDate dateUpdated, Integer totalSValue, Integer totalNsValue, Integer totalRimValue, Integer sSkuCount, Integer nsSkuCount, Integer rimSkuCount, Integer sOver9M, Integer nsOver60, Integer nsUnder60) {
+	public FordDealerKpiEntity(Long dealerId, LocalDate dateUpdated, Integer totalSValue, Integer totalNsValue, Integer totalRimValue, Integer sSkuCount, Integer nsSkuCount, Integer rimSkuCount, Integer sOver9M, Integer nsOver60, Integer nsUnder60, Integer nsOver270) {
 		this.dealerId = dealerId;
 		this.dateUpdated = dateUpdated;
 		this.totalSValue = totalSValue;
@@ -37,6 +38,7 @@ public class FordDealerKpiEntity {
 		this.sOver9M = sOver9M;
 		this.nsOver60 = nsOver60;
 		this.nsUnder60 = nsUnder60;
+		this.nsOver270 = nsOver270;
 	}
 
 	@Id
@@ -149,6 +151,16 @@ public class FordDealerKpiEntity {
 		this.nsUnder60 = nsUnder60;
 	}
 
+	@Basic
+	@Column(name = "NS_OVER_270", nullable = true)
+	public Integer getNsOver270() {
+		return nsOver270;
+	}
+
+	public void setNsOver270(Integer nsOver270) {
+		this.nsOver270 = nsOver270;
+	}
+
 	@Override
 	public String toString() {
 		return "FordDealerKpiEntity{" +
@@ -163,6 +175,7 @@ public class FordDealerKpiEntity {
 				", sOver9M=" + sOver9M +
 				", nsOver60=" + nsOver60 +
 				", nsUnder60=" + nsUnder60 +
+				", nsOver270=" + nsOver270 +
 				'}';
 	}
 
@@ -171,11 +184,11 @@ public class FordDealerKpiEntity {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 		FordDealerKpiEntity that = (FordDealerKpiEntity) o;
-		return Objects.equals(dealerId, that.dealerId) && Objects.equals(dateUpdated, that.dateUpdated) && Objects.equals(totalSValue, that.totalSValue) && Objects.equals(totalNsValue, that.totalNsValue) && Objects.equals(totalRimValue, that.totalRimValue) && Objects.equals(sSkuCount, that.sSkuCount) && Objects.equals(nsSkuCount, that.nsSkuCount) && Objects.equals(rimSkuCount, that.rimSkuCount) && Objects.equals(sOver9M, that.sOver9M) && Objects.equals(nsOver60, that.nsOver60) && Objects.equals(nsUnder60, that.nsUnder60);
+		return Objects.equals(dealerId, that.dealerId) && Objects.equals(dateUpdated, that.dateUpdated) && Objects.equals(totalSValue, that.totalSValue) && Objects.equals(totalNsValue, that.totalNsValue) && Objects.equals(totalRimValue, that.totalRimValue) && Objects.equals(sSkuCount, that.sSkuCount) && Objects.equals(nsSkuCount, that.nsSkuCount) && Objects.equals(rimSkuCount, that.rimSkuCount) && Objects.equals(sOver9M, that.sOver9M) && Objects.equals(nsOver60, that.nsOver60) && Objects.equals(nsUnder60, that.nsUnder60) && Objects.equals(nsOver270, that.nsOver270);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(dealerId, dateUpdated, totalSValue, totalNsValue, totalRimValue, sSkuCount, nsSkuCount, rimSkuCount, sOver9M, nsOver60, nsUnder60);
+		return Objects.hash(dealerId, dateUpdated, totalSValue, totalNsValue, totalRimValue, sSkuCount, nsSkuCount, rimSkuCount, sOver9M, nsOver60, nsUnder60, nsOver270);
 	}
 }

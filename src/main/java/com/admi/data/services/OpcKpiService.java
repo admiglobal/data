@@ -270,7 +270,7 @@ public class OpcKpiService {
      * @param qoh The quantity on hand value
      * @return The non-null QOH value. Will be -1 if the qoh argument is more than 5 digits long.
      */
-    private static Long safeReadQoh(Long qoh){
+    private static Long safeReadQoh(Integer qoh){
         return ensureUnderFiveDigits(
                     zeroIfNull(qoh));
     }

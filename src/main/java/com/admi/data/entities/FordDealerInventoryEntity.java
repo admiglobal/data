@@ -2,41 +2,36 @@ package com.admi.data.entities;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.util.Objects;
 
 @Entity
 @Table(name = "FORD_DEALER_INVENTORY", schema = "ADMI")
 public class FordDealerInventoryEntity {
-    private Long dealerId;
+	private String paCode;
     private String partno;
-    private Long cents;
-    private Long qoh;
-    private String description;
+    private Integer cents;
+	private Integer qoh;
     private String status;
     private LocalDate lastSale;
     private LocalDate lastReceipt;
-    private String bin;
-    private String source;
     private Boolean mfgControlled;
     private LocalDate dataDate;
     private String admiStatus;
-    private String manufacturer;
-    private Long qoo;
-    private Long twelveMonthSales;
-    private LocalDate entryDate;
-    private String paCode;
+    private Integer qoo;
 
     @Basic
-    @Column(name = "DEALER_ID")
-    public Long getDealerId() {
-        return dealerId;
+    @Column(name = "PA_CODE", nullable = true, length = 6)
+    public String getPaCode() {
+        return paCode;
     }
 
-    public void setDealerId(Long dealerId) {
-        this.dealerId = dealerId;
+    public void setPaCode(String paCode) {
+        this.paCode = paCode;
     }
 
+    @Basic
     @Id
-    @Column(name = "PARTNO")
+    @Column(name = "PARTNO", nullable = false, length = 30)
     public String getPartno() {
         return partno;
     }
@@ -46,37 +41,27 @@ public class FordDealerInventoryEntity {
     }
 
     @Basic
-    @Column(name = "CENTS")
-    public Long getCents() {
+    @Column(name = "CENTS", nullable = true, precision = 0)
+    public Integer getCents() {
         return cents;
     }
 
-    public void setCents(Long cents) {
-        this.cents = cents;
-    }
+	public void setCents(Integer cents) {
+		this.cents = cents;
+	}
 
     @Basic
-    @Column(name = "QOH")
-    public Long getQoh() {
+    @Column(name = "QOH", nullable = true, precision = 0)
+    public Integer getQoh() {
         return qoh;
     }
 
-    public void setQoh(Long qoh) {
-        this.qoh = qoh;
-    }
+	public void setQoh(Integer qoh) {
+		this.qoh = qoh;
+	}
 
     @Basic
-    @Column(name = "DESCRIPTION")
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    @Basic
-    @Column(name = "STATUS")
+    @Column(name = "STATUS", nullable = true, length = 20)
     public String getStatus() {
         return status;
     }
@@ -86,7 +71,7 @@ public class FordDealerInventoryEntity {
     }
 
     @Basic
-    @Column(name = "LAST_SALE")
+    @Column(name = "LAST_SALE", nullable = true)
     public LocalDate getLastSale() {
         return lastSale;
     }
@@ -96,7 +81,7 @@ public class FordDealerInventoryEntity {
     }
 
     @Basic
-    @Column(name = "LAST_RECEIPT")
+    @Column(name = "LAST_RECEIPT", nullable = true)
     public LocalDate getLastReceipt() {
         return lastReceipt;
     }
@@ -106,27 +91,7 @@ public class FordDealerInventoryEntity {
     }
 
     @Basic
-    @Column(name = "BIN")
-    public String getBin() {
-        return bin;
-    }
-
-    public void setBin(String bin) {
-        this.bin = bin;
-    }
-
-    @Basic
-    @Column(name = "SOURCE")
-    public String getSource() {
-        return source;
-    }
-
-    public void setSource(String source) {
-        this.source = source;
-    }
-
-    @Basic
-    @Column(name = "MFG_CONTROLLED")
+    @Column(name = "MFG_CONTROLLED", nullable = true, precision = 0)
     public Boolean getMfgControlled() {
         return mfgControlled;
     }
@@ -136,7 +101,7 @@ public class FordDealerInventoryEntity {
     }
 
     @Basic
-    @Column(name = "DATA_DATE")
+    @Column(name = "DATA_DATE", nullable = true)
     public LocalDate getDataDate() {
         return dataDate;
     }
@@ -146,7 +111,7 @@ public class FordDealerInventoryEntity {
     }
 
     @Basic
-    @Column(name = "ADMI_STATUS")
+    @Column(name = "ADMI_STATUS", nullable = true, length = 1)
     public String getAdmiStatus() {
         return admiStatus;
     }
@@ -156,130 +121,53 @@ public class FordDealerInventoryEntity {
     }
 
     @Basic
-    @Column(name = "MANUFACTURER")
-    public String getManufacturer() {
-        return manufacturer;
-    }
-
-    public void setManufacturer(String manufacturer) {
-        this.manufacturer = manufacturer;
-    }
-
-    @Basic
-    @Column(name = "QOO")
-    public Long getQoo() {
+    @Column(name = "QOO", nullable = true, precision = 0)
+    public Integer getQoo() {
         return qoo;
     }
 
-    public void setQoo(Long qoo) {
-        this.qoo = qoo;
-    }
+	public void setQoo(Integer qoo) {
+		this.qoo = qoo;
+	}
 
-    @Basic
-    @Column(name = "TWELVE_MONTH_SALES")
-    public Long getTwelveMonthSales() {
-        return twelveMonthSales;
-    }
-
-    public void setTwelveMonthSales(Long twelveMonthSales) {
-        this.twelveMonthSales = twelveMonthSales;
-    }
-
-    @Basic
-    @Column(name = "ENTRY_DATE")
-    public LocalDate getEntryDate() {
-        return entryDate;
-    }
-
-    public void setEntryDate(LocalDate entryDate) {
-        this.entryDate = entryDate;
-    }
-
-    @Basic
-    @Column(name = "PA_CODE")
-    public String getPaCode() {
-        return paCode;
-    }
-
-    public void setPaCode(String paCode) {
-        this.paCode = paCode;
+    @Transient
+    public LocalDate getLastSaleOrReceipt() {
+        if (lastReceipt != null) {
+            return lastReceipt;
+        } else if (lastSale != null) {
+            return lastSale;
+        } else {
+            return LocalDate.of(2000,1,1);
+        }
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         FordDealerInventoryEntity that = (FordDealerInventoryEntity) o;
-
-        if (dealerId != null ? !dealerId.equals(that.dealerId) : that.dealerId != null) return false;
-        if (partno != null ? !partno.equals(that.partno) : that.partno != null) return false;
-        if (cents != null ? !cents.equals(that.cents) : that.cents != null) return false;
-        if (qoh != null ? !qoh.equals(that.qoh) : that.qoh != null) return false;
-        if (description != null ? !description.equals(that.description) : that.description != null) return false;
-        if (status != null ? !status.equals(that.status) : that.status != null) return false;
-        if (lastSale != null ? !lastSale.equals(that.lastSale) : that.lastSale != null) return false;
-        if (lastReceipt != null ? !lastReceipt.equals(that.lastReceipt) : that.lastReceipt != null) return false;
-        if (bin != null ? !bin.equals(that.bin) : that.bin != null) return false;
-        if (source != null ? !source.equals(that.source) : that.source != null) return false;
-        if (mfgControlled != null ? !mfgControlled.equals(that.mfgControlled) : that.mfgControlled != null)
-            return false;
-        if (dataDate != null ? !dataDate.equals(that.dataDate) : that.dataDate != null) return false;
-        if (admiStatus != null ? !admiStatus.equals(that.admiStatus) : that.admiStatus != null) return false;
-        if (manufacturer != null ? !manufacturer.equals(that.manufacturer) : that.manufacturer != null) return false;
-        if (qoo != null ? !qoo.equals(that.qoo) : that.qoo != null) return false;
-        if (twelveMonthSales != null ? !twelveMonthSales.equals(that.twelveMonthSales) : that.twelveMonthSales != null)
-            return false;
-        if (entryDate != null ? !entryDate.equals(that.entryDate) : that.entryDate != null) return false;
-        if (paCode != null ? !paCode.equals(that.paCode) : that.paCode != null) return false;
-
-        return true;
+        return Objects.equals(paCode, that.paCode) && Objects.equals(partno, that.partno) && Objects.equals(cents, that.cents) && Objects.equals(qoh, that.qoh) && Objects.equals(status, that.status) && Objects.equals(lastSale, that.lastSale) && Objects.equals(lastReceipt, that.lastReceipt) && Objects.equals(mfgControlled, that.mfgControlled) && Objects.equals(dataDate, that.dataDate) && Objects.equals(admiStatus, that.admiStatus) && Objects.equals(qoo, that.qoo);
     }
 
     @Override
     public int hashCode() {
-        int result = dealerId != null ? dealerId.hashCode() : 0;
-        result = 31 * result + (partno != null ? partno.hashCode() : 0);
-        result = 31 * result + (cents != null ? cents.hashCode() : 0);
-        result = 31 * result + (qoh != null ? qoh.hashCode() : 0);
-        result = 31 * result + (description != null ? description.hashCode() : 0);
-        result = 31 * result + (status != null ? status.hashCode() : 0);
-        result = 31 * result + (lastSale != null ? lastSale.hashCode() : 0);
-        result = 31 * result + (lastReceipt != null ? lastReceipt.hashCode() : 0);
-        result = 31 * result + (bin != null ? bin.hashCode() : 0);
-        result = 31 * result + (source != null ? source.hashCode() : 0);
-        result = 31 * result + (mfgControlled != null ? mfgControlled.hashCode() : 0);
-        result = 31 * result + (dataDate != null ? dataDate.hashCode() : 0);
-        result = 31 * result + (admiStatus != null ? admiStatus.hashCode() : 0);
-        result = 31 * result + (manufacturer != null ? manufacturer.hashCode() : 0);
-        result = 31 * result + (qoo != null ? qoo.hashCode() : 0);
-        result = 31 * result + (twelveMonthSales != null ? twelveMonthSales.hashCode() : 0);
-        result = 31 * result + (entryDate != null ? entryDate.hashCode() : 0);
-        result = 31 * result + (paCode != null ? paCode.hashCode() : 0);
-        return result;
+        return Objects.hash(paCode, partno, cents, qoh, status, lastSale, lastReceipt, mfgControlled, dataDate, admiStatus, qoo);
     }
 
     @Override
     public String toString() {
         return "FordDealerInventoryEntity{" +
-                "dealerId=" + dealerId +
+                "paCode='" + paCode + '\'' +
                 ", partno='" + partno + '\'' +
                 ", cents=" + cents +
                 ", qoh=" + qoh +
-                ", description='" + description + '\'' +
                 ", status='" + status + '\'' +
                 ", lastSale=" + lastSale +
                 ", lastReceipt=" + lastReceipt +
-                ", bin='" + bin + '\'' +
-                ", source='" + source + '\'' +
                 ", mfgControlled=" + mfgControlled +
                 ", dataDate=" + dataDate +
                 ", admiStatus='" + admiStatus + '\'' +
-                ", manufacturer='" + manufacturer + '\'' +
                 ", qoo=" + qoo +
-                ", twelveMonthSales=" + twelveMonthSales +
-                ", entryDate=" + entryDate +
-                ", paCode='" + paCode + '\'' +
                 '}';
     }
 }
