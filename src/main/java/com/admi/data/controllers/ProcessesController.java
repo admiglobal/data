@@ -1,9 +1,6 @@
 package com.admi.data.controllers;
 
-import com.admi.data.entities.AipInventoryEntity;
-import com.admi.data.entities.CpcDealerProfileEntity;
-import com.admi.data.entities.DealerMasterEntity;
-import com.admi.data.entities.KpiEntity;
+import com.admi.data.entities.*;
 import com.admi.data.enums.DmsProvider;
 import com.admi.data.repositories.CpcDealerProfileRepository;
 import com.admi.data.repositories.DealerMasterRepository;
@@ -61,16 +58,6 @@ public class ProcessesController {
 
 	@Autowired
 	EmailService emailService;
-
-//	@ResponseBody
-////	@GetMapping("/processTest")
-//	public String processTest(Model model) {
-//		List<AipInventoryEntity> inventory = aipInventoryRepo.findAllByDealerIdAndDataDate(1969L, LocalDate.of(2021,10,21));
-//
-//		KpiEntity kpis = aisKpiService.calculateAisKpi(inventory);
-//
-//		return kpis.toString();
-//	}
 
 	/**
 	 * Called to delete a Motorcraft order file from the P: drive and send an email notification of the cancellation.
@@ -205,6 +192,13 @@ public class ProcessesController {
 
 		return "Ran UDB Data for Ford programs. " +
 				"Time to complete: " + completionTime + " seconds.";
+	}
+
+	@ResponseBody
+	@GetMapping("/testRel")
+	public String testNewRelationships() {
+		FordInventoryEntity part = fordDealerKpiService.testNewRels("09951", "1816030C2");
+		return part.toString();
 	}
 
 	@ResponseBody

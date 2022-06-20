@@ -1,6 +1,6 @@
 package com.admi.data.entities;
 
-import com.admi.data.entities.keys.FordDealerKpiEntityPK;
+import com.admi.data.entities.keys.FordKpiEntityPK;
 
 import javax.persistence.*;
 import java.time.LocalDate;
@@ -8,8 +8,8 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "FORD_DEALER_KPI", schema = "ADMI")
-@IdClass(FordDealerKpiEntityPK.class)
-public class FordDealerKpiEntity {
+@IdClass(FordKpiEntityPK.class)
+public class FordKpiEntity {
 
 	private Long dealerId;
 	private LocalDate dateUpdated;
@@ -24,9 +24,9 @@ public class FordDealerKpiEntity {
 	private Integer nsUnder60;
 	private Integer nsOver270;
 
-	public FordDealerKpiEntity() {}
+	public FordKpiEntity() {}
 
-	public FordDealerKpiEntity(Long dealerId, LocalDate dateUpdated, Integer totalSValue, Integer totalNsValue, Integer totalRimValue, Integer sSkuCount, Integer nsSkuCount, Integer rimSkuCount, Integer sOver9M, Integer nsOver60, Integer nsUnder60, Integer nsOver270) {
+	public FordKpiEntity(Long dealerId, LocalDate dateUpdated, Integer totalSValue, Integer totalNsValue, Integer totalRimValue, Integer sSkuCount, Integer nsSkuCount, Integer rimSkuCount, Integer sOver9M, Integer nsOver60, Integer nsUnder60, Integer nsOver270) {
 		this.dealerId = dealerId;
 		this.dateUpdated = dateUpdated;
 		this.totalSValue = totalSValue;
@@ -183,7 +183,7 @@ public class FordDealerKpiEntity {
 	public boolean equals(Object o) {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
-		FordDealerKpiEntity that = (FordDealerKpiEntity) o;
+		FordKpiEntity that = (FordKpiEntity) o;
 		return Objects.equals(dealerId, that.dealerId) && Objects.equals(dateUpdated, that.dateUpdated) && Objects.equals(totalSValue, that.totalSValue) && Objects.equals(totalNsValue, that.totalNsValue) && Objects.equals(totalRimValue, that.totalRimValue) && Objects.equals(sSkuCount, that.sSkuCount) && Objects.equals(nsSkuCount, that.nsSkuCount) && Objects.equals(rimSkuCount, that.rimSkuCount) && Objects.equals(sOver9M, that.sOver9M) && Objects.equals(nsOver60, that.nsOver60) && Objects.equals(nsUnder60, that.nsUnder60) && Objects.equals(nsOver270, that.nsOver270);
 	}
 

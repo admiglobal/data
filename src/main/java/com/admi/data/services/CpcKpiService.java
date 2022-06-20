@@ -36,7 +36,7 @@ public class CpcKpiService {
     PriceTapeRepository priceTapeRepo;
 
     @Autowired
-    FordDealerInventoryRepository inventoryRepo;
+    FordInventoryRepository inventoryRepo;
 
     public void runCpcDealers(LocalDate inventoryDate) {
 
@@ -54,10 +54,10 @@ public class CpcKpiService {
         calculateCpcKpi(dealerId, inventoryDate, partsList, tierList);
     }
 
-    private BigDecimal getTotalInvestment(List<FordDealerInventoryEntity> inventory, List<PriceTapeEntity> priceTapeParts) {
+    private BigDecimal getTotalInvestment(List<FordInventoryEntity> inventory, List<PriceTapeEntity> priceTapeParts) {
 
-        Map<String, FordDealerInventoryEntity> mappedDealerParts = inventory.stream()
-                .collect(Collectors.toMap(FordDealerInventoryEntity::getPartno, entity -> entity));
+        Map<String, FordInventoryEntity> mappedDealerParts = inventory.stream()
+                .collect(Collectors.toMap(FordInventoryEntity::getPartno, entity -> entity));
         Map<String, PriceTapeEntity> mappedPriceTapeParts = priceTapeParts.stream()
                 .collect(Collectors.toMap(PriceTapeEntity::getPartNo, entity -> entity));
         List<BigDecimal> investments = new ArrayList<>();
@@ -76,13 +76,13 @@ public class CpcKpiService {
         return totalInvestment.setScale(0, RoundingMode.HALF_EVEN);
     }
 
-    private List<FordDealerInventoryEntity> getOnHandCpcParts(Long dealerId, List<FordDealerInventoryEntity> inventory, List<CpcPartsListsEntity> cpcParts, LocalDate dataDate) {
+    private List<FordInventoryEntity> getOnHandCpcParts(Long dealerId, List<FordInventoryEntity> inventory, List<CpcPartsListsEntity> cpcParts, LocalDate dataDate) {
 
         Map<String, String> cpcPartsSku = cpcParts.stream()
                 .collect(Collectors.toMap(CpcPartsListsEntity::getPrimarySku,
                         part -> Optional.ofNullable(part.getAlternateSku()).orElse("")));
         Map<String, List<String>> formattedCpcPartsSku = new HashMap<>();
-        List<FordDealerInventoryEntity> onHandCpcParts = new ArrayList<>();
+        List<FordInventoryEntity> onHandCpcParts = new ArrayList<>();
         List<CpcPartsOnHandEntity> onHandEntities = new ArrayList<>();
 
         //Reformat alternateSku Strings into List<String> for use in comparisons
@@ -92,7 +92,7 @@ public class CpcKpiService {
                 formattedCpcPartsSku.put(key, formattedAlternates);
         });
 
-        for (FordDealerInventoryEntity part : inventory) {
+        for (FordInventoryEntity part : inventory) {
             if (formattedCpcPartsSku.containsKey(part.getPartno())) {
                 onHandCpcParts.add(part);
                 onHandEntities.add(new CpcPartsOnHandEntity(
@@ -126,12 +126,12 @@ public class CpcKpiService {
 
     public void calculateCpcKpi(Long dealerId, LocalDate dataDate, String partsList, Short tierList) {
 
-        List<FordDealerInventoryEntity> collisionParts = inventoryRepo.findAllCollisionPartsInInventory(dealerId);
-        List<FordDealerInventoryEntity> nonCollisionParts = inventoryRepo.findAllNonCollisionPartsInInventory(dealerId);
+        List<FordInventoryEntity> collisionParts = inventoryRepo.findAllCollisionPartsInInventory(dealerId);
+        List<FordInventoryEntity> nonCollisionParts = inventoryRepo.findAllNonCollisionPartsInInventory(dealerId);
         List<CpcPartsListsEntity> cpcParts = cpcPartsListsRepo.findByPartsListAndRankIsLessThanEqual(partsList, tierList);
         List<PriceTapeEntity> allOnHandDealerPartsInPriceTape = priceTapeRepo.findAllOnHandDealerPartsInPriceTape(dealerId);
         List<PriceTapeEntity> allCpcListPartsInPriceTape = priceTapeRepo.findAllCpcListPartsInPriceTape(partsList, tierList);
-        List<FordDealerInventoryEntity> onHandCpcParts = getOnHandCpcParts(dealerId, collisionParts, cpcParts, dataDate);
+        List<FordInventoryEntity> onHandCpcParts = getOnHandCpcParts(dealerId, collisionParts, cpcParts, dataDate);
         CpcObjectivesEntity objectiveMonth = cpcObjectivesRepo.findByObjectiveMonth(dataDate.withDayOfMonth(1));
 
         long totalCollisionSku = collisionParts.size();

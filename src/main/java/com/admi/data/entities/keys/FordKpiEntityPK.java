@@ -1,13 +1,11 @@
 package com.admi.data.entities.keys;
 
 import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import java.io.Serializable;
 import java.time.LocalDate;
 
-public class FordDealerKpiEntityPK implements Serializable {
+public class FordKpiEntityPK implements Serializable {
 	private Long dealerId;
 	private LocalDate dateUpdated;
 
@@ -36,7 +34,7 @@ public class FordDealerKpiEntityPK implements Serializable {
 		if (this == o) return true;
 		if (o == null || getClass() != o.getClass()) return false;
 
-		FordDealerKpiEntityPK that = (FordDealerKpiEntityPK) o;
+		FordKpiEntityPK that = (FordKpiEntityPK) o;
 
 		if (dealerId != null ? !dealerId.equals(that.dealerId) : that.dealerId != null) return false;
 		if (dateUpdated != null ? !dateUpdated.equals(that.dateUpdated) : that.dateUpdated != null) return false;

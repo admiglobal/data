@@ -1,7 +1,6 @@
 package com.admi.data.repositories;
 
-import com.admi.data.entities.AipInventoryEntity;
-import com.admi.data.entities.FordDealerInventoryEntity;
+import com.admi.data.entities.FordInventoryEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -10,10 +9,10 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface FordDealerInventoryRepository extends JpaRepository<FordDealerInventoryEntity, Long> {
-    FordDealerInventoryEntity findFirstByPaCode(String paCode);
-    FordDealerInventoryEntity findFirstByPaCodeAndPartno(String paCode, String partno);
-    List<FordDealerInventoryEntity> findAllByPaCode(String paCode);
+public interface FordInventoryRepository extends JpaRepository<FordInventoryEntity, Long> {
+    FordInventoryEntity findFirstByPaCode(String paCode);
+    FordInventoryEntity findFirstByPaCodeAndPartno(String paCode, String partno);
+    List<FordInventoryEntity> findAllByPaCode(String paCode);
 
     @Query(value =  "select \n" +
                     "    i.PA_CODE, \n" +
@@ -36,7 +35,7 @@ public interface FordDealerInventoryRepository extends JpaRepository<FordDealerI
                     "    on pt.PARTNO = i.PARTNO \n" +
                     "where i.PA_CODE = :pa",
             nativeQuery = true)
-    List<FordDealerInventoryEntity> findFordInventoryByPaCode(@Param("pa") String pa_code);
+    List<FordInventoryEntity> findFordInventoryByPaCode(@Param("pa") String pa_code);
 
     @Query( value = "select \n" +
             "    i.PA_CODE, \n" +
@@ -63,7 +62,7 @@ public interface FordDealerInventoryRepository extends JpaRepository<FordDealerI
             "AND DM.PRIMARY_MANUFACTURER_ID = 1\n" +
             "AND DM.TERMINATION_DATE IS NULL\n" +
             "AND DM.DEALERSHIP_COUNTRY = 'USA'", nativeQuery = true)
-    List<FordDealerInventoryEntity> findAllCollisionPartsInInventory(
+    List<FordInventoryEntity> findAllCollisionPartsInInventory(
             @Param("dealerId") Long dealerId);
 
     @Query( value = "select \n" +
@@ -91,7 +90,7 @@ public interface FordDealerInventoryRepository extends JpaRepository<FordDealerI
             "AND DM.PRIMARY_MANUFACTURER_ID = 1\n" +
             "AND DM.TERMINATION_DATE IS NULL\n" +
             "AND DM.DEALERSHIP_COUNTRY = 'USA'", nativeQuery = true)
-    List<FordDealerInventoryEntity> findAllNonCollisionPartsInInventory(
+    List<FordInventoryEntity> findAllNonCollisionPartsInInventory(
             @Param("dealerId") Long dealerId);
 
 }

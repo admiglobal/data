@@ -4,7 +4,6 @@ import com.admi.data.dto.Opc200PartDto;
 import com.admi.data.dto.OpcKpiDto;
 import com.admi.data.entities.*;
 import com.admi.data.repositories.*;
-import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -26,7 +25,7 @@ public class OpcKpiService {
     DealerMasterRepository dealerMasterRepo;
 
     @Autowired
-    FordDealerInventoryRepository fordDealerInventoryRepo;
+    FordInventoryRepository fordDealerInventoryRepo;
 
     @Autowired
     OpcTsp200Repository opcTsp200Repo;
@@ -111,11 +110,11 @@ public class OpcKpiService {
      * Queries the list of OPC parts that a dealer has on-hand, including QOH info
      */
     private List<OpcTsp200DataEntity> getOpc200Data(String paCode){
-        List<FordDealerInventoryEntity> inventory = fordDealerInventoryRepo.findAllByPaCode(paCode);
+        List<FordInventoryEntity> inventory = fordDealerInventoryRepo.findAllByPaCode(paCode);
         List<OpcTsp200Entity> opc200List = opcTsp200Repo.findAll();
         Set<Opc200PartDto> opcOnHand = new HashSet<>();
 
-        for(FordDealerInventoryEntity part : inventory){
+        for(FordInventoryEntity part : inventory){
             for(OpcTsp200Entity opcPart : opc200List){
                 //need to account for both part numbers
                 //also need to account for an inventory having the same OPC200 part under both names--only count this once (use a Set)
