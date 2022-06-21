@@ -74,17 +74,25 @@ public class ImportService {
 			throws IOException, InvalidFormatException, NoSuchFieldException, IllegalAccessException {
 		System.out.println(DateService.getTimeString() + ": Importing Dealer " + dealerId);
 
-		List<AipInventoryEntity> inventory;
+		List<AipInventoryEntity> inventory = new ArrayList<>();
 
 		System.out.println("File type: " + fileType);
 
-		if (Objects.equals(fileType, "text/csv")	) {
-			inventory = importCsvInventoryFile(file, dealerId, dmsId);
-		} else if (Objects.equals(fileType, "application/vnd.ms-excel")) {
-			inventory = importXlsInventoryFile(file, dealerId, dmsId);
-		} else {
-			inventory = importXlsxInventoryFile(file, dealerId, dmsId);
+		try{
+			if (Objects.equals(fileType, "text/csv")	) {
+				inventory = importCsvInventoryFile(file, dealerId, dmsId);
+			} else if (Objects.equals(fileType, "application/vnd.ms-excel")) {
+				inventory = importXlsInventoryFile(file, dealerId, dmsId);
+			} else {
+				inventory = importXlsxInventoryFile(file, dealerId, dmsId);
+			}
+		} catch (Exception e){
+			//something went wrong with uploading the file
+			//send the user a failure email
+			//send errors@admiglobal an error email with more details
 		}
+
+
 
 		aipInventoryService.saveAll(inventory, dealerId, paCode, DmsProvider.findDms(dmsId));
 
@@ -96,6 +104,7 @@ public class ImportService {
 
 		System.out.println(DateService.getTimeString() + ": Completed importing Dealer " + dealerId);
 
+		//upload success email
 		if(userEmail != null && !userEmail.equals("")){
 			try {
 				emailService.sendAipUploadVerificationEmail(userEmail, paCode);
