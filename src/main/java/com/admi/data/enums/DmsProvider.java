@@ -7,10 +7,10 @@ import java.util.Arrays;
 public enum DmsProvider {
 
 	CDK(new Integer[]{8,37,54,61}, "CDK", CdkStatus.STOCK),
-	RR_ERA(new Integer[]{1,48,50}, "R&R Era/Ignite", RREraStatus.STOCK),
+	RR_ERA(new Integer[]{1,50}, "R&R Era/Ignite", RREraStatus.STOCK),
 	AUTOSOFT(new Integer[]{9}, "AutoSoft", AutosoftStatus.Y),
 	AUTOMATE(new Integer[]{22}, "AutoMate", AutomateStatus.STOCKED),
-//	RR_POWER(new Integer[]{}, "R&R Power", RRPowerStatus.STOCK),
+	RR_POWER(new Integer[]{48}, "R&R Power", RRPowerStatus.STOCK),
 	PBS(new Integer[]{30}, "PBS", PbsStatus.STOCK),
 	DEALERTRACK(new Integer[]{13}, "DealerTrack", DealerTrackStatus.A),
 	LIGHTYEAR(new Integer[]{23}, "LightYear", LightyearStatus.S),
