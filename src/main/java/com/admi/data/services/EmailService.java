@@ -1,7 +1,6 @@
 package com.admi.data.services;
 
 import com.admi.data.dto.ImportIssue;
-import com.admi.data.dto.MotorcraftOrder;
 import com.admi.data.dto.MotorcraftOrderSet;
 import com.admi.data.repositories.McOrdersContentRepository;
 import com.admi.data.repositories.McOrdersRepository;
@@ -13,7 +12,6 @@ import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import javax.mail.MessagingException;
-import javax.mail.SendFailedException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -115,16 +113,6 @@ public class EmailService {
 		}
 	}
 
-	public void sendPlanBUploadEmail(String userEmail, String paCode, String errorMessage) throws MessagingException {
-		if (errorMessage != null) {
-			sendAipUploadFailureEmail(userEmail, paCode);
-			System.out.println("Upload failure message sent to " + userEmail + ".");
-			return;
-		}
-
-		sendAipUploadVerificationEmail(userEmail, paCode);
-		System.out.println("Upload verification message sent to " + userEmail + ".");
-	}
 
 	public void sendAipUploadVerificationEmail(String userEmail, String paCode) throws MessagingException {
 		String errorEmail = "errors@admiglobal.com";
@@ -155,35 +143,86 @@ public class EmailService {
 		}
 	}
 
-	public void sendAipUploadFailureEmail(String userEmail, String paCode) throws MessagingException {
+	public void sendAipUploadFailureNotification(String userEmail, String paCode) {
+		try {
+			if(userEmail == null || userEmail.equals(""))
+				throw new MessagingException("Unable to send AIP upload failure notification: user email is null or blank.");
+
+			String errorEmail = "errors@admiglobal.com";
+
+			String to = userEmail;
+			String from = "aisSupport@admiglobal.com";
+			String cc = errorEmail;
+			String[] bcc = {};
+			String subject = "Error with file upload: Dealer " + paCode;
+
+			String message = "Thank you for uploading your inventory file to the ADMI Insights Platform. " +
+					"There was an error while reading your file; " +
+					"this is usually caused by improper formatting. " +
+					"Please ensure your inventory file has the proper column names for your DMS, and re-upload your file. " +
+					//TODO -- would be nice to tell the dealer exactly what columns we were hoping for: maybe add a static list to each Field enum of the absolutely necessary fields? This list could be reused in the SpreadsheetHeaders object, too.
+//					"Please ensure your file is of the " + fileFormat + " format and has the following columns: " +
+//					"<br>" + columnList + "<br>" +
+					"Contact your ADMI representative for questions or assistance. ";
+
+			Context context = new Context();
+
+			context.setVariable("message", message);
+
+			//re-using this email template, since it's pretty bare bones
+			String html = templateEngine.process("email/uploadVerificationMessage", context);
+
+			try {
+				emailUtility.sendMimeMessage(to, from, cc, bcc, subject, html);
+			} catch (MailSendException e) {
+
+				emailUtility.sendMimeMessage(errorEmail, from, bcc,"AIP Upload Failure Email Failed to Send - " + subject, html);
+				throw e;
+			}
+
+			System.out.println("Upload failure email sent to " + userEmail + ".");
+
+		} catch (MessagingException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+
+	}
+
+	public void sendAipUploadFailureStackTraceToDev(String userEmail, String paCode, StackTraceElement[] errorDetails) {
 		//We'll want to send the stack trace to errors@admiglobal.com as well
 
-//		String errorEmail = "errors@admiglobal.com";
-//
-//		String to = userEmail;
-//		String from = "aisSupport@admiglobal.com";
-////		String cc = "";
-//		String[] bcc = {};
-//		String subject = "File finished processing for P&A code " + paCode;
-//
-//		String message = "Thank you for uploading your inventory file to the ADMI Insights Platform. " +
-//				"You are receiving this email to notify you that the file has finished processing for P&A code " + paCode + ", and " +
-//				"the ADMI Insights Platform site will now reflect your updated inventory information. " +
-//				"If you have any questions, please contact your ADMI representative. ";
-//
-//		Context context = new Context();
-//
-//		context.setVariable("message", message);
-//
-//		String html = templateEngine.process("email/uploadVerificationMessage", context);
-//
-//		try {
-//			emailUtility.sendMimeMessage(to, from, /*cc,*/ bcc, subject, html);
-//		} catch (MailSendException e) {
-//
-//			emailUtility.sendMimeMessage(errorEmail, from, bcc,"AIP Upload Verification Failed to Send - " + subject, html);
-//			throw e;
-//		}
+		try {
+//			if(userEmail == null || userEmail.equals(""))
+//				throw new MessagingException("Unable to send AIP upload failure notification: user email is null or blank.");
+
+			String errorEmail = "errors@admiglobal.com";
+
+			String to = "errors@admiglobal.com";
+			String from = "aisSupport@admiglobal.com";
+//			String cc = errorEmail;
+			String[] bcc = {};
+			String subject = "Error with file upload: Dealer " + paCode;
+
+			String body = "Thank you for uploading your inventory file to the ADMI Insights Platform. " +
+					"There was an error while reading your file; " +
+					"this is usually caused by improper formatting. " +
+					"Please ensure your inventory file has the proper column names for your DMS, and re-upload your file. " +
+					"Contact your ADMI representative for questions or assistance. ";
+
+			try {
+				emailUtility.sendMimeMessage(to, from, /*cc,*/ bcc, subject, body);
+			} catch (MailSendException e) {
+				System.out.println("Failed to send details of upload failure to " + errorEmail + ".");
+				e.printStackTrace();
+			}
+
+			System.out.println("Sent details of the upload failure to " + errorEmail + ".");
+
+		} catch (MessagingException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
 	}
 
 }

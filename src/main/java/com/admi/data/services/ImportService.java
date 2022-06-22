@@ -86,20 +86,21 @@ public class ImportService {
 			} else {
 				inventory = importXlsxInventoryFile(file, dealerId, dmsId);
 			}
+
+			aipInventoryService.saveAll(inventory, dealerId, paCode, DmsProvider.findDms(dmsId));
+
+			TipEnrollmentsEntity tipDealer = tipEnrollmentsRepo.findByDealerId(dealerId);
+
+			if (tipDealer != null) {
+				tipService.runSingleTipDealer(dealerId, inventory, DmsProvider.findDms(dmsId));
+			}
+
 		} catch (Exception e){
 			//something went wrong with uploading the file
 			//send the user a failure email
+			emailService.sendAipUploadFailureNotification(userEmail, paCode);
 			//send errors@admiglobal an error email with more details
-		}
-
-
-
-		aipInventoryService.saveAll(inventory, dealerId, paCode, DmsProvider.findDms(dmsId));
-
-		TipEnrollmentsEntity tipDealer = tipEnrollmentsRepo.findByDealerId(dealerId);
-
-		if (tipDealer != null) {
-			tipService.runSingleTipDealer(dealerId, inventory, DmsProvider.findDms(dmsId));
+			emailService.sendAipUploadFailureStackTraceToDev(userEmail, paCode, errorDetails);
 		}
 
 		System.out.println(DateService.getTimeString() + ": Completed importing Dealer " + dealerId);
