@@ -215,6 +215,8 @@ public class ProcessesController {
 		if (dealer != null) {
 			List<AipInventoryEntity> inventory = aipInventoryRepo.findAllByDealerIdAndDataDate(dealer.getDealerId(), LocalDate.now());
 
+
+
 			DmsProvider dms = DmsProvider.findDms(dealer.getDmsId());
 			KpiEntity kpis = aisKpiService.calculateAisKpi(inventory, dms);
 

@@ -6,16 +6,16 @@ import java.util.Arrays;
 
 public enum DmsProvider {
 
-	CDK(new Integer[]{8,37,54,61}, "CDK", CdkStatus.STOCK),
-	RR_ERA(new Integer[]{1,50}, "R&R Era/Ignite", RREraStatus.STOCK),
-	AUTOSOFT(new Integer[]{9}, "AutoSoft", AutosoftStatus.Y),
 	AUTOMATE(new Integer[]{22}, "AutoMate", AutomateStatus.STOCKED),
-	RR_POWER(new Integer[]{48}, "R&R Power", RRPowerStatus.STOCK),
-	PBS(new Integer[]{30}, "PBS", PbsStatus.STOCK),
+	AUTOSOFT(new Integer[]{9}, "AutoSoft", AutosoftStatus.Y),
+	CDK(new Integer[]{8,37,54,61}, "CDK", CdkStatus.STOCK),
 	DEALERTRACK(new Integer[]{13}, "DealerTrack", DealerTrackStatus.A),
-	LIGHTYEAR(new Integer[]{23}, "LightYear", LightyearStatus.S),
-	QUORUM(new Integer[]{}, "Quorum", GenericStatus.STOCK),
 	DOMINION(new Integer[]{}, "Dominion", GenericStatus.STOCK),
+	LIGHTYEAR(new Integer[]{23}, "LightYear", LightyearStatus.S),
+	PBS(new Integer[]{30}, "PBS", PbsStatus.STOCK),
+	QUORUM(new Integer[]{}, "Quorum", GenericStatus.STOCK),
+	RR_ERA(new Integer[]{1,50}, "R&R Era/Ignite", RREraStatus.STOCK),
+	RR_POWER(new Integer[]{48}, "R&R Power", RRPowerStatus.STOCK),
 	GENERIC(new Integer[]{0}, "Generic", GenericStatus.STOCK);
 
 	private final Integer[] idArray;

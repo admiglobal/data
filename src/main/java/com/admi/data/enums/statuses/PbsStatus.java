@@ -39,9 +39,8 @@ public enum PbsStatus implements DmsStatus {
 	 */
 	public static PbsStatus findStatus(String statusName) {
 		for (PbsStatus status : values()) {
-			if (Arrays.asList(status.statusNameArray).contains(statusName.toUpperCase())) {
+			if (Arrays.asList(status.statusNameArray).contains(statusName.toUpperCase()))
 				return status;
-			}
 		}
 		return null;
 	}
