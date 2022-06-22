@@ -65,7 +65,7 @@ public enum RRPowerInventoryField{
                     Cell :: getNumericCellValue,
                     Long.class,
                     RRPowerDto :: setNet,
-                    Long.class)),
+                    String.class)), //this is a String because sometimes formatted as "$5.49", sometimes as "549"
     QOH(new String[] {"On-Hand"},
             new CellDefinition<>(
                     CellType.NUMERIC,
@@ -249,7 +249,6 @@ public enum RRPowerInventoryField{
 
     /**
      * Returns the RRPowerInventoryField enum that corresponds to this field name.
-     * Will ignore fields of the format "MMM YR2" (e.g. MAY YR2), as Jay says these are junk fields (data from 2 years ago)
      * @param fieldName A String corresponding to a field name. This class accounts for multiple possible names for a column
      * @return The corresponding RRPowerInventoryField enum constant
      */
