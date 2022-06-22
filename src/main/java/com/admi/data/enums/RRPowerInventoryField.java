@@ -11,6 +11,7 @@ import java.util.Map;
 
 public enum RRPowerInventoryField{
     OCT(new String[] {"OCT"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -18,6 +19,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setOct,
                     Long.class)),
     NOV(new String[] {"NOV"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -25,6 +27,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setNov,
                     Long.class)),
     DEC(new String[] {"DEC"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -32,6 +35,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setDec,
                     Long.class)),
     JAN(new String[] {"JAN"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -39,6 +43,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setJan,
                     Long.class)),
     FEB(new String[] {"FEB"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -46,6 +51,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setFeb,
                     Long.class)),
     MAR(new String[] {"MAR"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -53,6 +59,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setMar,
                     Long.class)),
     TWELVE_MONTH_SALES_YR1(new String[] {"12 Month Sales YR1"},
+            false,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -60,6 +67,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setTwelveMonthSalesYr1,
                     Long.class)),
     NET(new String[] {"Net"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -67,6 +75,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setNet,
                     String.class)), //this is a String because sometimes formatted as "$5.49", sometimes as "549"
     QOH(new String[] {"On-Hand"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -74,6 +83,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setQuantityOnHand,
                     Long.class)),
     ON_HAND_VALUE(new String[] {"On-Hand Value"},
+            false,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -81,6 +91,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setOnHandValue,
                     Double.class)),
     BACKORDER(new String[] {"Backorder"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -88,6 +99,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setBackorder,
                     Long.class)),
     OUTSTANDING(new String[] {"Outstanding"},
+            false,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -95,6 +107,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setOutstanding,
                     Long.class)),
     MINIMUM(new String[] {"Minimum"},
+            false,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -102,6 +115,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setMinimum,
                     Long.class)),
     MAXIMUM(new String[] {"Maximum"},
+            false,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -109,6 +123,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setMaximum,
                     Long.class)),
     SOURCE(new String[] {"Source"},
+            true,
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
@@ -116,6 +131,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setSource,
                     String.class)),
     PART_NUMBER(new String[] {"Part"},
+            true,
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
@@ -123,6 +139,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto::setPartNumber,
                     String.class)),
     GROUP(new String[] {"Group"},
+            false,
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
@@ -130,6 +147,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto::setGroup,
                     String.class)),
     BIN(new String[] {"Bin"},
+            true,
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
@@ -137,6 +155,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setBin,
                     String.class)),
     ENTRY(new String[] {"Entry"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getLocalDateTimeCellValue,
@@ -144,6 +163,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setEntry,
                     LocalDate.class)),
     LAST_SALE_DATE(new String[] {"Last Sale Date"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getLocalDateTimeCellValue,
@@ -151,6 +171,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setLastSaleDate,
                     LocalDate.class)),
     OVERALL_STATUS(new String[] {"Overall Status"},
+            true,
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
@@ -158,6 +179,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setOverallStatus,
                     String.class)),
     RECEIPT_DATE(new String[] {"Receipt Date"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -165,6 +187,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setReceiptDate,
                     LocalDate.class)),
     RIM_STATE(new String[] {"RIM State"},
+            true,
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
@@ -172,6 +195,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setRimState,
                     String.class)),
     MAY(new String[] {"MAY"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -179,6 +203,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setMay,
                     Long.class)),
     APR(new String[] {"APR"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getStringCellValue,
@@ -194,6 +219,7 @@ public enum RRPowerInventoryField{
 //                    RRPowerDto :: setMarYr2,
 //                    Long.class)),
     SEP(new String[] {"SEP"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -201,6 +227,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setSep,
                     Long.class)),
     DESCRIPTION(new String[] {"Description"},
+            true,
             new CellDefinition<>(
                     CellType.STRING,
                     Cell :: getStringCellValue,
@@ -208,6 +235,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setDescription,
                     String.class)),
     AUG(new String[] {"AUG"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -215,6 +243,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setAug,
                     Long.class)),
     JUL(new String[] {"JUL"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -222,6 +251,7 @@ public enum RRPowerInventoryField{
                     RRPowerDto :: setJul,
                     Long.class)),
     JUN(new String[] {"JUN"},
+            true,
             new CellDefinition<>(
                     CellType.NUMERIC,
                     Cell :: getNumericCellValue,
@@ -231,11 +261,16 @@ public enum RRPowerInventoryField{
     ;
 
     private final String[] fieldNames;
+    /**
+     * A field is considered critical when we use it in the RRPowerDto method toAipInventory()
+     */
+    private final boolean criticalField;
     private final CellDefinition<RRPowerDto, ?, ?> definition;
     private static final Map<String, RRPowerInventoryField> map = new HashMap<>(values().length, 1);
 
-    RRPowerInventoryField(String[] fieldNames, CellDefinition<RRPowerDto, ?, ?> definition) {
+    RRPowerInventoryField(String[] fieldNames, boolean criticalField, CellDefinition<RRPowerDto, ?, ?> definition) {
         this.fieldNames = fieldNames;
+        this.criticalField = criticalField;
         this.definition = definition;
     }
 
