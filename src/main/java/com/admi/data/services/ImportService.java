@@ -100,7 +100,7 @@ public class ImportService {
 			//send the user a failure email
 			emailService.sendAipUploadFailureNotification(userEmail, paCode);
 			//send errors@admiglobal an error email with more details
-			emailService.sendAipUploadFailureStackTraceToDev(userEmail, paCode, errorDetails);
+			emailService.sendAipUploadFailureStackTraceToDev(userEmail, paCode, e.getStackTrace());
 		}
 
 		System.out.println(DateService.getTimeString() + ": Completed importing Dealer " + dealerId);

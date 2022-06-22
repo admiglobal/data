@@ -158,7 +158,7 @@ public class EmailService {
 
 			String message = "Thank you for uploading your inventory file to the ADMI Insights Platform. " +
 					"There was an error while reading your file; " +
-					"this is usually caused by improper formatting. " +
+					"this is usually caused by improper data formatting. " +
 					"Please ensure your inventory file has the proper column names for your DMS, and re-upload your file. " +
 					//TODO -- would be nice to tell the dealer exactly what columns we were hoping for: maybe add a static list to each Field enum of the absolutely necessary fields? This list could be reused in the SpreadsheetHeaders object, too.
 //					"Please ensure your file is of the " + fileFormat + " format and has the following columns: " +
@@ -204,11 +204,11 @@ public class EmailService {
 			String[] bcc = {};
 			String subject = "Error with file upload: Dealer " + paCode;
 
-			String body = "Thank you for uploading your inventory file to the ADMI Insights Platform. " +
-					"There was an error while reading your file; " +
-					"this is usually caused by improper formatting. " +
-					"Please ensure your inventory file has the proper column names for your DMS, and re-upload your file. " +
-					"Contact your ADMI representative for questions or assistance. ";
+//			String body = "Thank you for uploading your inventory file to the ADMI Insights Platform. " +
+//					"There was an error while reading your file; " +
+//					"this is usually caused by improper formatting. " +
+//					"Please ensure your inventory file has the proper column names for your DMS, and re-upload your file. " +
+//					"Contact your ADMI representative for questions or assistance. ";
 
 			try {
 				emailUtility.sendMimeMessage(to, from, /*cc,*/ bcc, subject, body);
