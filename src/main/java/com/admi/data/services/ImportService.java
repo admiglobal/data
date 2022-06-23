@@ -49,7 +49,7 @@ public class ImportService {
 	CdkImportService cdkImportService;
 
 	@Autowired
-	TipOrderDetailService tipService;
+	TipService tipService;
 
 	@Autowired
 	AipInventoryRepository inventoryRepo;

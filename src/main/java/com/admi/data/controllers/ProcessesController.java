@@ -57,7 +57,7 @@ public class ProcessesController {
 	OpcKpiService opcKpiService;
 
 	@Autowired
-	TipOrderDetailService tipService;
+	TipService tipService;
 
 	@Autowired
 	EmailService emailService;

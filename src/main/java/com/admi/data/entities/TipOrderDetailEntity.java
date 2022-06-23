@@ -4,6 +4,7 @@ import com.admi.data.entities.keys.TipOrderDetailEntityPK;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Entity
@@ -11,7 +12,7 @@ import java.util.Objects;
 @IdClass(TipOrderDetailEntityPK.class)
 public class TipOrderDetailEntity {
 	private Long dealerId;
-	private LocalDate dataDate;
+	private LocalDateTime dataDate;
 	private String partNo;
 	private String description;
 	private Integer cents;
@@ -32,7 +33,7 @@ public class TipOrderDetailEntity {
 
 	public TipOrderDetailEntity() {}
 
-	public TipOrderDetailEntity(Long dealerId, LocalDate dataDate, String partNo, String description, Integer cents, String src, Integer ytdSales, Integer ytdHitsByMonth, Integer monthsNoSale, Integer qoh, String status, LocalDate lastSale, LocalDate lastReceipt, String bin, Boolean mfgControlled, String manufacturer, Integer qoo, LocalDate entryDate, Integer orderQty) {
+	public TipOrderDetailEntity(Long dealerId, LocalDateTime dataDate, String partNo, String description, Integer cents, String src, Integer ytdSales, Integer ytdHitsByMonth, Integer monthsNoSale, Integer qoh, String status, LocalDate lastSale, LocalDate lastReceipt, String bin, Boolean mfgControlled, String manufacturer, Integer qoo, LocalDate entryDate, Integer orderQty) {
 		this.dealerId = dealerId;
 		this.dataDate = dataDate;
 		this.partNo = partNo;
@@ -66,11 +67,11 @@ public class TipOrderDetailEntity {
 
 	@Id
 	@Column(name = "DATA_DATE", nullable = false)
-	public LocalDate getDataDate() {
+	public LocalDateTime getDataDate() {
 		return dataDate;
 	}
 
-	public void setDataDate(LocalDate dataDate) {
+	public void setDataDate(LocalDateTime dataDate) {
 		this.dataDate = dataDate;
 	}
 

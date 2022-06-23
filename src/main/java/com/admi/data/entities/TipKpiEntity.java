@@ -4,25 +4,33 @@ import com.admi.data.entities.keys.TipKpiEntityPK;
 
 import javax.persistence.*;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "TIP_KPI", schema = "ADMI")
 @IdClass(TipKpiEntityPK.class)
 public class TipKpiEntity {
     private Long dealerId;
-    private LocalDate dataDate;
+    private LocalDateTime dataDate;
     private Integer lines;
-    private Long orderTotal;
+    private Integer orderTotal;
     private Integer totalStockParts;
     private Integer totalStockPartsQoh;
 
     public TipKpiEntity() {}
 
-    public TipKpiEntity(Long dealerId, LocalDate dataDate, Integer lines, Long orderTotal, Integer totalStockParts, Integer totalStockPartsQoh) {
+    public TipKpiEntity(Long dealerId, LocalDateTime dataDate, Integer lines, Integer orderTotal, Integer totalStockParts, Integer totalStockPartsQoh) {
         this.dealerId = dealerId;
         this.dataDate = dataDate;
         this.lines = lines;
         this.orderTotal = orderTotal;
+        this.totalStockParts = totalStockParts;
+        this.totalStockPartsQoh = totalStockPartsQoh;
+    }
+
+    public TipKpiEntity(Long dealerId, LocalDateTime dataDate, Integer totalStockParts, Integer totalStockPartsQoh) {
+        this.dealerId = dealerId;
+        this.dataDate = dataDate;
         this.totalStockParts = totalStockParts;
         this.totalStockPartsQoh = totalStockPartsQoh;
     }
@@ -39,11 +47,11 @@ public class TipKpiEntity {
 
     @Id
     @Column(name = "DATA_DATE", nullable = false)
-    public LocalDate getDataDate() {
+    public LocalDateTime getDataDate() {
         return dataDate;
     }
 
-    public void setDataDate(LocalDate dataDate) {
+    public void setDataDate(LocalDateTime dataDate) {
         this.dataDate = dataDate;
     }
 
@@ -59,11 +67,11 @@ public class TipKpiEntity {
 
     @Basic
     @Column(name = "ORDER_TOTAL", nullable = true, precision = 0)
-    public Long getOrderTotal() {
+    public Integer getOrderTotal() {
         return orderTotal;
     }
 
-    public void setOrderTotal(Long orderTotal) {
+    public void setOrderTotal(Integer orderTotal) {
         this.orderTotal = orderTotal;
     }
 
