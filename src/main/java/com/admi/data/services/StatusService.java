@@ -1,6 +1,7 @@
 package com.admi.data.services;
 
 import com.admi.data.entities.*;
+import com.admi.data.enums.DmsProvider;
 import com.admi.data.enums.KpiTitle;
 import com.admi.data.enums.statuses.*;
 import com.admi.data.repositories.*;
@@ -29,7 +30,7 @@ public class StatusService {
     @Autowired
     DealerMasterRepository dealerMasterRepo;
 
-    public void runStatusValuesForToday(Long dealerId) {
+    public void runStatusValuesForToday(Long dealerId, DmsProvider dmsProvider) {
         DealerMasterEntity dealer = dealerMasterRepo.findByDealerId(dealerId);
 
         ZigEntity zigEntityForDate = zigRepo.findFirstByPaCode(dealer.getPaCode());
@@ -50,7 +51,7 @@ public class StatusService {
         List<ZigEntity> supportedParts = zigRepo.findAllSupportedParts(
                 dealer.getPaCode(),
                 todayDate,
-                getStockStatusString(dealer.getDmsId())
+                dmsProvider.getStatusType().getStockStatus().toString()
         );
 
         KpiEntity kpiEntity = kpiRepo.findByDealerIdAndDataDate(dealer.getDealerId(), dataDate);
@@ -76,7 +77,7 @@ public class StatusService {
         rimTotals.put(KpiTitle.NON_RIM.toString(), allPartsTotal.subtract(rimAllTotal));
 
         maps.put(0, supportedTotals);
-        maps.put(1, totalPartsByStatus(nonnegativeQohParts, dealer.getDmsId()));
+        maps.put(1, totalPartsByStatus(nonnegativeQohParts, dmsProvider));
         maps.put(2, rimTotals);
 
         maps.forEach((k,v) -> saveStatusFromMap(v, dealer, k, dataDate));
@@ -99,46 +100,6 @@ public class StatusService {
         statusTotalsRepo.flush();
     }
 
-    public String getStockStatusString(int dms) {
-        DmsStatus status;
-
-        switch (dms) {
-            case 8:
-            case 37:
-            case 54:
-            case 61:
-                status = CdkStatus.STOCK;
-                break;
-            case 22:
-                status = AutomateStatus.STOCKED;
-                break;
-            case 9:
-                status = AutosoftStatus.Y;
-                break;
-            case 13:
-                status = DealerTrackStatus.A;
-                break;
-            case 23:
-                status = LightyearStatus.S;
-                break;
-            case 30:
-                status = PbsStatus.STOCK;
-                break;
-            case 1:
-            case 50:
-                status = RREraStatus.STOCK;
-                break;
-            case 48:
-                status = RRPowerStatus.STOCK;
-                break;
-            default:
-                status = GenericStatus.STOCK;
-                break;
-        }
-
-        return status.toString();
-    }
-
     public BigDecimal totalAllParts(List<ZigEntity> inventory) {
         BigDecimal total = BigDecimal.ZERO;
 
@@ -154,10 +115,10 @@ public class StatusService {
      * that is, the sum of all cost*QOH for all parts of that status.
      * Note: DOES include parts with a negative on-hand value. This will skew results if not omitted from the inventory argument.
      * @param inventory All parts in this dealer's inventory
-     * @param dms The DMS ID for this dealer
+     * @param dmsProvider The DmsProvider for this dealer
      * @return A HashMap of: DMS status name -> status total
      */
-    public HashMap<String, BigDecimal> totalPartsByStatus(List<ZigEntity> inventory, int dms) {
+    public HashMap<String, BigDecimal> totalPartsByStatus(List<ZigEntity> inventory, DmsProvider dmsProvider) {
         HashMap<String, BigDecimal> totals = new HashMap<>();
 
         BigDecimal total;
@@ -167,7 +128,7 @@ public class StatusService {
             String statusName;
 
             try {
-                DmsStatus status = getStatusByDms(part.getDmsStatus(), dms);
+                DmsStatus status = DmsStatus.findStatus(part.getDmsStatus(), dmsProvider);
                 statusName = status.toString();
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -185,79 +146,5 @@ public class StatusService {
             totals.put(statusName, total.add(partTotal));
         }
         return totals;
-    }
-
-    private DmsStatus getStatusByDms(String statusString, int dms) {
-        DmsStatus status;
-
-        switch (dms) {
-            case 8:
-            case 37:
-            case 54:
-            case 61:
-                try {
-                    status = CdkStatus.valueOf(statusString);
-                } catch (NullPointerException | IllegalArgumentException e) {
-                    status = CdkStatus.NS;
-                }
-                break;
-            case 22:
-                try {
-                    status = AutomateStatus.valueOf(statusString);
-                } catch (NullPointerException | IllegalArgumentException e) {
-                    status = AutomateStatus.NOT_STOCKED;
-                }
-                break;
-            case 9:
-                try {
-                    status = AutosoftStatus.valueOf(statusString);
-                } catch (NullPointerException | IllegalArgumentException e) {
-                    status = AutosoftStatus.N;
-                }
-                break;
-            case 13:
-                try {
-                    status = DealerTrackStatus.valueOf(statusString);
-                } catch (NullPointerException | IllegalArgumentException e) {
-                    status = DealerTrackStatus.N;
-                }
-                break;
-            case 23:
-                try {
-                    status = LightyearStatus.valueOf(statusString);
-                } catch (NullPointerException | IllegalArgumentException e) {
-                    status = LightyearStatus.N;
-                }
-                break;
-            case 30:
-                try {
-                    status = PbsStatus.findStatus(statusString); //case-insensitive
-                    if(status == null)
-                        status = PbsStatus.TEST;
-                } catch (NullPointerException | IllegalArgumentException e) {
-                    status = PbsStatus.TEST;
-                }
-                break;
-            case 1:
-            case 50:
-                try {
-                    status = RREraStatus.valueOf(statusString);
-                } catch (NullPointerException | IllegalArgumentException e) {
-                    status = RREraStatus.NS;
-                }
-                break;
-            case 48:
-                try{
-                    status = RRPowerStatus.valueOf(statusString);
-                } catch (NullPointerException | IllegalArgumentException e) {
-                    status = RRPowerStatus.N_STK;
-                }
-                break;
-            default:
-                status = GenericStatus.NONE;
-                break;
-        }
-
-        return status;
     }
 }

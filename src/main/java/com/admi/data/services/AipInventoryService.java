@@ -55,10 +55,8 @@ public class AipInventoryService {
 	public void processInventory(List<AipInventoryEntity> inventory, Long dealerId, String paCode, DmsProvider dms) {
 		zigService.saveAsZig(inventory, paCode);
 		rimService.addOrUpdateRimParts(dealerId, inventory);
-//		processService.calculateAisKpi(inventory);
 		processService.calculateAisKpi(inventory, dms);
-		statusService.runStatusValuesForToday(dealerId);
-//		statusService.runStatusValuesForToday(dealerId, dms);
+		statusService.runStatusValuesForToday(dealerId, dms);
 	}
 
 }

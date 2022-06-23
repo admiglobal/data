@@ -2,9 +2,11 @@ package com.admi.data.services;
 
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.entities.DealerMasterEntity;
+import com.admi.data.entities.FordDealerInventoryEntity;
 import com.admi.data.entities.FordDealerKpiEntity;
 import com.admi.data.repositories.AipInventoryRepository;
 import com.admi.data.repositories.DealerMasterRepository;
+import com.admi.data.repositories.FordDealerInventoryRepository;
 import com.admi.data.repositories.FordDealerKpiRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,35 +22,39 @@ public class FordDealerKpiService {
 	@Autowired
 	DealerMasterRepository dealerRepo;
 
-	@Autowired
-	AipInventoryRepository inventoryRepo;
+//	@Autowired
+//	AipInventoryRepository inventoryRepo;
 
 	@Autowired
 	FordDealerKpiRepository kpiRepo;
 
-	public void runAllFordDealers() {
+	@Autowired
+	FordDealerInventoryRepository inventoryRepo;
+
+	public void runAllFordDealers(LocalDate date) {
 		List<DealerMasterEntity> dealers = dealerRepo.findAllInInventory();
 
 		for(DealerMasterEntity dealer : dealers) {
 			System.out.println("Running dealer " + dealer.getPaCode() + " - " + dealer.getDealershipName());
-			runSingleDealer(dealer);
+			runSingleDealer(dealer, date);
 		}
 	}
 
-	public void runDealerByPaCode(String paCode) {
+	public void runDealerByPaCode(String paCode, LocalDate date) {
 		DealerMasterEntity dealer = dealerRepo.findInInventory(paCode);
 
 		System.out.println("Running dealer " + dealer.getPaCode() + " - " + dealer.getDealershipName());
-		runSingleDealer(dealer);
+		runSingleDealer(dealer, date);
 	}
 
-	public void runSingleDealer(DealerMasterEntity dealer) {
-		List<AipInventoryEntity> inventory = inventoryRepo.findFordInventoryByPaCode(dealer.getPaCode());
+	public void runSingleDealer(DealerMasterEntity dealer, LocalDate date) {
+//		List<AipInventoryEntity> inventory = inventoryRepo.findFordInventoryByPaCode(dealer.getPaCode());
+		List<FordDealerInventoryEntity> inventory = inventoryRepo.findFordInventoryByPaCode(dealer.getPaCode());
 		FordDealerKpiEntity kpi;
 
 		if (inventory.size() > 0) {
 
-			LocalDate invDate = null;
+			LocalDate invDate = date;
 
 			int totalRimValue = 0;
 			int totalRimSkus = 0;
@@ -61,35 +67,38 @@ public class FordDealerKpiService {
 			int totalNonStockSkus = 0;
 			int totalNonStockValueUnder60 = 0;
 			int totalNonStockValueOver60 = 0;
+			int totalNonStockValueOver270 = 0;
 
-			for (AipInventoryEntity part : inventory) {
-				if (invDate == null) {
-					invDate = part.getDataDate();
-				}
+			int badPartCount = 0;
 
+			for (FordDealerInventoryEntity part : inventory) {
 				if (part.getQoh() > 0) {
 					if (part.getMfgControlled() != null && part.getMfgControlled()) {
 						totalRimValue += part.getCents() * part.getQoh();
 						totalRimSkus += 1;
 					} else {
-						totalStockValue += getPartTotalByField(part, "Y", AipInventoryEntity :: getAdmiStatus);
-						totalStockSkus += getSkuCountByField(part, "Y", AipInventoryEntity :: getAdmiStatus);
-						totalStockValueOver9M += getPartTotalByStatusBeforeDate(part, "Y", 9, AipInventoryEntity :: getLastSaleOrReceipt, AipInventoryEntity :: getAdmiStatus);
+						totalStockValue += getPartTotalByField(part, "Y", FordDealerInventoryEntity :: getAdmiStatus);
+						totalStockSkus += getSkuCountByField(part, "Y", FordDealerInventoryEntity :: getAdmiStatus);
+						totalStockValueOver9M += getPartTotalByStatusBeforeDate(part, "Y", 9, FordDealerInventoryEntity :: getLastSaleOrReceipt, FordDealerInventoryEntity :: getAdmiStatus);
 
-						totalNonStockValue += getPartTotalByField(part, "N", AipInventoryEntity :: getAdmiStatus);
-						totalNonStockSkus += getSkuCountByField(part, "N", AipInventoryEntity :: getAdmiStatus);
-						totalNonStockValueUnder60 += getPartTotalByStatusAfterDate(part, "N", 2, AipInventoryEntity :: getLastSaleOrReceipt, AipInventoryEntity :: getAdmiStatus);
-						totalNonStockValueOver60 += getPartTotalByStatusBeforeDate(part, "N", 2, AipInventoryEntity :: getLastSaleOrReceipt, AipInventoryEntity :: getAdmiStatus);
+						totalNonStockValue += getPartTotalByField(part, "N", FordDealerInventoryEntity :: getAdmiStatus);
+						totalNonStockSkus += getSkuCountByField(part, "N", FordDealerInventoryEntity :: getAdmiStatus);
+						totalNonStockValueUnder60 += getPartTotalByStatusAfterDate(part, "N", 2, FordDealerInventoryEntity :: getLastSaleOrReceipt, FordDealerInventoryEntity :: getAdmiStatus);
+						totalNonStockValueOver60 += getPartTotalByStatusBeforeDate(part, "N", 2, FordDealerInventoryEntity :: getLastSaleOrReceipt, FordDealerInventoryEntity :: getAdmiStatus);
+						totalNonStockValueOver270 += getPartTotalByStatusBeforeDate(part, "N", 9, FordDealerInventoryEntity :: getLastSaleOrReceipt, FordDealerInventoryEntity :: getAdmiStatus);
 					}
+				} else {
+					badPartCount++;
 				}
 			}
 
-			kpi = new FordDealerKpiEntity(dealer.getDealerId(), invDate, totalStockValue, totalNonStockValue, totalRimValue, totalStockSkus, totalNonStockSkus, totalRimSkus, totalStockValueOver9M, totalNonStockValueOver60, totalNonStockValueUnder60);
+			System.out.println("Bad Part Count: " + badPartCount);
+			kpi = new FordDealerKpiEntity(dealer.getDealerId(), invDate, totalStockValue, totalNonStockValue, totalRimValue, totalStockSkus, totalNonStockSkus, totalRimSkus, totalStockValueOver9M, totalNonStockValueOver60, totalNonStockValueUnder60, totalNonStockValueOver270);
 			kpiRepo.save(kpi);
 		}
 	}
 
-	private <T> Integer getPartTotalByField(AipInventoryEntity part, T valueToMatch, Function<AipInventoryEntity, T> fieldGetter) {
+	private <T> Integer getPartTotalByField(FordDealerInventoryEntity part, T valueToMatch, Function<FordDealerInventoryEntity, T> fieldGetter) {
 		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
 			return part.getQoh() * part.getCents();
 		} else {
@@ -97,7 +106,7 @@ public class FordDealerKpiService {
 		}
 	}
 
-	private <T> Integer getSkuCountByField(AipInventoryEntity part, T valueToMatch, Function<AipInventoryEntity, T> fieldGetter) {
+	private <T> Integer getSkuCountByField(FordDealerInventoryEntity part, T valueToMatch, Function<FordDealerInventoryEntity, T> fieldGetter) {
 		if (Objects.equals(fieldGetter.apply(part), valueToMatch)) {
 			return 1;
 		} else {
@@ -105,11 +114,11 @@ public class FordDealerKpiService {
 		}
 	}
 
-	private Integer getPartTotalByStatusBeforeDate(AipInventoryEntity part,
+	private Integer getPartTotalByStatusBeforeDate(FordDealerInventoryEntity part,
 	                                               String status,
 	                                               Integer monthCount,
-	                                               Function<AipInventoryEntity, LocalDate> dateGetter,
-	                                               Function<AipInventoryEntity, String> stringGetter) {
+	                                               Function<FordDealerInventoryEntity, LocalDate> dateGetter,
+	                                               Function<FordDealerInventoryEntity, String> stringGetter) {
 		LocalDate date = LocalDate.now().minusMonths(monthCount);
 		LocalDate partDate = dateGetter.apply(part);
 
@@ -122,11 +131,11 @@ public class FordDealerKpiService {
 		}
 	}
 
-	private Integer getPartTotalByStatusAfterDate(AipInventoryEntity part,
+	private Integer getPartTotalByStatusAfterDate(FordDealerInventoryEntity part,
 	                                               String status,
 	                                               Integer monthCount,
-	                                               Function<AipInventoryEntity, LocalDate> dateGetter,
-	                                               Function<AipInventoryEntity, String> stringGetter) {
+	                                               Function<FordDealerInventoryEntity, LocalDate> dateGetter,
+	                                               Function<FordDealerInventoryEntity, String> stringGetter) {
 		LocalDate date = LocalDate.now().minusMonths(monthCount);
 		LocalDate partDate = dateGetter.apply(part);
 

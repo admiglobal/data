@@ -169,19 +169,21 @@ public class ProcessesController {
 	}
 
 	@ResponseBody
-	@GetMapping("/dpoc")
-	public String processInventoryForDpocSite() {
+	@GetMapping("/dpoc/{dateString}")
+	public String processInventoryForDpocSite(@PathVariable("dateString") String dateString) {
 
-		fordDealerKpiService.runAllFordDealers();
+		LocalDate date = LocalDate.parse(dateString);
+		fordDealerKpiService.runAllFordDealers(date);
 
 		return "DPOC dealers ran.";
 	}
 
 	@ResponseBody
-	@GetMapping("/dpoc/{paCode}")
-	public String processInventoryForDpocSite(@PathVariable("paCode") String paCode) {
+	@GetMapping("/dpoc/{paCode}/{dateString}")
+	public String processInventoryForDpocSite(@PathVariable("paCode") String paCode, @PathVariable("dateString") String dateString) {
 
-		fordDealerKpiService.runDealerByPaCode(paCode);
+		LocalDate date = LocalDate.parse(dateString);
+		fordDealerKpiService.runDealerByPaCode(paCode, date);
 
 		return "DPOC dealers ran.";
 	}
@@ -194,7 +196,7 @@ public class ProcessesController {
 		LocalDate date = LocalDate.parse(dateString);
 
 		cpcService.runCpcDealers(date);
-		fordDealerKpiService.runAllFordDealers();
+		fordDealerKpiService.runAllFordDealers(date);
 		opcKpiService.runOpcProcess(date);
 
 		long endTime = System.currentTimeMillis();
@@ -212,6 +214,8 @@ public class ProcessesController {
 
 		if (dealer != null) {
 			List<AipInventoryEntity> inventory = aipInventoryRepo.findAllByDealerIdAndDataDate(dealer.getDealerId(), LocalDate.now());
+
+
 
 			DmsProvider dms = DmsProvider.findDms(dealer.getDmsId());
 			KpiEntity kpis = aisKpiService.calculateAisKpi(inventory, dms);

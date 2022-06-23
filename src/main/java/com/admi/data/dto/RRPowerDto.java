@@ -22,7 +22,7 @@ public class RRPowerDto {
     private Long feb;
     private Long mar;
     private Long twelveMonthSalesYr1;
-    private Long net;
+    private String net;
     private Long quantityOnHand;
     private Double onHandValue;
     private Long backorder;
@@ -55,7 +55,7 @@ public class RRPowerDto {
 
         inv.setDealerId(dealerId);
         inv.setPartNo(SpreadsheetService.getPartNumberDbFormat(partNumber, this.hashCode()));
-        inv.setCents((net == null) ? null : Math.toIntExact(net));
+        inv.setCents(this.getCents());
         inv.setQoh(quantityOnHand == null ? 0 : Math.toIntExact(this.quantityOnHand));
         inv.setDescription(this.description);
         inv.setStatus(this.overallStatus);
@@ -114,6 +114,26 @@ public class RRPowerDto {
                 && jun == null;
     }
 
+    /**
+     * Since the "Net" value for RR Power is either of the "$5,999.49" (dollars) format
+     * or the "599949" (cents) format, we read it in as a String first.
+     * This method returns this DTO's Net value formatted as an Integer for the AIP_INVENTORY cents field.
+     * @return an Integer representing the cost of this part in cents
+     */
+    public Integer getCents(){
+        try{
+            return Integer.parseInt(net
+                                    .replaceAll("\\$", "")
+                                    .replaceAll("\\.", "")
+                                    .replaceAll(",", "")
+                                    .trim()
+                                    );
+        } catch (NumberFormatException nfe){
+            System.out.println("Unable to parse " + net + " as a dollar or cents value.");
+        }
+        return null;
+    }
+
     public Long getOct() {
         return oct;
     }
@@ -170,11 +190,11 @@ public class RRPowerDto {
         this.twelveMonthSalesYr1 = twelveMonthSalesYr1;
     }
 
-    public Long getNet() {
+    public String getNet() {
         return net;
     }
 
-    public void setNet(Long net) {
+    public void setNet(String net) {
         this.net = net;
     }
 
