@@ -11,12 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Service
-public class TipOrderDetailService {
+public class TipService {
 
     @Autowired
     AipInventoryRepository inventoryRepo;
@@ -33,11 +34,6 @@ public class TipOrderDetailService {
         calculateTipKpi(dealerId, inventory, DmsProvider.CDK);
     }
 
-    public void runSingleTipDealer(Long dealerId, LocalDate dataDate, DmsProvider dms) {
-       List<AipInventoryEntity> inventory = inventoryRepo.findAllByDealerIdAndDataDate(dealerId, dataDate);
-       calculateTipKpi(dealerId, inventory, dms);
-    }
-
     public void runSingleTipDealer(Long dealerId, List<AipInventoryEntity> inventory, DmsProvider dms) {
        calculateTipKpi(dealerId, inventory, dms);
     }
@@ -51,12 +47,10 @@ public class TipOrderDetailService {
     public void calculateTipKpi(Long dealerId, List<AipInventoryEntity> inventory, DmsProvider dms) {
         List<TipOrderDetailEntity> orderList = new ArrayList<>();
 
-        int lines = 0;
-        int orderTotal = 0;
         int stockParts = 0;
         int onHandStockParts = 0;
 
-        LocalDate creationTime = LocalDate.now();
+        LocalDateTime creationTime = LocalDateTime.now();
 
         for (AipInventoryEntity part : inventory) {
             int currentMonth = part.getDataDate().getMonthValue();
@@ -77,8 +71,6 @@ public class TipOrderDetailService {
                         && monthsNoSale <= 6
                         && part.getYtdMonthsWithSales() != null && part.getYtdMonthsWithSales() >= 2
                         && part.getTwelveMonthSales() != null && part.getTwelveMonthSales() > 0) {
-                    lines++;
-                    orderTotal += part.getCents();
 
                     TipOrderDetailEntity order = new TipOrderDetailEntity(
                             part.getDealerId(),
@@ -125,8 +117,6 @@ public class TipOrderDetailService {
         TipKpiEntity kpi = new TipKpiEntity(
                 dealerId,
                 creationTime,
-                lines,
-                (long) orderTotal,
                 stockParts,
                 onHandStockParts);
 

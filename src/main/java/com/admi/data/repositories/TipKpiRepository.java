@@ -10,6 +10,6 @@ import java.util.List;
 @Repository
 public interface TipKpiRepository extends JpaRepository<TipKpiEntity, Long> {
 
-    List<TipKpiEntity> findAllByDealerIdAndDataDate(Long dealerId, LocalDateTime dataDate);
+    TipKpiEntity findByDealerIdAndDataDate(Long dealerId, LocalDateTime dateTime);
 
 }
