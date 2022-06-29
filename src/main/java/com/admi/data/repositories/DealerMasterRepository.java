@@ -16,15 +16,15 @@ public interface DealerMasterRepository extends JpaRepository<DealerMasterEntity
 	DealerMasterEntity findByDealerId(long dealerId);
 
 	@Query(value = "select dm.* \n" +
-			"from DEALER_MASTER dm \n" +
-			"join GOLDD_IMPORTER g \n" +
-			"	on dm.PA_CODE = g.PA_CODE\n" +
-			"where g.COUNTRY_CODE = 'USA'\n" +
-			"  and dm.PRIMARY_MANUFACTURER_ID = 1 \n" +
-			"  and dm.TERMINATION_DATE is null \n" +
-			"  and (dm.DEALERSHIP_COUNTRY = 'USA' or dm.DEALERSHIP_COUNTRY is null) \n" +
-			"  and g.QUICK_LANE = 'Y' \n" +
-			"order by dm.PA_CODE",
+			"from QUICK_LANE_DEALERS ql \n" +
+			"inner join ( \n" +
+			"	select * \n" +
+			"	from DEALER_MASTER \n" +
+			"	where TERMINATION_DATE is null \n" +
+			"	and PRIMARY_MANUFACTURER_ID = 1 \n" +
+			"	and (dealership_country = 'USA' or DEALERSHIP_COUNTRY is null) \n" +
+			") dm \n" +
+			"on ql.PA_CODE = dm.pa_code",
 			nativeQuery = true)
 	List<DealerMasterEntity> findAllQuickLaneDealers();
 
