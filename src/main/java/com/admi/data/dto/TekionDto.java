@@ -8,44 +8,46 @@ import java.time.LocalDate;
 
 public class TekionDto {
 
-    String partNumber;
-    String partDescription;
-    String stockingStatus;
-    Integer onHandQty;
-    Integer excessStockQty;
-    Integer onHoldQty;
-    Integer onOrderQty;
-    String bins;
-    Double partCostDollars;
-    Double coreCostDollars;
-    Double totalExtendedCostDollars;
-    Double totalExcessStockCost;
-    Integer sourceCode;
-    String manuallyControlled;
-    String manufacturer;
-    String manufacturerControlCode;
-    String groupNumber;
-    String partsClassificationCode;
-    Integer monthNoSale;
-    Integer monthNoReceipt;
-    Integer twelveMonthSaleQty;
-    Integer jan;
-    Integer feb;
-    Integer mar;
-    Integer apr;
-    Integer may;
-    Integer jun;
-    Integer jul;
-    Integer aug;
-    Integer sep;
-    Integer oct;
-    Integer nov;
-    Integer dec;
-    String manualOrder;
-    LocalDate createdDate;
-    LocalDate lastTransactionTime;
-    LocalDate lastSaleDate;
-    LocalDate lastReceiptDate;
+    private String partNumber;
+    private String partDescription;
+    private String stockingStatus;
+    private Integer onHandQty;
+    private Integer excessStockQty;
+    private Integer onHoldQty;
+    private Integer onOrderQty;
+    private String bins;
+    private Double partCostDollars;
+    private Double coreCostDollars;
+    private Double totalPartCostDollars;
+    private Double totalExtendedCostDollars;
+    private Double totalExcessStockCost;
+    private Integer sourceCode;
+    private String manuallyControlled;
+    private String manufacturer;
+    private String manufacturerControlCode;
+    private String manufacturerControlled;
+    private String groupNumber;
+    private String partsClassificationCode;
+    private Integer monthNoSale;
+    private Integer monthNoReceipt;
+    private Integer twelveMonthSaleQty;
+    private Integer jan;
+    private Integer feb;
+    private Integer mar;
+    private Integer apr;
+    private Integer may;
+    private Integer jun;
+    private Integer jul;
+    private Integer aug;
+    private Integer sep;
+    private Integer oct;
+    private Integer nov;
+    private Integer dec;
+    private String manualOrder;
+    private LocalDate createdDate;
+    private LocalDate lastTransactionTime;
+    private LocalDate lastSaleDate;
+    private LocalDate lastReceiptDate;
 
     public TekionDto() {}
 
@@ -155,6 +157,16 @@ public class TekionDto {
         this.coreCostDollars = coreCostDollars;
     }
 
+
+    public Double getTotalPartCostDollars() {
+        return totalPartCostDollars;
+    }
+
+    public void setTotalPartCostDollars(Double totalPartCostDollars) {
+        this.totalPartCostDollars = totalPartCostDollars;
+    }
+
+
     public Double getTotalExtendedCostDollars() {
         return totalExtendedCostDollars;
     }
@@ -201,6 +213,14 @@ public class TekionDto {
 
     public void setManufacturerControlCode(String manufacturerControlCode) {
         this.manufacturerControlCode = manufacturerControlCode;
+    }
+
+    public String getManufacturerControlled() {
+        return manufacturerControlled;
+    }
+
+    public void setManufacturerControlled(String manufacturerControlled) {
+        this.manufacturerControlled = manufacturerControlled;
     }
 
     public String getGroupNumber() {
