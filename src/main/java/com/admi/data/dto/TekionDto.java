@@ -1,7 +1,6 @@
 package com.admi.data.dto;
 
 import com.admi.data.entities.AipInventoryEntity;
-import com.admi.data.services.CdkImportService;
 import com.admi.data.services.SpreadsheetService;
 
 import java.time.LocalDate;
@@ -75,6 +74,49 @@ public class TekionDto {
 //        inv.setYtdMonthsWithSales(this.calculateYtdMonthsWithSales());
 
         return inv;
+    }
+
+    public boolean isBlankRow(){
+        return partNumber == null
+                && partDescription == null
+                && stockingStatus == null
+                && onHandQty == null
+                && excessStockQty == null
+                && onHoldQty == null
+                && onOrderQty == null
+                && bins == null
+                && partCostDollars == null
+                && coreCostDollars == null
+                && totalPartCostDollars == null
+                && totalExtendedCostDollars == null
+                && totalExcessStockCost == null
+                && sourceCode == null
+                && manuallyControlled == null
+                && manufacturer == null
+                && manufacturerControlCode == null
+                && manufacturerControlled == null
+                && groupNumber == null
+                && partsClassificationCode == null
+                && monthNoSale == null
+                && monthNoReceipt == null
+                && twelveMonthSaleQty == null
+                && jan == null
+                && feb == null
+                && mar == null
+                && apr == null
+                && may == null
+                && jun == null
+                && jul == null
+                && aug == null
+                && sep == null
+                && oct == null
+                && nov == null
+                && dec == null
+                && manualOrder == null
+                && createdDate == null
+                && lastTransactionTime == null
+                && lastSaleDate == null
+                && lastReceiptDate == null;
     }
 
     public String getPartNumber() {

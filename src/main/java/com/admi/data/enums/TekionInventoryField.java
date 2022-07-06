@@ -255,10 +255,7 @@ public enum TekionInventoryField {
                     Cell :: getNumericCellValue,
                     Integer.class,
                     TekionDto :: setDec,
-                    Integer.class)),
-    
-    
-    
+                    Integer.class))
     ;
 
     private final String[] fieldNames;
@@ -271,9 +268,9 @@ public enum TekionInventoryField {
     }
 
     static {
-        for (com.admi.data.enums.TekionInventoryField c : values()){
-            for(String fieldName: c.fieldNames){
-                map.put(fieldName, c);
+        for (com.admi.data.enums.TekionInventoryField field : values()){
+            for(String fieldName: field.fieldNames){
+                map.put(fieldName, field);
             }
         }
     }
@@ -297,7 +294,7 @@ public enum TekionInventoryField {
         return null;
     }
 
-    public String[] getfieldNames() {
+    public String[] getFieldNames() {
         return fieldNames;
     }
 
