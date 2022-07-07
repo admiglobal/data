@@ -76,11 +76,18 @@ public class SpreadsheetHeaders<F extends Enum<?>> {
 
         while(cellIterator.hasNext()) {
             String cellValue = SpreadsheetService.translateCellIntoString(cellIterator.next());
+            System.out.println("Cell value: " + cellValue);
             F field = findByColumnName.apply(cellValue); //Returns the InventoryField with this String value
             headers.add(field);
         }
 
         return headers;
+    }
+
+    public List<F> getSecondaryHeaderList(Sheet sheet, F[] secondaryFieldValues){
+        //Research shows that Apache POI reads in a merged cell as the cell content, then a bunch of nulls
+        // (for the rest of the width of the cell)
+        // Ideal for me!
     }
 
     public List<F> getHeaderList() {

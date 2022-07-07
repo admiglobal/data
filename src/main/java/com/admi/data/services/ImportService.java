@@ -49,6 +49,9 @@ public class ImportService {
 	CdkImportService cdkImportService;
 
 	@Autowired
+	TekionImportService tekionImportService;
+
+	@Autowired
 	TipService tipService;
 
 	@Autowired
@@ -471,6 +474,9 @@ public class ImportService {
 			case 54:	//CDK
 			case 61:	//CDK
 				inventory = cdkImportService.importInventory(sheet, dealerId);
+				break;
+			case 68:	//Tekion
+				inventory = tekionImportService.importInventory(sheet, dealerId);
 				break;
 			default:
 				break;
