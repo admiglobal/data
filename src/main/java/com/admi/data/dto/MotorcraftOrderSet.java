@@ -45,7 +45,7 @@ public class MotorcraftOrderSet {
 	public String getTotalOrderCost(){
 		Float total = 0F;
 		for(McOrdersContentEntity part: orderContent){
-			total += part.getPrice();
+			total += part.getPrice() * part.getQty();
 		}
 		return "$" + String.format("%.2f", total); //currency format
 	}

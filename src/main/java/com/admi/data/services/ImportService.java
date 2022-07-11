@@ -192,12 +192,7 @@ public class ImportService {
 		Date cellDate = orderDateCell.getDateCellValue();
 		LocalDate orderDate = LocalDate.now();
 
-		if (cellDate != null) {
-			orderDate = orderDateCell.getDateCellValue()
-					.toInstant()
-					.atZone(ZoneId.systemDefault())
-					.toLocalDate();
-		} else {
+		if (cellDate == null) {
 			issues.add(new ImportIssue(
 					"Missing Order Date",
 					"Order date was missing or invalid.",
@@ -205,6 +200,23 @@ public class ImportService {
 					"Please re-upload this sheet with a valid order date." )
 			);
 			skipOrder = true;
+		} else if (LocalDate.now().isAfter(orderDateCell
+												.getDateCellValue()
+												.toInstant()
+												.atZone(ZoneId.systemDefault())
+												.toLocalDate())) {
+			issues.add(new ImportIssue(
+					"Order Date Passed",
+					"The order date provided is in the past.",
+					sheet.getSheetName(),
+					"Please re-upload this sheet with an order date that is today or after.")
+			);
+			skipOrder = true;
+		} else {
+			orderDate = orderDateCell.getDateCellValue()
+					.toInstant()
+					.atZone(ZoneId.systemDefault())
+					.toLocalDate();
 		}
 
 		order.setOrderNumber(orderNumber);

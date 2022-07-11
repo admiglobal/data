@@ -3,6 +3,7 @@ package com.admi.data.services;
 import com.admi.data.dto.ImportIssue;
 import com.admi.data.dto.MotorcraftOrder;
 import com.admi.data.dto.MotorcraftOrderSet;
+import com.admi.data.entities.McOrdersEntity;
 import com.admi.data.repositories.McOrdersContentRepository;
 import com.admi.data.repositories.McOrdersRepository;
 import com.admi.data.utilities.EmailUtility;
@@ -32,8 +33,17 @@ public class EmailService {
 	@Autowired
 	TemplateEngine templateEngine = new TemplateEngine();
 
+	public void sendMotorcraftOrderEmail(Long orderNumber) throws MessagingException {
+		MotorcraftOrderSet order = new MotorcraftOrderSet(
+											mcOrdersRepo.findByOrderNumber(orderNumber.toString()),
+											mcOrdersContentRepo.findAllByOrderNumber(orderNumber.toString()),
+											new ArrayList<>()); //issues list is empty: issues are already filtered out on wwwroot side
+
+		sendMotorcraftOrderEmail(order.getOrder().getEmail(), List.of(order), order.getOrder().getPaCode());
+	}
+
 	public void sendMotorcraftOrderEmail(String userEmail, List<MotorcraftOrderSet> orders, String paCode) throws MessagingException {
-		boolean test = false;
+		boolean test = true;
 		String devEmail = (test)? "jbetzig@admiglobal.com":"kmowers@admiglobal.com";
 
 		List<ImportIssue> issues = new ArrayList<>();
@@ -52,8 +62,11 @@ public class EmailService {
 
 		String message = "Your order has been received and will be uploaded to DOW within 72 hours of your desired order upload date. " +
 				"You can check its status on the Motorcraft Order Site under the 'Orders' tab. " +
-				"Please note, orders will not be uploaded the same day they are submitted. " +
-				"If there were any issues with any of your order forms, they will be listed below.";
+				"Please note, orders will not be uploaded the same day they are submitted. ";
+		if(issues.size() > 0){
+			message += "If there were issues with any of your order forms, they will be listed below.";
+		}
+
 
 		String issuesMessage = "**Note: " +
 				"Be sure only to re-upload those orders that contain errors and require re-submission. " +
@@ -79,12 +92,12 @@ public class EmailService {
 
 
 	public void sendMotorcraftCancellationEmail(String orderNumber) throws MessagingException {
-//		String devEmail = "jbetzig@admiglobal.com";
-		String devEmail = "kmowers@admiglobal.com";
+		boolean test = true;
+		String devEmail = (test) ? "jbetzig@admiglobal.com" : "kmowers@admiglobal.com";
 
 		MotorcraftOrderSet order = new MotorcraftOrderSet(mcOrdersRepo.findByOrderNumber(orderNumber),
 														  mcOrdersContentRepo.findAllByOrderNumber(orderNumber),
-														  null); //issues always null because these are associated with upload isues, not cancellation issues
+														  null); //issues always null because these are associated with upload issues, not cancellation issues
 
 		if (order.getOrder().getEmail() == null || order.getOrder().getEmail().equals("")) {
 			throw new MessagingException("Unable to deliver cancellation confirmation email for Motorcraft order: the email field for order number " + orderNumber + " is empty in database table MC_ORDERS.");
