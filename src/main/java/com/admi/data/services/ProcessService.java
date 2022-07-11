@@ -46,6 +46,9 @@ public class ProcessService {
 		System.out.println("Files Generated.");
 	}
 
+	/**
+	 * Creates a DOW Order spreadsheet for this order and saves it to the P drive.
+	 */
 	public void generateOneOrder(MotorcraftOrderSet order) {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet("Sheet1");

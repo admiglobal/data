@@ -1,6 +1,7 @@
 package com.admi.data.controllers;
 
 import com.admi.data.dto.ImportJob;
+import com.admi.data.dto.MotorcraftOrderSet;
 import com.admi.data.entities.*;
 import com.admi.data.enums.DmsProvider;
 import com.admi.data.exceptions.ApiNotSupportedException;
@@ -80,6 +81,9 @@ public class ImportsController {
 
 	@Autowired
 	AipInventoryService aipInventoryService;
+
+	@Autowired
+	EmailService emailService;
 
 	@Autowired
 	ZigRepository zigRepo;
@@ -240,6 +244,9 @@ public class ImportsController {
 		return "File received.";
 	}
 
+	/**
+	 * The Motorcraft site calls this method when an order is uploaded via excel document
+	 */
 	@PostMapping("motorcraft")
 	@ResponseBody
 	public String submitMotorcraftOrder(@RequestBody ImportJob call, Model model)
@@ -260,10 +267,23 @@ public class ImportsController {
 
 	}
 
+	/**
+	 * The Motorcraft site calls this method when an order is generated via the online cart (no excel upload)
+	 */
 	@PostMapping("generateMotorcraftOrder")
 	@ResponseBody
 	public String generateMotorcraftOrder(@RequestBody Long orderNumber, Model model) {
-		processService.generateOneOrder(processService.getOrderSet(orderNumber));
+		MotorcraftOrderSet orderSet = processService.getOrderSet(orderNumber);
+
+		processService.generateOneOrder(orderSet);
+
+		try {
+			emailService.sendMotorcraftOrderEmail(orderNumber);
+		} catch (MessagingException e) {
+			System.out.println(e.getMessage());
+			e.printStackTrace();
+		}
+
 		return "Generating Motorcraft Order";
 	}
 
