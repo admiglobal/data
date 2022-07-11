@@ -37,13 +37,13 @@ public class EmailService {
 		MotorcraftOrderSet order = new MotorcraftOrderSet(
 											mcOrdersRepo.findByOrderNumber(orderNumber.toString()),
 											mcOrdersContentRepo.findAllByOrderNumber(orderNumber.toString()),
-											new ArrayList<>());
+											new ArrayList<>()); //issues list is empty: issues are already filtered out on wwwroot side
 
 		sendMotorcraftOrderEmail(order.getOrder().getEmail(), List.of(order), order.getOrder().getPaCode());
 	}
 
 	public void sendMotorcraftOrderEmail(String userEmail, List<MotorcraftOrderSet> orders, String paCode) throws MessagingException {
-		boolean test = false;
+		boolean test = true;
 		String devEmail = (test)? "jbetzig@admiglobal.com":"kmowers@admiglobal.com";
 
 		List<ImportIssue> issues = new ArrayList<>();
@@ -92,12 +92,12 @@ public class EmailService {
 
 
 	public void sendMotorcraftCancellationEmail(String orderNumber) throws MessagingException {
-//		String devEmail = "jbetzig@admiglobal.com";
-		String devEmail = "kmowers@admiglobal.com";
+		boolean test = true;
+		String devEmail = (test) ? "jbetzig@admiglobal.com" : "kmowers@admiglobal.com";
 
 		MotorcraftOrderSet order = new MotorcraftOrderSet(mcOrdersRepo.findByOrderNumber(orderNumber),
 														  mcOrdersContentRepo.findAllByOrderNumber(orderNumber),
-														  null); //issues always null because these are associated with upload isues, not cancellation issues
+														  null); //issues always null because these are associated with upload issues, not cancellation issues
 
 		if (order.getOrder().getEmail() == null || order.getOrder().getEmail().equals("")) {
 			throw new MessagingException("Unable to deliver cancellation confirmation email for Motorcraft order: the email field for order number " + orderNumber + " is empty in database table MC_ORDERS.");
