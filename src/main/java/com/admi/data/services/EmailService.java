@@ -21,6 +21,8 @@ import java.util.List;
 @Service
 public class EmailService {
 
+	private boolean test = false;
+
 	@Autowired
 	McOrdersRepository mcOrdersRepo;
 
@@ -43,7 +45,6 @@ public class EmailService {
 	}
 
 	public void sendMotorcraftOrderEmail(String userEmail, List<MotorcraftOrderSet> orders, String paCode) throws MessagingException {
-		boolean test = true;
 		String devEmail = (test)? "jbetzig@admiglobal.com":"kmowers@admiglobal.com";
 
 		List<ImportIssue> issues = new ArrayList<>();
@@ -92,7 +93,6 @@ public class EmailService {
 
 
 	public void sendMotorcraftCancellationEmail(String orderNumber) throws MessagingException {
-		boolean test = true;
 		String devEmail = (test) ? "jbetzig@admiglobal.com" : "kmowers@admiglobal.com";
 
 		MotorcraftOrderSet order = new MotorcraftOrderSet(mcOrdersRepo.findByOrderNumber(orderNumber),
