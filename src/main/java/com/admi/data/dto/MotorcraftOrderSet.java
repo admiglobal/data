@@ -47,15 +47,23 @@ public class MotorcraftOrderSet {
 		for(McOrdersContentEntity part: orderContent){
 			total += part.getPrice() * part.getQty();
 		}
-		return "$" + String.format("%.2f", total); //currency format
+
+		if(total > 0)
+			return "$" + String.format("%.2f", total); //currency format
+
+		return "$ - ";
 	}
 
-	public Long getTotalOrderQuantity(){
+	public String getTotalOrderQuantity(){
 		Long count = 0L;
 		for(McOrdersContentEntity part: orderContent){
 			count += part.getQty();
 		}
-		return count;
+
+		if(count > 0)
+			return count.toString();
+
+		return "-";
 	}
 
 	public McOrdersEntity getOrder() {
