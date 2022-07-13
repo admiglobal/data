@@ -71,4 +71,15 @@ public interface DealerMasterRepository extends JpaRepository<DealerMasterEntity
 			"and PA_CODE <> :paCode",
 			nativeQuery = true)
 	List<DealerMasterEntity> findSameSalesCodeDealers(String paCode);
+
+	@Query(value = "select dp.EMAIL_ADDRESS \n" +
+			"from dealer_master dm \n" +
+			"inner join dlr_personnel dp \n" +
+			"	on dm.DEALER_ID = dp.DEALER_ID \n" +
+			"where dm.PA_CODE = :paCode \n" +
+			"	and dp.DLR_NAME_TYPE_ID = 76 \n" + // 76 indicates Aftermarket Sales Manager
+			"	and dm.TERMINATION_DATE is null \n" +
+			"	and (dm.DEALERSHIP_COUNTRY is null or dm.DEALERSHIP_COUNTRY = 'USA') \n" +
+			"	and ROWNUM = 1", nativeQuery = true)
+	String findAsmEmailAddress(String paCode);
 }

@@ -4,6 +4,7 @@ import com.admi.data.dto.ImportIssue;
 import com.admi.data.dto.MotorcraftOrder;
 import com.admi.data.dto.MotorcraftOrderSet;
 import com.admi.data.entities.McOrdersEntity;
+import com.admi.data.repositories.DealerMasterRepository;
 import com.admi.data.repositories.McOrdersContentRepository;
 import com.admi.data.repositories.McOrdersRepository;
 import com.admi.data.utilities.EmailUtility;
@@ -30,6 +31,9 @@ public class EmailService {
 	McOrdersContentRepository mcOrdersContentRepo;
 
 	@Autowired
+	DealerMasterRepository dealerMasterRepo;
+
+	@Autowired
 	private EmailUtility emailUtility;
 
 	@Autowired
@@ -54,10 +58,10 @@ public class EmailService {
 			userEmail = devEmail;
 		}
 
-		String recipientEmail = userEmail;
-
+		String to = userEmail;
 		String from = "Motorcraft@admiglobal.com";
-		String cc = (test)? devEmail: "Motorcraft@admiglobal.com";
+		String[] cc = (test)? new String[]{devEmail}
+							: emailArray(new String[]{"Motorcraft@admiglobal.com", dealerMasterRepo.findAsmEmailAddress(paCode)});
 		String[] bcc = {devEmail};
 		String subject = "Motorcraft Order Status - " + paCode;
 
@@ -83,7 +87,7 @@ public class EmailService {
 		String html = templateEngine.process("email/importMessage", context);
 
 		try {
-			emailUtility.sendMimeMessage(recipientEmail, from, cc, bcc, subject, html);
+			emailUtility.sendMimeMessage(to, from, cc, bcc, subject, html);
 		} catch (MailSendException e) {
 
 			emailUtility.sendMimeMessage(devEmail, from, bcc,"Order Failed to Send - " + subject, html);
@@ -156,6 +160,24 @@ public class EmailService {
 			emailUtility.sendMimeMessage(errorEmail, from, bcc,"AIP Upload Verification Failed to Send - " + subject, html);
 			throw e;
 		}
+	}
+
+	/**
+	 * Returns an array of Strings appropriate for our EmailUtility, which cannot accept null or empty String email addresses.
+	 * This is used, for example, for our "String[] cc" parameter
+	 * @param emailList An array of our desired email addresses, which may contain null values or empty Strings
+	 * @return The same list of email addresses, but without null values or empty Strings
+	 */
+	public String[] emailArray(String[] emailList){
+		List<String> emailArray = new ArrayList<>();
+
+		for (String email : emailList) {
+			if(email != null && !email.equals("")){
+				emailArray.add(email);
+			}
+		}
+
+		return emailArray.toArray(new String[]{});
 	}
 
 }
