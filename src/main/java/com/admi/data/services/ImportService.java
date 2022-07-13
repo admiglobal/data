@@ -11,6 +11,7 @@ import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.tomcat.jni.Local;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Async;
@@ -200,24 +201,24 @@ public class ImportService {
 					"Please re-upload this sheet with a valid order date." )
 			);
 			skipOrder = true;
-		} else if (LocalDate.now().isAfter(orderDateCell
-												.getDateCellValue()
-												.toInstant()
-												.atZone(ZoneId.systemDefault())
-												.toLocalDate())) {
-			issues.add(new ImportIssue(
-					"Order Date Passed",
-					"The order date provided is in the past.",
-					sheet.getSheetName(),
-					"Please re-upload this sheet with an order date that is today or after.")
-			);
-			skipOrder = true;
 		} else {
 			orderDate = orderDateCell.getDateCellValue()
 					.toInstant()
 					.atZone(ZoneId.systemDefault())
 					.toLocalDate();
+
+			//must be a date in the future
+			if(!orderDate.isAfter(LocalDate.now())){
+				issues.add(new ImportIssue(
+						"Order Date Invalid",
+						"Order date cannot be today or a date in the past.",
+						sheet.getSheetName(),
+						"Please re-upload this sheet with an order date that is after today's date.")
+				);
+				skipOrder = true;
+			}
 		}
+
 
 		order.setOrderNumber(orderNumber);
 		order.setPaCode(paCode);
