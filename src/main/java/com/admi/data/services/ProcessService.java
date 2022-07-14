@@ -53,27 +53,24 @@ public class ProcessService {
 		Workbook workbook = new XSSFWorkbook();
 		Sheet sheet = workbook.createSheet("Sheet1");
 
-		CreationHelper helper = workbook.getCreationHelper();
-		Row firstRow = getHeaderRow(sheet.createRow(0));
+		workbook.getCreationHelper();
+		createDowHeaderRow(sheet.createRow(0));
 
 		int i = 1;
 
 		for (DowOrderRow part : order.getOrderContentAsDowOrder()) {
-
-//			System.out.println(part.toString());
-
 			Row row = sheet.createRow(i);
 			Cell paCodeCell = row.createCell(0);
 			Cell orderTypeCell = row.createCell(1);
 			Cell partNumberCell = row.createCell(2);
-			Cell termsCodeCell = row.createCell(3);
-			Cell quantityCell = row.createCell(4);
-			Cell poNumberCell = row.createCell(5);
+//			Cell termsCodeCell = row.createCell(3);
+			Cell quantityCell = row.createCell(3);
+			Cell poNumberCell = row.createCell(4);
 
 			paCodeCell.setCellValue(part.getPaCode());
 			orderTypeCell.setCellValue(part.getOrderType());
 			partNumberCell.setCellValue(part.getPartNumber());
-			termsCodeCell.setCellValue(part.getTermsCode());
+//			termsCodeCell.setCellValue(part.getTermsCode());
 			quantityCell.setCellValue(part.getQuantity());
 			poNumberCell.setCellValue(part.getPoNumber());
 
@@ -193,15 +190,19 @@ public class ProcessService {
 		generateDowOrders(getAllOrdersAfterDate(date));
 	}
 
-	private Row getHeaderRow(Row row) {
+	/**
+	 * Adds the following fields, in this order, to the given row:
+	 * P&A CODE, ORDER TYPE, PART NUMBER, QUANTITY, PO NUMBER
+	 * @param row
+	 */
+	private void createDowHeaderRow(Row row) {
 		row.createCell(0).setCellValue("P&A CODE");
 		row.createCell(1).setCellValue("ORDER TYPE");
 		row.createCell(2).setCellValue("PART NUMBER");
-		row.createCell(3).setCellValue("TERMS CODE");
-		row.createCell(4).setCellValue("QUANTITY");
-		row.createCell(5).setCellValue("PO NUMBER");
+//		row.createCell(3).setCellValue("TERMS CODE");
+		row.createCell(3).setCellValue("QUANTITY");
+		row.createCell(4).setCellValue("PO NUMBER");
 
-		return row;
 	}
 
 }
