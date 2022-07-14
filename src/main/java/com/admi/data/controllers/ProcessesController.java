@@ -196,15 +196,18 @@ public class ProcessesController {
 		LocalDate date = LocalDate.parse(dateString);
 
 		cpcService.runCpcDealers(date);
+		long cpcTime = System.currentTimeMillis();
+
 		fordDealerKpiService.runAllFordDealers(date);
+		long dpocTime = System.currentTimeMillis();
+
 		opcKpiService.runOpcProcess(date);
-
 		long endTime = System.currentTimeMillis();
-		Long l = endTime-startTime;
-		double completionTime = (l.doubleValue())/1000;
 
-		return "Ran UDB Data for Ford programs. " +
-				"Time to complete: " + completionTime + " seconds.";
+		return "Ran UDB Data for Ford programs. Total time to complete: " + processService.timestamp(endTime-startTime) +
+				"\n\tCPC: " + processService.timestamp(cpcTime-startTime) +
+				"\n\tDPOC: " + processService.timestamp(dpocTime-cpcTime) +
+				"\n\tOPC: " + processService.timestamp(endTime-dpocTime);
 	}
 
 	@ResponseBody
