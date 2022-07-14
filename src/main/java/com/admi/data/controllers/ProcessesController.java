@@ -191,20 +191,15 @@ public class ProcessesController {
 	@ResponseBody
 	@GetMapping("/ford/{dateString}")
 	public String processUDBForAllFordPrograms(@PathVariable("dateString") String dateString) {
-		long startTime = System.currentTimeMillis();
-
 		LocalDate date = LocalDate.parse(dateString);
+		return runUDBData(date);
+	}
 
-		cpcService.runCpcDealers(date);
-		fordDealerKpiService.runAllFordDealers(date);
-		opcKpiService.runOpcProcess(date);
-
-		long endTime = System.currentTimeMillis();
-		Long l = endTime-startTime;
-		double completionTime = (l.doubleValue())/1000;
-
-		return "Ran UDB Data for Ford programs. " +
-				"Time to complete: " + completionTime + " seconds.";
+	@ResponseBody
+	@GetMapping("/ford")
+	public String processUDBForAllFordPrograms() {
+		LocalDate date = LocalDate.now();
+		return runUDBData(date);
 	}
 
 	@ResponseBody
@@ -267,6 +262,21 @@ public class ProcessesController {
 	public String runTipDealer() {
 		tipService.runSingleTipDealerTest();
 		return "TIP process has completed successfully.";
+	}
+
+	private String runUDBData(LocalDate date) {
+		long startTime = System.currentTimeMillis();
+
+		cpcService.runCpcDealers(date);
+		fordDealerKpiService.runAllFordDealers(date);
+		opcKpiService.runOpcProcess(date);
+
+		long endTime = System.currentTimeMillis();
+		Long l = endTime-startTime;
+		double completionTime = (l.doubleValue())/1000;
+
+		return "Ran UDB Data for Ford programs. " +
+				"Time to complete: " + completionTime + " seconds.";
 	}
 
 }
