@@ -71,5 +71,26 @@ public class DateService {
 				.toFormatter();
 	}
 
+	/**
+	 * @param monthAbbreviation A month name like "Jan." or "DEC"
+	 * @return The integer value of this month (Jan=1, Feb=2, etc).
+	 */
+	public static int getMonthFromAbbreviation(String monthAbbreviation){
+		switch(monthAbbreviation.toUpperCase().replace(".","")){
+			case "JAN": return 1;
+			case "FEB": return 2;
+			case "MAR": return 3;
+			case "APR": return 4;
+			case "MAY": return 5;
+			case "JUN": return 6;
+			case "JUL": return 7;
+			case "AUG": return 8;
+			case "SEP": return 9;
+			case "OCT": return 10;
+			case "NOV": return 11;
+			case "DEC": return 12;
+			default: throw new IllegalArgumentException("Could not parse " + monthAbbreviation + " into a month name.");
+		}
+	}
 
 }

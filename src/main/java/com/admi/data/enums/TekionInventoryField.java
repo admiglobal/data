@@ -2,6 +2,7 @@ package com.admi.data.enums;
 
 import com.admi.data.dto.TekionDto;
 import com.admi.data.dto.CellDefinition;
+import com.admi.data.services.DateService;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellType;
 
@@ -283,15 +284,73 @@ public enum TekionInventoryField {
     }
 
     /**
-     * Accounts for more than one possible column name
+     * Accounts for more than one possible column name.
+     * Since Tekion lists the last 14 months of data in format "Dec'21", we use today's date to see if the given
+     * month corresponds to a month in the last 12 months. If not, returns null. <br>
+     *  - For example: if today is 2022-07-01, passing in "Nov'21" will return the enum constant NOV. <br>
+     *  - If today is 2022-07-01, passing in "Jun'21" will return null.
      */
     public static TekionInventoryField findByColumnName(String columnName) {
+        //Filter out months (format like "mmm'yy")
+        if(columnName.matches("\\w\\w\\w'\\d\\d")) { return findLastTwelveMonthsByColumnName(columnName); }
+
         for (TekionInventoryField field : values()) {
             if (Arrays.asList(field.fieldNames).contains(columnName)){
                 return field;
             }
         }
         return null;
+    }
+
+    /**
+     * Given a String of the date format "May'22" (for May 2022), return the corresponding month's enum constant
+     * if the given month is within the last 12 months from today. Otherwise, return null.<br>
+     *  - For example: if today is 2022-07-01, passing in "Nov'21" will return the enum constant NOV. <br>
+     *  - If today is 2022-07-01, passing in "Jun'21" will return null.
+     * @param columnName A String of the date format "May'22" (for May 2022)
+     * @return The corresponding month's enum constant if the given month is within the last 12 months from today.
+     * Otherwise, null. Also null if unable to parse as a date.
+     */
+    private static TekionInventoryField findLastTwelveMonthsByColumnName(String columnName){
+        int thisMonth = LocalDate.now().getMonthValue();
+        int thisYear = LocalDate.now().getYear();
+
+        int thatMonth;
+        int thatYear;
+
+        try{
+            thatMonth = DateService.getMonthFromAbbreviation(columnName.split("'")[0]);
+            thatYear = Integer.parseInt(columnName.split("'")[1]);
+        } catch (IllegalArgumentException iae){
+            System.out.println("Unable to parse " + columnName + " as a Tekion date month field of the format \"DEC'21\".");
+            return null;
+        }
+
+        if(thisYear == thatYear && thisMonth >= thatMonth)
+            return TekionInventoryField.ofMonthNumber(thatMonth);
+
+        if(thatYear == (thisYear-1) && thisMonth < thatMonth)
+            return TekionInventoryField.ofMonthNumber(thatMonth);
+
+        return null;
+    }
+
+    public static TekionInventoryField ofMonthNumber(int monthNumber){
+        switch(monthNumber) {
+            case 1:   return TekionInventoryField.valueOf("JAN");
+            case 2:   return TekionInventoryField.valueOf("FEB");
+            case 3:   return TekionInventoryField.valueOf("MAR");
+            case 4:   return TekionInventoryField.valueOf("APR");
+            case 5:   return TekionInventoryField.valueOf("MAY");
+            case 6:   return TekionInventoryField.valueOf("JUN");
+            case 7:   return TekionInventoryField.valueOf("JUL");
+            case 8:   return TekionInventoryField.valueOf("AUG");
+            case 9:   return TekionInventoryField.valueOf("SEP");
+            case 10:  return TekionInventoryField.valueOf("OCT");
+            case 11:  return TekionInventoryField.valueOf("NOV");
+            case 12:  return TekionInventoryField.valueOf("DEC");
+            default: return null;
+        }
     }
 
     public String[] getFieldNames() {
