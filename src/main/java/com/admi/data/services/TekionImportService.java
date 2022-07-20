@@ -89,6 +89,10 @@ public class TekionImportService {
             Double d = SpreadsheetService.translateCellIntoDouble(cell, null);
             value = (d == null) ? null : (V) Long.valueOf(Math.round(d));
 
+        } else if (setterClass == Integer.class) {
+            Double d = SpreadsheetService.translateCellIntoDouble(cell, null);
+            value = (d == null) ? null : (V) Integer.valueOf(d.intValue());
+
         } else if (setterClass == Double.class) {
             value = (V) SpreadsheetService.translateCellIntoDouble(cell, null);
 
