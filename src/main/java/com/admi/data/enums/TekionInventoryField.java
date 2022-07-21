@@ -291,6 +291,8 @@ public enum TekionInventoryField {
      *  - If today is 2022-07-01, passing in "Jun'21" will return null.
      */
     public static TekionInventoryField findByColumnName(String columnName) {
+        if(columnName == null) { return null; }
+
         //Filter out months (format like "mmm'yy")
         if(columnName.matches("\\w\\w\\w'\\d\\d")) { return findLastTwelveMonthsByColumnName(columnName); }
 
@@ -320,7 +322,7 @@ public enum TekionInventoryField {
 
         try{
             thatMonth = DateService.getMonthFromAbbreviation(columnName.split("'")[0]);
-            thatYear = Integer.parseInt(columnName.split("'")[1]);
+            thatYear = 2000 + Integer.parseInt(columnName.split("'")[1]);
         } catch (IllegalArgumentException iae){
             System.out.println("Unable to parse " + columnName + " as a Tekion date month field of the format \"DEC'21\".");
             return null;

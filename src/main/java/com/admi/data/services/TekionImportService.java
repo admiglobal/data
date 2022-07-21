@@ -23,9 +23,10 @@ public class TekionImportService {
     public List<AipInventoryEntity> importInventory(Sheet sheet, Long dealerId) throws NoSuchFieldException, IllegalAccessException {
         SpreadsheetHeaders<TekionInventoryField> headersObject = new SpreadsheetHeaders<>(sheet,
                 TekionInventoryField :: findByColumnName,
-                TekionInventoryField.values());
-        List<TekionInventoryField> headers = headersObject.getHeaderList();
-        int headerRowNum = headersObject.getHeaderRowNum();
+                TekionInventoryField.values(),
+                true);
+        List<TekionInventoryField> headers = headersObject.getMergedPrimaryAndSecondaryHeaderRow();
+        int headerRowNum = headersObject.getSecondaryHeaderRowNum();
 
         List<AipInventoryEntity> inventoryList = new ArrayList<>();
 
