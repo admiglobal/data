@@ -1,6 +1,7 @@
 package com.admi.data.dto;
 
 import com.admi.data.entities.AipInventoryEntity;
+import com.admi.data.services.DateService;
 import com.sun.istack.NotNull;
 
 import java.time.LocalDate;
@@ -12,8 +13,8 @@ public class RRDto {
 	private Long quantityOnHand;
 	private String description;
 	private String status;
-	private LocalDate lastSaleDate;
-	private LocalDate lastReceiptDate;
+	private Long lastSaleDate;
+	private Long lastReceiptDate;
 	private String bin;
 	private String source;
 	private String make;
@@ -28,7 +29,7 @@ public class RRDto {
 
 	public RRDto(){}
 
-	public RRDto(String partNo, Long costCents, Long quantityOnHand, String description, String status, LocalDate lastSaleDate, LocalDate lastReceiptDate, String bin, String source, String make, Boolean mfgControlled, Long min, Long max, Long bestStockingLevel, Long quantityPerRepair, Long history6, Long history12, Long history24) {
+	public RRDto(String partNo, Long costCents, Long quantityOnHand, String description, String status, Long lastSaleDate, Long lastReceiptDate, String bin, String source, String make, Boolean mfgControlled, Long min, Long max, Long bestStockingLevel, Long quantityPerRepair, Long history6, Long history12, Long history24) {
 		this.partNo = partNo;
 		this.costCents = costCents;
 		this.quantityOnHand = quantityOnHand;
@@ -60,8 +61,8 @@ public class RRDto {
 		inv.setDescription(this.description);
 		inv.setStatus(this.getDmsStatus());
 		inv.setAdmiStatus(this.getAdmiStatus());
-		inv.setLastSale(getDefaultDateIfNull(this.lastSaleDate));
-		inv.setLastReceipt(getDefaultDateIfNull(this.lastReceiptDate));
+		inv.setLastSale(getDefaultDateIfNull(DateService.parseLongAsDate(this.lastSaleDate)));
+		inv.setLastReceipt(getDefaultDateIfNull(DateService.parseLongAsDate(this.lastReceiptDate)));
 		inv.setBin(this.bin);
 		inv.setSource(this.source);
 
@@ -72,6 +73,8 @@ public class RRDto {
 
 		inv.setDataDate(date);
 		inv.setManufacturer(this.make);
+
+//		System.out.println("Part no: " + inv.getPartNo() + "; last sale date: " + inv.getLastSale() + "; last recpt date: " + inv.getLastReceipt());
 
 		return inv;
 	}
@@ -156,19 +159,19 @@ public class RRDto {
 		this.status = status;
 	}
 
-	public LocalDate getLastSaleDate() {
+	public Long getLastSaleDate() {
 		return lastSaleDate;
 	}
 
-	public void setLastSaleDate(LocalDate lastSaleDate) {
+	public void setLastSaleDate(Long lastSaleDate) {
 		this.lastSaleDate = lastSaleDate;
 	}
 
-	public LocalDate getLastReceiptDate() {
+	public Long getLastReceiptDate() {
 		return lastReceiptDate;
 	}
 
-	public void setLastReceiptDate(LocalDate lastReceiptDate) {
+	public void setLastReceiptDate(Long lastReceiptDate) {
 		this.lastReceiptDate = lastReceiptDate;
 	}
 

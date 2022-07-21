@@ -71,5 +71,29 @@ public class DateService {
 				.toFormatter();
 	}
 
+	/**
+	 * Parses a long of the format mddyy into a LocalDate. Assumes that the yy field
+	 * represents a date between the years 1990 and 2090.
+	 * If the argument is null, returns a null LocalDate.
+	 * @param longDate A Long number representing a date of the format mddyy,
+	 *                 for example "32717" represents March 27, 2017 and
+	 *                 "110321" is November 3, 2021.
+	 * @return this date as a LocalDate object
+	 */
+	public static LocalDate parseLongAsDate(Long longDate){
+		if(longDate == null) { return null; }
+
+		int truncYear = (int) (longDate % 100);
+		int day = (int) (longDate % 10000) / 100;
+		int month = (int) (longDate - truncYear - day) / 10000;
+
+		int year = 2000 + truncYear;
+		if(year > 2090) {
+			year -= 100; //reset to the 1990's
+		}
+
+		return LocalDate.of(year, month, day);
+	}
+
 
 }
