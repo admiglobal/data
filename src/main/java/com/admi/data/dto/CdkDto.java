@@ -65,7 +65,7 @@ public class CdkDto {
         inv.setQoo(this.quantityOnOrder == null ? null : Math.toIntExact(this.quantityOnOrder));
         inv.setTwelveMonthSales(this.getTwelveMonthSales());
         inv.setEntryDate(this.getEntry());
-        inv.setYtdMonthsWithSales(this.calculateYtdMonthsWithSales());
+        inv.setYtdMonthsWithSales(this.countLastTwelveMonthsWithSales());
 
         return inv;
     }
@@ -93,7 +93,7 @@ public class CdkDto {
      * Calculates the number of months in the past year that included sales for this part.
      * @return An integer in the range 0-12, inclusive
      */
-    private Integer calculateYtdMonthsWithSales(){
+    private Integer countLastTwelveMonthsWithSales(){
         Long[] monthsSales = {jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec};
 
         int count = 0;

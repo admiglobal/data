@@ -123,20 +123,13 @@ public class TekionImportService {
     public static String getAdmiStatus(String tekionStatus){
         String status = "N";
 
-        if(tekionStatus != null){
-            switch(tekionStatus){
-                case "AP":
-                case "MO":
-                    status = "S";
-                    break;
-                case "SP":
-                case "NS":
-                case "DEL":
-                    status = "N";
-                    break;
-            }
-        } else{
-            status = "S";
+        switch(tekionStatus){
+            case "Active":
+                status = "S";
+                break;
+            case "Non-Stock":
+                status = "N";
+                break;
         }
 
         return status;

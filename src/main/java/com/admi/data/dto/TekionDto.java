@@ -2,6 +2,7 @@ package com.admi.data.dto;
 
 import com.admi.data.entities.AipInventoryEntity;
 import com.admi.data.services.SpreadsheetService;
+import com.admi.data.services.TekionImportService;
 
 import java.time.LocalDate;
 
@@ -54,24 +55,24 @@ public class TekionDto {
 
         AipInventoryEntity inv = new AipInventoryEntity();
 
-//        inv.setDealerId(dealerId);
-//        inv.setPartNo(SpreadsheetService.getPartNumberDbFormat(partNo, this.hashCode()));
-//        inv.setCents(this.costCents == null ? 0 : Math.toIntExact(this.costCents));
-//        inv.setQoh(this.quantityOnHand == null ? null : Math.toIntExact(this.quantityOnHand));
-//        inv.setDescription(this.description);
-//        inv.setStatus(getModifiedSpecialStatus());
-//        inv.setLastSale(this.getLastSaleDate());
-//        inv.setLastReceipt(this.getLastReceiptDate());
-//        inv.setBin(this.bin);
-//        inv.setSource(this.source);
+        inv.setDealerId(dealerId);
+        inv.setPartNo(SpreadsheetService.getPartNumberDbFormat(partNumber, this.hashCode()));
+        inv.setCents(this.partCostDollars == null ? 0 : Double.valueOf(partCostDollars*100).intValue());
+        inv.setQoh(this.onHandQty);
+        inv.setDescription(this.partDescription);
+        inv.setStatus(this.stockingStatus);
+        inv.setLastSale(this.lastSaleDate);
+        inv.setLastReceipt(this.lastReceiptDate);
+        inv.setBin(this.bins);
+        inv.setSource(this.sourceCode.toString());
 //        //mfgControlled
-//        inv.setDataDate(date);
-//        inv.setAdmiStatus(CdkImportService.getAdmiStatus(this.getStatus()));
-//        //manufacturer
-//        inv.setQoo(this.quantityOnOrder == null ? null : Math.toIntExact(this.quantityOnOrder));
-//        inv.setTwelveMonthSales(this.getTwelveMonthSales());
-//        inv.setEntryDate(this.getEntry());
-//        inv.setYtdMonthsWithSales(this.calculateYtdMonthsWithSales());
+        inv.setDataDate(date);
+        inv.setAdmiStatus(TekionImportService.getAdmiStatus(this.stockingStatus));
+        inv.setManufacturer(this.manufacturer);
+        inv.setQoo(this.onOrderQty);
+        inv.setTwelveMonthSales(this.twelveMonthSaleQty);
+        inv.setEntryDate(this.createdDate);
+        inv.setYtdMonthsWithSales(this.countLastTwelveMonthsWithSales());
 
         return inv;
     }
@@ -117,6 +118,23 @@ public class TekionDto {
                 && lastTransactionTime == null
                 && lastSaleDate == null
                 && lastReceiptDate == null;
+    }
+
+    /**
+     * Calculates the number of months in the past year that included sales for this part.
+     * @return An integer in the range 0-12, inclusive
+     */
+    private Integer countLastTwelveMonthsWithSales(){
+        Integer[] monthsSales = {jan,feb,mar,apr,may,jun,jul,aug,sep,oct,nov,dec};
+
+        int count = 0;
+
+        for(Integer monthSales: monthsSales){
+            if(monthSales != null && monthSales > 0)
+                count++;
+        }
+
+        return count;
     }
 
     public String getPartNumber() {
