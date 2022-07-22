@@ -111,16 +111,18 @@ public class ImportService {
 	@Async("asyncMotorcraftExecutor")
 	public void runMotorcraftOrders(ImportJob job) throws IOException, InvalidFormatException, MessagingException {
 		List<MotorcraftOrderSet> orders = importMotorcraftOrders(job);
+		System.out.println("File Imported");
+
+		processService.generateDowOrders(orders);
 
 		try {
 			emailService.sendMotorcraftOrderEmail(job.getEmail(), orders, job.getPaCode());
+			System.out.println("Confirmation email sent to " + job.getEmail());
 		} catch (MessagingException e) {
 			System.out.println(e.getMessage());
 			e.printStackTrace();
 		}
 
-		processService.generateDowOrders(orders);
-		System.out.println("File Imported");
 	}
 
 	public List<MotorcraftOrderSet> importMotorcraftOrders(ImportJob job) throws IOException, InvalidFormatException {
