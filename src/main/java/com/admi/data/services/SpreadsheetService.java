@@ -46,6 +46,7 @@ public class SpreadsheetService {
 
     /**
      * Takes a Cell of NUMERIC or STRING CellType and returns its value as a Double.
+     * This includes dollar values formatted as "$5,873.56" or even " - ".
      * If the cell is blank or null, returns a null Double.
      * If the value of the cell is a String that can't be parsed into a Double, returns the fallback value.
      * @param cell the Cell we're reading from
@@ -61,7 +62,10 @@ public class SpreadsheetService {
             String value = cell.getStringCellValue();
             if(value == null || value.equals("")){ return null; }
             try{
-                return Double.parseDouble(cell.getStringCellValue());
+                return Double.parseDouble(value
+                        .replaceAll("\\$", "")
+                        .replaceAll(",", "")
+                        .trim() );
             } catch (NumberFormatException nfe){
                 //return fallbackValue;
             }
