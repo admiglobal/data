@@ -96,8 +96,12 @@ public class SpreadsheetHeaders<F extends Enum<?>> {
      * and since some files may contain unknown fields (which we'll return as null),
      * we consider to have found the header row once three known fields have been found in that row.
      * @param sheet The Sheet that we want to find the headers of
-     * @param findByColumnNameFunction The Function that accepts a String and returns an enum instance for this InventoryField, usually named findByColumnName() or of(). This method should return null if this field isn't recognized.
+     * @param findByColumnNameFunction The Function that accepts a String and returns an enum instance for this
+     *                                 InventoryField, usually named findByColumnName() or of(). This method should
+     *                                 return null if this field isn't recognized.
      * @param inventoryFieldValues The list of all enum values for this InventoryField class
+     * @param secondaryHeaderPresent This flag will tell the constructor to automatically look for a secondary header list
+     *                               in the row immediately following the primary header.
      * @throws IllegalArgumentException Thrown if the header row is missing or doesn't match our expected inventoryFieldValues
      */
     public SpreadsheetHeaders(Sheet sheet,
@@ -154,7 +158,6 @@ public class SpreadsheetHeaders<F extends Enum<?>> {
             Cell cell = row.getCell(i, Row.MissingCellPolicy.RETURN_BLANK_AS_NULL); //prevents skipping over blank cells
 
             String cellValue = SpreadsheetService.translateCellIntoString(cell);
-            System.out.println("Cell value: " + cellValue);
             F field = findByColumnName.apply(cellValue); //Returns the InventoryField with this String value
             headers.add(field);
         }

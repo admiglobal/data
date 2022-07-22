@@ -256,7 +256,42 @@ public enum TekionInventoryField {
                     Cell :: getNumericCellValue,
                     Integer.class,
                     TekionDto :: setDec,
-                    Integer.class))
+                    Integer.class)),
+    MANUAL_ORDER(new String[] {"Manual Order"},
+            new CellDefinition<>(
+                    CellType.STRING,
+                    Cell :: getStringCellValue,
+                    String.class,
+                    TekionDto :: setManualOrder,
+                    String.class)),
+    CREATED_DATE(new String[] {"Created Date"},
+            new CellDefinition<>(
+                    CellType.NUMERIC,
+                    Cell :: getNumericCellValue,
+                    LocalDate.class,
+                    TekionDto :: setCreatedDate,
+                    LocalDate.class)),
+    LAST_TRANSACTION_TIME(new String[] {"Last Transaction Time"},
+            new CellDefinition<>(
+                    CellType.NUMERIC,
+                    Cell :: getNumericCellValue,
+                    LocalDate.class,
+                    TekionDto :: setLastTransactionTime,
+                    LocalDate.class)),
+    LAST_SALE_DATE(new String[] {"Last Sale Date"},
+            new CellDefinition<>(
+                    CellType.NUMERIC,
+                    Cell :: getNumericCellValue,
+                    LocalDate.class,
+                    TekionDto :: setLastSaleDate,
+                    LocalDate.class)),
+    LAST_RECEIPT_DATE(new String[] {"Last Receipt Date"},
+            new CellDefinition<>(
+                    CellType.NUMERIC,
+                    Cell :: getNumericCellValue,
+                    LocalDate.class,
+                    TekionDto :: setLastReceiptDate,
+                    LocalDate.class))
     ;
 
     private final String[] fieldNames;
