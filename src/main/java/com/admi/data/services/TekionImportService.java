@@ -99,14 +99,12 @@ public class TekionImportService {
 
         } else if (setterClass == LocalDate.class) {
             LocalDate date;
-            try{
-                date = cell.getDateCellValue()
-                        .toInstant()
-                        .atZone(ZoneId.systemDefault())
-                        .toLocalDate();
-            } catch(IllegalStateException ise){ //the cell isn't formatted as a numeric date
-                //assume format like "04FEB22", "FEB22", or "-12345*19680-"--otherwise, null
-                date = SpreadsheetService.parseUglyDate(cell.getStringCellValue());
+
+            try{ //assume format like "March 3, 2022"
+                date = DateService.parseLongDate(SpreadsheetService.translateCellIntoString(cell));
+            } catch (IllegalArgumentException iae) {
+                date = null;
+                System.out.println("Unable to parse " + SpreadsheetService.translateCellIntoString(cell) + " as a LocalDate.");
             }
             value = (V) date;
 

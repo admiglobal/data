@@ -6,6 +6,7 @@ import java.text.DateFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.time.temporal.ChronoField;
@@ -90,6 +91,27 @@ public class DateService {
 			case "NOV": return 11;
 			case "DEC": return 12;
 			default: throw new IllegalArgumentException("Could not parse " + monthAbbreviation + " into a month name.");
+		}
+	}
+
+	/**
+	 * Parses a String date of the format "March 2, 2022" into a LocalDate object.
+	 * Throws an IllegalArgumentException if unable to parse.
+	 * @param longDate a String date of the format "March 2, 2022"
+	 * @throws IllegalArgumentException if not of the expected format
+	 */
+	public static LocalDate parseLongDate(String longDate) throws IllegalArgumentException {
+		String[] monthDayYear = longDate.replace(",","").split(" ");
+
+		try{
+			int month = Month.valueOf(monthDayYear[0].toUpperCase()).get(ChronoField.MONTH_OF_YEAR);
+			int day = Integer.parseInt(monthDayYear[1]);
+			int year = Integer.parseInt(monthDayYear[2]);
+
+			return LocalDate.of(year, month, day);
+
+		} catch (Exception e) {
+			throw new IllegalArgumentException("Unable to parse \'" + longDate + "\' as a LocalDate.");
 		}
 	}
 
