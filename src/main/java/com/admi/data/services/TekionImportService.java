@@ -99,13 +99,18 @@ public class TekionImportService {
 
         } else if (setterClass == LocalDate.class) {
             LocalDate date;
-
-            try{ //assume format like "March 3, 2022"
-                date = DateService.parseLongDate(SpreadsheetService.translateCellIntoString(cell));
-            } catch (IllegalArgumentException iae) {
+            String cellValue = SpreadsheetService.translateCellIntoString(cell);
+            if(cellValue.equals("-")){
                 date = null;
-                System.out.println("Unable to parse " + SpreadsheetService.translateCellIntoString(cell) + " as a LocalDate.");
+            } else {
+                try{ //assume format like "March 3, 2022"
+                    date = DateService.parseLongDate(cellValue);
+                } catch (IllegalArgumentException iae) {
+                    date = null;
+                    System.out.println("Unable to parse " + cellValue + " as a LocalDate.");
+                }
             }
+
             value = (V) date;
 
         } else {
