@@ -204,4 +204,22 @@ public class ProcessService {
 		return row;
 	}
 
+	/**
+	 * Given a certain number of milliseconds, returns a String-formatted time (h:mm:ss)
+	 * @param milliseconds A time in milliseconds
+	 * @return This amount of time formatted as a timestamp string (h:mm:ss)
+	 */
+	public String timestamp(long milliseconds){
+		int seconds = (int) (milliseconds / 1000) % 60 ;
+		int minutes = (int) ((milliseconds / (1000*60)) % 60);
+		int hours   = (int) ((milliseconds / (1000*60*60)) % 24);
+
+		String timestamp = hours + ":";
+		timestamp += (minutes < 10) ? ("0" + minutes) : minutes;
+		timestamp += ":";
+		timestamp += (seconds < 10) ? ("0" + seconds) : seconds;
+
+		return timestamp;
+	}
+
 }
