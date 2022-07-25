@@ -114,9 +114,9 @@ public class RRImportService {
 
 		if (cell.getCellType() == cellType) {
 			if (clazz == String.class) {
-				value = (V) cell.getStringCellValue();
+				value = (V) SpreadsheetService.translateCellIntoString(cell);
 			} else if (clazz == Long.class) {
-				Double d = cell.getNumericCellValue();
+				Double d = SpreadsheetService.translateCellIntoDouble(cell, null);
 				value = (V) Long.valueOf(Math.round(d));
 			} else if (clazz == Double.class) {
 //				We are making the assumption that Doubles are only used for the cost of a part.
@@ -129,7 +129,7 @@ public class RRImportService {
 						.toLocalDate();
 				value = (V) date;
 			} else {
-				System.out.println("Incorrect class for cell: " + cell.toString());
+				System.out.println("Incorrect class for cell: " + cell);
 			}
 			fieldDefinition.getSetter()
 					.accept(dto, value);
